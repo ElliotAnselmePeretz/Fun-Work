@@ -157,9 +157,9 @@ export first if you might want it back.
 - **Phase 3 — Enhancements:** done. Screenshot import via the Anthropic API, a
   level/milestone editor (Activity → Edit levels), and a Stats tab.
 
-Verified end to end in a browser except the drag gestures on the Organize
-screen and the image import itself — the first needs a real pointer or finger,
-the second needs your API key.
+Verified end to end in a browser, including real pointer drags on the Organize
+screen for both same-category reordering and cross-category moves. Image import
+itself remains unverified because it requires your API key.
 
 ## Tech
 
