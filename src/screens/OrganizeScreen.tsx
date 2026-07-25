@@ -34,6 +34,7 @@ import { ORDER_STEP } from '../lib/ordering'
 import { withAlpha } from '../lib/palette'
 import { navigate } from '../lib/router'
 import type { Id } from '../types'
+import { AvatarIcon } from '../components/AvatarIcon'
 
 export function OrganizeScreen() {
   const categories = useCategories()
@@ -135,7 +136,11 @@ export function OrganizeScreen() {
                   className="mb-2 flex items-center gap-2 rounded-2xl px-3 py-2"
                   style={{ backgroundColor: withAlpha(category.color, 0.12) }}
                 >
-                  <span aria-hidden>{category.emoji}</span>
+                  <AvatarIcon
+                    name={category.name}
+                    id={category.id}
+                    stored={category.emoji}
+                  />
                   <h2
                     className="flex-1 font-extrabold"
                     style={{ color: category.color }}
@@ -180,7 +185,11 @@ export function OrganizeScreen() {
                 borderLeftWidth: 6,
               }}
             >
-              <span aria-hidden>{draggingActivity.emoji}</span>
+              <AvatarIcon
+                name={draggingActivity.name}
+                id={draggingActivity.id}
+                stored={draggingActivity.emoji}
+              />
               <span className="text-sm font-extrabold">{draggingActivity.name}</span>
             </div>
           )}

@@ -45,7 +45,13 @@ export function LevelPath({ activity, progress, color }: LevelPathProps) {
   const arrival = useArrival(progress)
 
   useEffect(() => {
-    currentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const reduced =
+      typeof matchMedia === 'function' &&
+      matchMedia('(prefers-reduced-motion: reduce)').matches
+    currentRef.current?.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'center',
+    })
   }, [progress.currentLevelIndex])
 
   if (activity.levels.length === 0) {

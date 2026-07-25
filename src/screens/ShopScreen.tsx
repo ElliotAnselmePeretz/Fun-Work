@@ -159,8 +159,8 @@ export function ShopScreen() {
         <div className="gear-category-intro">
           <div>
             <p className="section-kicker">{filterDetails.eyebrow}</p>
-            <h2 className="text-xl font-black">{filterDetails.label}</h2>
-            <p className="mt-1 max-w-md text-xs leading-relaxed text-ink-soft">
+            <h2 className="text-world text-xl font-black">{filterDetails.label}</h2>
+            <p className="mt-1 max-w-md text-xs leading-relaxed text-white/60">
               {filterDetails.description}
             </p>
           </div>

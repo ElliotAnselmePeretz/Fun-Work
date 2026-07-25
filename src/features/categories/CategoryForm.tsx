@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { ColorPicker } from '../../components/ColorPicker'
-import { EmojiPicker } from '../../components/EmojiPicker'
+import { IconPicker } from '../../components/IconPicker'
 import { Modal } from '../../components/Modal'
 import { TextField } from '../../components/TextField'
-import { nextColor, nextEmoji } from '../../lib/palette'
+import { nextColor } from '../../lib/palette'
 import type { Category } from '../../types'
 import { createCategory, deleteCategory, updateCategory } from './categoryActions'
 
@@ -25,7 +25,9 @@ export function CategoryForm({
 }: CategoryFormProps) {
   const editing = category !== undefined
   const [name, setName] = useState(category?.name ?? '')
-  const [emoji, setEmoji] = useState(category?.emoji ?? nextEmoji(existingCount))
+  // Empty means "let the name choose", which is what the picker shows until
+  // the user pins something.
+  const [emoji, setEmoji] = useState(category?.emoji ?? '')
   const [color, setColor] = useState(category?.color ?? nextColor(existingCount))
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
@@ -60,7 +62,12 @@ export function CategoryForm({
             if (event.key === 'Enter') void submit()
           }}
         />
-        <EmojiPicker value={emoji} onChange={setEmoji} />
+        <IconPicker
+          value={emoji}
+          onChange={setEmoji}
+          name={name}
+          id={category?.id}
+        />
         <ColorPicker value={color} onChange={setColor} />
 
         <Button size="lg" color={color} onClick={submit} disabled={!name.trim()}>

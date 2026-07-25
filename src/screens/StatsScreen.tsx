@@ -15,6 +15,7 @@ import { multiplierLabel, nextCoinMultiplier } from '../lib/coins'
 import { dayKeyToDate } from '../lib/date'
 import { navigate } from '../lib/router'
 import { recentDayWindow } from '../lib/streak'
+import { AvatarIcon } from '../components/AvatarIcon'
 
 const WINDOW_DAYS = 30
 
@@ -136,8 +137,13 @@ export function StatsScreen() {
           {perCategory.map(({ category, coinTotal, total }) => (
             <div key={category.id}>
               <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
-                <span className="truncate font-extrabold">
-                  {category.emoji} {category.name}
+                <span className="flex min-w-0 items-center gap-1.5 truncate font-extrabold">
+                  <AvatarIcon
+                    name={category.name}
+                    id={category.id}
+                    stored={category.emoji}
+                  />
+                  {category.name}
                 </span>
                 <span className="shrink-0 text-xs font-bold text-ink-soft">
                   {coinTotal.toLocaleString()} coins ·{' '}

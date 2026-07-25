@@ -11,7 +11,7 @@ interface ScreenHeaderProps {
 
 export function ScreenHeader({ title, subtitle, back, action }: ScreenHeaderProps) {
   return (
-    <header className="mb-4 flex items-center gap-2">
+    <header className="screen-header mb-4 flex items-center gap-2">
       {back && (
         <button
           onClick={goBack}

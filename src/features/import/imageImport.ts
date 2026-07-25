@@ -26,10 +26,6 @@ const EXTRACTION_SCHEMA = {
         type: 'object',
         properties: {
           name: { type: 'string', description: 'The category name.' },
-          emoji: {
-            type: 'string',
-            description: 'A single emoji suiting the category. Empty if unsure.',
-          },
           activities: {
             type: 'array',
             description: 'The items listed under this category.',
@@ -37,17 +33,13 @@ const EXTRACTION_SCHEMA = {
               type: 'object',
               properties: {
                 name: { type: 'string', description: 'The activity name.' },
-                emoji: {
-                  type: 'string',
-                  description: 'A single emoji suiting the activity. Empty if unsure.',
-                },
               },
-              required: ['name', 'emoji'],
+              required: ['name'],
               additionalProperties: false,
             },
           },
         },
-        required: ['name', 'emoji', 'activities'],
+        required: ['name', 'activities'],
         additionalProperties: false,
       },
     },
@@ -63,7 +55,6 @@ Rules:
 - Headings, bold lines, or lines that group the items below them become categories.
 - If the image is a flat list with no headings, return one category named "Imported".
 - Keep the author's wording. Fix only obvious transcription slips.
-- Choose an emoji that suits each name; use an empty string if nothing fits.
 - Ignore page furniture: dates, page numbers, checkboxes, and struck-through items.`
 
 export interface ExtractedList {
@@ -162,11 +153,9 @@ function toParseResult(extracted: ExtractedList): ParseResult {
   const categories = extracted.categories
     .map((category) => ({
       name: category.name.trim(),
-      ...(category.emoji?.trim() ? { emoji: category.emoji.trim() } : {}),
       activities: category.activities
         .map((activity) => ({
           name: activity.name.trim(),
-          ...(activity.emoji?.trim() ? { emoji: activity.emoji.trim() } : {}),
         }))
         .filter((activity) => activity.name),
     }))

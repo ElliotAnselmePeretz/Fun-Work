@@ -52,7 +52,10 @@ export function LevelEditor({
       ...levels,
       ...Array.from({ length: nextCount - levels.length }, (_, offset) => {
         const index = levels.length + offset
-        return makeLevel(`Level ${index + 1}`, defaultSessionsForLevel(index))
+        return makeLevel(
+          `Level ${index + 1}`,
+          defaultSessionsForLevel(index, activity.difficulty),
+        )
       }),
     ])
   }

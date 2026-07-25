@@ -2,7 +2,7 @@ import { Card } from '../../components/Card'
 import { ProgressRing } from '../../components/ProgressRing'
 import { avatarSrcFor } from '../../lib/avatars'
 import { navigate } from '../../lib/router'
-import { levelFraction } from '../../lib/xp'
+import { activityDifficulty, difficultyDefinition, levelFraction } from '../../lib/xp'
 import type { Activity, ActivityProgress } from '../../types'
 import { LogButton } from './LogButton'
 
@@ -18,6 +18,7 @@ export function ActivityCard({ activity, progress, color }: ActivityCardProps) {
     ? 'All levels complete'
     : (activity.levels[progress.currentLevelIndex]?.name ??
       `Level ${progress.currentLevelIndex + 1}`)
+  const difficulty = difficultyDefinition(activityDifficulty(activity))
 
   return (
     <Card className="activity-card flex items-center gap-3 p-3">
@@ -28,7 +29,7 @@ export function ActivityCard({ activity, progress, color }: ActivityCardProps) {
       >
         <ProgressRing value={levelFraction(progress)} color={color} size={52}>
           <img
-            src={avatarSrcFor(activity.name, activity.id)}
+            src={avatarSrcFor(activity.name, activity.id, activity.emoji)}
             alt=""
             className="pixel-art h-7 w-7"
           />
@@ -43,6 +44,9 @@ export function ActivityCard({ activity, progress, color }: ActivityCardProps) {
                 {levelName} · {progress.sessionsIntoLevel}/{progress.sessionsForLevel}
               </>
             )}
+          </span>
+          <span className="mt-0.5 block text-[9px] font-black uppercase tracking-wider text-violet">
+            {difficulty.name} quest
           </span>
         </span>
       </button>

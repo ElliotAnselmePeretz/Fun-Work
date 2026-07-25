@@ -2,7 +2,7 @@ import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
 import { nextOrder, reindex } from '../../lib/ordering'
 import { makeDefaultLevels, makeLevelsFromNames } from '../../lib/xp'
-import type { Activity, Id, Level } from '../../types'
+import type { Activity, ActivityDifficulty, Id, Level } from '../../types'
 
 export interface ActivityDraft {
   categoryId: Id
@@ -15,6 +15,8 @@ export interface ActivityDraft {
   levelNames?: string[]
   /** Used when custom milestone names are omitted. */
   levelCount?: number
+  /** Sets the session pacing for levels generated during creation. */
+  difficulty?: ActivityDifficulty
 }
 
 export async function createActivity(draft: ActivityDraft): Promise<Id> {
@@ -29,11 +31,13 @@ export async function createActivity(draft: ActivityDraft): Promise<Id> {
     id: newId(),
     categoryId: draft.categoryId,
     name: draft.name.trim(),
-    emoji: draft.emoji || '⭐',
+    // Left empty when nothing was pinned, so the icon derives from the name.
+    emoji: draft.emoji ?? '',
+    difficulty: draft.difficulty ?? 'standard',
     levels:
       names.length > 0
-        ? makeLevelsFromNames(names)
-        : makeDefaultLevels(draft.levelCount),
+        ? makeLevelsFromNames(names, draft.difficulty)
+        : makeDefaultLevels(draft.levelCount, draft.difficulty),
     order: nextOrder(siblings),
     createdAt: Date.now(),
   }

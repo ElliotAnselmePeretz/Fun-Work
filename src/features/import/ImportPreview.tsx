@@ -2,6 +2,7 @@ import { Card } from '../../components/Card'
 import { nextColor, withAlpha } from '../../lib/palette'
 import type { Activity, Category } from '../../types'
 import { countActivities, type ParseResult } from './parseBulkText'
+import { AvatarIcon } from '../../components/AvatarIcon'
 
 interface ImportPreviewProps {
   result: ParseResult
@@ -82,7 +83,7 @@ export function ImportPreview({
               className="flex items-center gap-2 px-3 py-2"
               style={{ backgroundColor: withAlpha(color, 0.15) }}
             >
-              <span aria-hidden>{existing?.emoji ?? group.emoji ?? '📁'}</span>
+              <AvatarIcon name={group.name} stored={existing?.emoji} />
               <span className="font-extrabold" style={{ color }}>
                 {group.name}
               </span>
@@ -109,7 +110,7 @@ export function ImportPreview({
                         duplicate ? 'text-hare line-through' : ''
                       }`}
                     >
-                      <span aria-hidden>{activity.emoji ?? '⭐'}</span>
+                      <AvatarIcon name={activity.name} />
                       <span className="min-w-0 flex-1 truncate">{activity.name}</span>
                       {duplicate && (
                         <span className="shrink-0 text-[10px] font-extrabold uppercase no-underline">

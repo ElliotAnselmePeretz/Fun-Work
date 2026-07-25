@@ -10,18 +10,9 @@ export const CATEGORY_COLORS = [
   '#f77fbe', // pink
 ] as const
 
-export const CATEGORY_EMOJI = [
-  '💪', '📚', '🎹', '🏃', '🧠', '🎨', '🌱', '⚽',
-  '🧘', '💻', '🔬', '✍️', '🎯', '🍳', '🎸', '🗣️',
-]
-
 /** Deterministic pick so a new category never repeats the previous one. */
 export function nextColor(usedCount: number): string {
   return CATEGORY_COLORS[usedCount % CATEGORY_COLORS.length]
-}
-
-export function nextEmoji(usedCount: number): string {
-  return CATEGORY_EMOJI[usedCount % CATEGORY_EMOJI.length]
 }
 
 /**

@@ -1,4 +1,9 @@
-import { computeBossProgress } from '../../lib/bosses'
+import {
+  computeBossProgress,
+  type BossMoveKind,
+  type PlayerAction,
+  type StrikeTiming,
+} from '../../lib/bosses'
 import { isPurchaseLog } from '../../lib/coins'
 import { dayKey } from '../../lib/date'
 import { db } from '../../lib/db'
@@ -14,13 +19,31 @@ export interface AttackResult {
   lost: boolean
   defeated: boolean
   coinReward: number
+  /** What the boss did on this turn, and what the player answered with. */
+  move?: BossMoveKind
+  action: PlayerAction
+  timing?: StrikeTiming
+  bossHealed: number
 }
 
-export async function attackBoss(
-  bossId: Id,
-  weaponId: Id,
-  armourId: Id,
-): Promise<AttackResult> {
+export interface TurnInput {
+  bossId: Id
+  weaponId: Id
+  armourId: Id
+  action: PlayerAction
+  /** Ignored when guarding. */
+  timing?: StrikeTiming
+}
+
+/**
+ * Appends one combat turn to the ledger and reports how it resolved.
+ *
+ * The event stores only what the player chose; the outcome comes back out of
+ * `computeBossProgress`, so what the screen shows is exactly what a later
+ * replay will derive.
+ */
+export async function takeTurn(input: TurnInput): Promise<AttackResult> {
+  const { bossId, weaponId, armourId, action } = input
   return db.transaction('rw', db.logs, async () => {
     const ledger = await db.logs.toArray()
     const progress = computeBossProgress(ledger).find(
@@ -58,6 +81,8 @@ export async function attackBoss(
       bossId,
       weaponId,
       armourId,
+      action,
+      ...(action === 'strike' && input.timing ? { timing: input.timing } : undefined),
       at: now,
       day: dayKey(now),
     }
@@ -68,13 +93,17 @@ export async function attackBoss(
     )
     const turn = after?.lastTurn
     return {
-      playerDamage: turn?.playerDamage ?? weapon.damage ?? 0,
+      playerDamage: turn?.playerDamage ?? 0,
       bossDamage: turn?.bossDamage ?? 0,
       healing: turn?.healing ?? 0,
       critical: turn?.critical ?? false,
       lost: turn?.lost ?? false,
       defeated: after?.defeated ?? false,
       coinReward: after?.defeated ? progress.boss.coinReward : 0,
+      move: turn?.move,
+      action,
+      timing: turn?.timing,
+      bossHealed: turn?.bossHealed ?? 0,
     }
   })
 }

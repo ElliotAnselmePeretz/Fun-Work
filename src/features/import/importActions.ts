@@ -1,7 +1,7 @@
 import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
 import { nextOrder, ORDER_STEP } from '../../lib/ordering'
-import { nextColor, nextEmoji } from '../../lib/palette'
+import { nextColor } from '../../lib/palette'
 import { makeDefaultLevels } from '../../lib/xp'
 import type { Activity, Category } from '../../types'
 import type { ParsedCategory, ParseResult } from './parseBulkText'
@@ -52,7 +52,9 @@ export async function commitImport(result: ParseResult): Promise<ImportSummary> 
         category = {
           id: newId(),
           name: group.name,
-          emoji: group.emoji || nextEmoji(paletteIndex),
+          // Left empty so the icon derives from the name, like every other
+          // row. A leading emoji in the pasted text is only a name separator.
+          emoji: '',
           color: nextColor(paletteIndex),
           order: categoryOrder,
           createdAt: Date.now(),
@@ -83,7 +85,7 @@ export async function commitImport(result: ParseResult): Promise<ImportSummary> 
           id: newId(),
           categoryId: category.id,
           name: parsed.name,
-          emoji: parsed.emoji || '⭐',
+          emoji: '',
           levels: makeDefaultLevels(),
           order: activityOrder,
           createdAt: Date.now(),

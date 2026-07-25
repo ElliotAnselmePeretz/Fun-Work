@@ -1,11 +1,16 @@
 /**
  * Art avatars for categories and activities, replacing the old emoji.
  *
- * The choice is *derived* from the name and id, never stored, so no existing
- * row needs migrating and a rename picks a better icon straight away. Names
- * are matched against a keyword table first; anything unmatched falls back to
- * a stable hash so two activities rarely collide and one activity never
- * changes icon on its own.
+ * By default the choice is *derived* from the name and id, so no existing row
+ * needs migrating and a rename picks a better icon straight away. Names are
+ * matched against a keyword table first; anything unmatched falls back to a
+ * stable hash so two activities rarely collide and one activity never changes
+ * icon on its own.
+ *
+ * A row may also pin an icon explicitly, which is what the picker writes. That
+ * lives in the existing `emoji` field as an `avatar:` token rather than a new
+ * column, so the schema is untouched and old rows — which hold a real emoji
+ * character, or nothing — keep working exactly as before.
  */
 
 export const AVATARS = [
@@ -61,7 +66,28 @@ function hash(value: string): number {
   return h >>> 0
 }
 
-export function avatarFor(name: string, id: string): AvatarName {
+const AVATAR_PREFIX = 'avatar:'
+
+/** What the picker stores for an explicitly chosen icon. */
+export function avatarToken(avatar: AvatarName): string {
+  return `${AVATAR_PREFIX}${avatar}`
+}
+
+/**
+ * Reads a pinned icon out of a stored `emoji` value, or undefined when there
+ * isn't one — an empty field, or a legacy emoji character.
+ */
+export function avatarFromToken(stored?: string): AvatarName | undefined {
+  if (!stored?.startsWith(AVATAR_PREFIX)) return undefined
+  const name = stored.slice(AVATAR_PREFIX.length) as AvatarName
+  return AVATARS.includes(name) ? name : undefined
+}
+
+/** An explicit choice wins; otherwise the name and id decide. */
+export function avatarFor(name: string, id: string, stored?: string): AvatarName {
+  const pinned = avatarFromToken(stored)
+  if (pinned) return pinned
+
   const haystack = name.toLowerCase()
   for (const [pattern, avatar] of KEYWORDS) {
     if (pattern.test(haystack)) return avatar
@@ -74,6 +100,6 @@ export function avatarSrc(avatar: AvatarName): string {
 }
 
 /** Convenience for the common "I have a record, give me its art" case. */
-export function avatarSrcFor(name: string, id: string): string {
-  return avatarSrc(avatarFor(name, id))
+export function avatarSrcFor(name: string, id: string, stored?: string): string {
+  return avatarSrc(avatarFor(name, id, stored))
 }

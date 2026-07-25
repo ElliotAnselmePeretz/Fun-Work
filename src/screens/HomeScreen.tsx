@@ -157,9 +157,9 @@ export function HomeScreen() {
           <div className="mb-2 flex items-end justify-between">
             <div>
               <p className="section-kicker">Adventure log</p>
-              <h2 className="text-lg font-black">Recent wins</h2>
+              <h2 className="text-world text-lg font-black">Recent wins</h2>
             </div>
-            <span className="text-xs font-bold text-ink-soft">
+            <span className="text-xs font-bold text-white/65">
               {coins.earned.toLocaleString()} earned
             </span>
           </div>
@@ -174,6 +174,7 @@ export function HomeScreen() {
                       src={avatarSrcFor(
                         activity?.name ?? 'deleted',
                         activity?.id ?? log.activityId,
+                        activity?.emoji,
                       )}
                       alt=""
                       className="pixel-art h-6 w-6"

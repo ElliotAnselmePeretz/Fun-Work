@@ -42,9 +42,9 @@ devices. Use Settings → Export to move it.
 ## How it works
 
 - **Category** — a top-level grouping ("Physical", "Schoolwork") with a name,
-  emoji and color.
+  color and locally bundled pixel-art icon.
 - **Activity** — belongs to a category ("Running", "Math AA") and has a ladder
-  of progressive levels.
+  of progressive levels plus a challenge rating that sets its generated pace.
 - **Log** — one tap is one session. A session starts at 10 coins and earns more
   when a streak multiplier is active. Sessions, shop purchases, and combat turns
   are the only stored progress history; coin balances, levels, streaks, badges,
@@ -58,11 +58,13 @@ devices. Use Settings → Export to move it.
   critical-hit rhythms, healing magic with lower damage, or armour with guard
   and max-health bonuses. A purchase is appended to the same history rather
   than mutating a stored balance.
-- **Boss arena** — use an owned weapon-and-armour loadout against a four-boss
-  campaign. Bosses counterattack, the player can lose, and a defeat resets the
-  current attempt without taking coins. Every turn is a log event, so boss
-  health, player health, critical hits, defeats, victories, unlocks and rewards
-  are all replayed rather than stored as counters.
+- **Boss arena** — use an owned weapon-and-armour loadout against a ten-boss
+  campaign. Bosses telegraph rotating moves; timed strikes, guarding, healing
+  magic and deterministic critical hits create real choices. Bosses enrage in
+  long fights, the player can lose, and a defeat resets the current attempt
+  without taking coins. Every turn is a log event, so boss health, player
+  health, phases, defeats, victories, unlocks and rewards are replayed rather
+  than stored as counters.
 
 ### Coins and streak multipliers
 
@@ -77,19 +79,24 @@ every session on that day:
 
 ### Levels and the journey
 
-When creating an activity, choose any quick ladder size from 1–30 levels, or
-switch to named milestones and type one per line. Every milestone becomes one
-level. Activity → **Edit levels** lets you resize the path, rename or reorder
-levels, and change how many sessions each one needs at any time.
+When creating an activity, first choose Gentle, Standard, Hard or Legendary
+pacing. Then choose a Quick, Adventure, Campaign or Epic preset, tune the exact
+ladder size anywhere from 1–30 levels, or switch to named milestones and type
+one per line. Difficulty affects the session requirements generated for the
+new path; existing activity rows and log history remain compatible. Activity →
+**Edit levels** lets you resize the path, rename or reorder levels, and change
+how many sessions each one needs at any time.
 
 Levels are laid out as a winding route rather than a list. The route is split
-into named chapters — Green Hollow, Stoneford, Ember Ridge, Frostfall Pass,
+into named chapters — Green Hollow, Stoneford, Amber Ridge, Frostfall Pass,
 Sunspire Keep, Starfall Reach — and each is floored with its own terrain
 (grass, cobbles, lava, ice, sandstone, crystal), with the last stop of a
 chapter shown as a larger landmark. Chapters you have not reached are dimmed
-rather than drained, so the road ahead still reads as somewhere to go. Chapters are *derived* from how many levels an activity has (roughly
-four per chapter, up to six chapters), so editing levels re-chapters the route
-immediately; nothing about chapters is stored.
+rather than drained, so the road ahead still reads as somewhere to go. A
+three-level path maps exactly to Green Hollow, Stoneford and Amber Ridge. Longer
+paths open up to all six biomes. Chapters are *derived* from the level count, so
+editing levels re-chapters the route immediately; nothing about chapters is
+stored.
 
 The route is one ordered list for assistive tech: the decorative nodes are
 hidden and each stop announces its name, state and position ("Level 3 of 10").
@@ -210,15 +217,19 @@ export first if you might want it back.
 - **Phase 4 — Quest economy:** done. Adjustable 1–30-level paths, named
   milestone ladders, derived coins with streak multipliers, a reward shop, and
   a richer game-like home and navigation design.
-- **Phase 5 — Arena:** done. Functional weapon upgrades, four derived-health
+- **Phase 5 — Arena:** done. Functional weapon upgrades, derived-health
   boss encounters, battle rewards, clean icon-based navigation, animated
   banners and a lighter visual system with fewer decorative emoji.
 - **Phase 6 — Combat expansion:** done. CC0 boss and weapon artwork, armour
   loadouts, boss counterattacks, player health, deterministic critical hits,
   defeat/attempt resets, battle records, and offline-cached game art.
 - **Phase 7 — Armory rebuild:** done. Individually cropped equipment art,
-  nine visibly progressive weapons, four healing-magic options, six armour
+  thirteen visibly progressive weapons, seven healing-magic options, nine armour
   tiers, clearer combat tradeoffs, and mechanically replayed healing.
+- **Phase 8 — Adventure expansion:** done. A darker dungeon world, guided
+  difficulty-aware quest creation, adaptive six-biome journeys, a 29-piece
+  armory, ten bosses, telegraphed tactical turns, guarding, timing, phases,
+  enrage, battle logs and accessible reduced-motion behavior.
 
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import
@@ -232,10 +243,10 @@ terrain and activity icons all come from one tileset so the game reads as a
 matched set, and the gear ladder is drawn to match the price ladder: a starter
 knife looks like a starter knife, and endgame pieces look gilded.
 
-Categories and activities have no emoji field to fill in. Their icon is
-*derived* from the name — "Running" gets boots, "Math AA" a scroll — with a
-stable hash as the fallback, so nothing is stored, nothing needs migrating,
-and renaming an activity re-picks its icon immediately (`src/lib/avatars.ts`).
+Categories and activities use a pixel-art icon picker rather than decorative
+emoji. A choice is stored compatibly in the existing icon field; when no icon
+is pinned, "Running" gets boots and "Math AA" a scroll through deterministic
+name matching with a stable hash fallback (`src/lib/avatars.ts`).
 
 ## Tech
 

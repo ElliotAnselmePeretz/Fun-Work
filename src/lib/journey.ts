@@ -32,7 +32,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: 'ember-ridge',
-    name: 'Ember Ridge',
+    name: 'Amber Ridge',
     accent: '#ff6a00',
     terrain: terrain('ember-ridge'),
   },
@@ -56,12 +56,19 @@ export const CHAPTERS: Chapter[] = [
   },
 ]
 
-/** Roughly this many levels per chapter, until we run out of chapters. */
-const LEVELS_PER_CHAPTER = 4
-
 export function chapterCountFor(levelCount: number): number {
   if (levelCount <= 0) return 0
-  const wanted = Math.ceil(levelCount / LEVELS_PER_CHAPTER)
+  // Short journeys visit one distinct biome per level: a three-level path is
+  // exactly Green Hollow → Stoneford → Amber Ridge. Longer campaigns keep
+  // opening new scenery without making every single stop a chapter.
+  const wanted =
+    levelCount <= 3
+      ? levelCount
+      : levelCount <= 6
+        ? 4
+        : levelCount <= 10
+          ? 5
+          : CHAPTERS.length
   return Math.min(Math.max(wanted, 1), CHAPTERS.length)
 }
 

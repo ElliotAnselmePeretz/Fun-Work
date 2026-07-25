@@ -1,7 +1,7 @@
 import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
 import { nextOrder, reindex } from '../../lib/ordering'
-import { nextColor, nextEmoji } from '../../lib/palette'
+import { nextColor } from '../../lib/palette'
 import type { Category, Id } from '../../types'
 
 export interface CategoryDraft {
@@ -15,7 +15,8 @@ export async function createCategory(draft: CategoryDraft): Promise<Id> {
   const category: Category = {
     id: newId(),
     name: draft.name.trim(),
-    emoji: draft.emoji || nextEmoji(existing.length),
+    // Left empty when nothing was pinned, so the icon derives from the name.
+    emoji: draft.emoji ?? '',
     color: draft.color || nextColor(existing.length),
     order: nextOrder(existing),
     createdAt: Date.now(),

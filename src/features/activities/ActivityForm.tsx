@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Button } from '../../components/Button'
-import { EmojiPicker } from '../../components/EmojiPicker'
+import { GameIcon, type GameIconName } from '../../components/GameIcon'
+import { IconPicker } from '../../components/IconPicker'
 import { Modal } from '../../components/Modal'
 import { TextArea, TextField } from '../../components/TextField'
 import {
   DEFAULT_LEVEL_COUNT,
+  DIFFICULTIES,
   MAX_LEVEL_COUNT,
   MIN_LEVEL_COUNT,
 } from '../../lib/xp'
-import type { Activity, Category } from '../../types'
+import type { Activity, ActivityDifficulty, Category } from '../../types'
 import { createActivity, deleteActivity, updateActivity } from './activityActions'
 
 interface ActivityFormProps {
@@ -27,21 +29,31 @@ interface ActivityFormProps {
 export function ActivityForm({ open, onClose, category, activity }: ActivityFormProps) {
   const editing = activity !== undefined
   const [name, setName] = useState(activity?.name ?? '')
-  const [emoji, setEmoji] = useState(activity?.emoji ?? '⭐')
+  // Empty means "let the name choose", which is what the picker shows until
+  // the user pins something.
+  const [emoji, setEmoji] = useState(activity?.emoji ?? '')
   const [showMilestones, setShowMilestones] = useState(false)
   const [milestones, setMilestones] = useState('')
   const [levelCount, setLevelCount] = useState(DEFAULT_LEVEL_COUNT)
+  const [difficulty, setDifficulty] = useState<ActivityDifficulty>(
+    activity?.difficulty ?? 'standard',
+  )
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const milestoneNames = milestones
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
+    .slice(0, MAX_LEVEL_COUNT)
 
   const submit = async () => {
     if (!name.trim()) return
     if (editing) {
-      await updateActivity(activity.id, { name: name.trim(), emoji })
+      await updateActivity(activity.id, {
+        name: name.trim(),
+        emoji,
+        difficulty,
+      })
     } else {
       await createActivity({
         categoryId: category.id,
@@ -49,6 +61,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
         emoji,
         levelNames: showMilestones ? milestoneNames : undefined,
         levelCount: showMilestones ? undefined : levelCount,
+        difficulty,
       })
     }
     onClose()
@@ -77,10 +90,71 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
             if (event.key === 'Enter' && !showMilestones) void submit()
           }}
         />
-        <EmojiPicker value={emoji} onChange={setEmoji} extra={['⭐', '🏃', '📖', '🎹']} />
+        <IconPicker
+          value={emoji}
+          onChange={setEmoji}
+          name={name}
+          id={activity?.id}
+        />
+
+        <fieldset className="quest-builder">
+          <legend className="quest-builder-title">1. Choose the challenge</legend>
+          <div className="difficulty-grid">
+            {DIFFICULTIES.map((option, index) => {
+              const icons: GameIconName[] = ['sparkles', 'sword', 'swords', 'crown']
+              const selected = difficulty === option.id
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setDifficulty(option.id)}
+                  className={`difficulty-option ${
+                    selected ? 'difficulty-option-active' : ''
+                  }`}
+                >
+                  <GameIcon name={icons[index]} size={18} />
+                  <span>{option.name}</span>
+                  <small>{option.description}</small>
+                </button>
+              )
+            })}
+          </div>
+          {editing && (
+            <p className="mt-2 text-xs text-ink-soft">
+              This rating sets the pacing for levels you add later. Your current
+              level requirements stay exactly as edited.
+            </p>
+          )}
+        </fieldset>
 
         {!editing && (
-          <div className="rounded-3xl border-2 border-swan bg-polar/70 p-3">
+          <div className="quest-builder">
+            <p className="quest-builder-title">2. Shape the adventure</p>
+            {!showMilestones && (
+              <div className="journey-presets" aria-label="Journey length presets">
+                {[
+                  { label: 'Quick', count: 3, detail: '3 biomes' },
+                  { label: 'Adventure', count: 8, detail: '5 biomes' },
+                  { label: 'Campaign', count: 15, detail: '6 biomes' },
+                  { label: 'Epic', count: 24, detail: '6 biomes' },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    aria-pressed={levelCount === preset.count}
+                    onClick={() => setLevelCount(preset.count)}
+                    className={`journey-preset ${
+                      levelCount === preset.count ? 'journey-preset-active' : ''
+                    }`}
+                  >
+                    <strong>{preset.label}</strong>
+                    <span>{preset.count} levels · {preset.detail}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
@@ -90,11 +164,10 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
               />
               <span>
                 <span className="block text-sm font-extrabold">
-                  Build from named milestones
+                  Use named milestones
                 </span>
                 <span className="block text-xs text-ink-soft">
-                  Each milestone becomes a level. Leave this off to choose a quick
-                  ladder size instead.
+                  Add the exact moments that matter, one per level.
                 </span>
               </span>
             </label>
@@ -111,7 +184,9 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
                 <p className="mt-1.5 text-xs text-ink-soft">
                   {milestoneNames.length} milestone
                   {milestoneNames.length === 1 ? '' : 's'}
-                  {milestoneNames.length === 0 && ' — falls back to the default ladder'}
+                  {milestoneNames.length === 0 && ' — falls back to your selected ladder'}
+                  {milestones.split('\n').filter((line) => line.trim()).length >
+                    MAX_LEVEL_COUNT && ` · first ${MAX_LEVEL_COUNT} will be used`}
                 </p>
               </div>
             ) : (
@@ -151,6 +226,17 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
                 </div>
               </div>
             )}
+            <div className="quest-builder-summary">
+              <GameIcon name="castle" size={17} />
+              <span>
+                {showMilestones && milestoneNames.length > 0
+                  ? `${milestoneNames.length} named stops`
+                  : `${levelCount} levels`}
+                {' · '}
+                {DIFFICULTIES.find((option) => option.id === difficulty)?.name}{' '}
+                pacing
+              </span>
+            </div>
           </div>
         )}
 

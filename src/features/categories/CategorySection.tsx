@@ -28,7 +28,7 @@ export function CategorySection({
         style={{ backgroundColor: withAlpha(category.color, 0.12) }}
       >
         <img
-          src={avatarSrcFor(category.name, category.id)}
+          src={avatarSrcFor(category.name, category.id, category.emoji)}
           alt=""
           className="pixel-art h-6 w-6 shrink-0"
         />

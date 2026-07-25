@@ -21,12 +21,19 @@ export interface Level {
   sessionsRequired: number
 }
 
+export type ActivityDifficulty = 'gentle' | 'standard' | 'hard' | 'legendary'
+
 /** Something trackable inside a category, e.g. "Running" or "Math AA". */
 export interface Activity {
   id: Id
   categoryId: Id
   name: string
   emoji: string
+  /**
+   * Controls the pacing of auto-generated levels. Optional so existing
+   * IndexedDB rows and backups keep their original behaviour.
+   */
+  difficulty?: ActivityDifficulty
   levels: Level[]
   order: number
   createdAt: number
@@ -75,6 +82,15 @@ export interface BossHitLogEntry {
    * behavior so this combat upgrade cannot revoke an earned boss victory.
    */
   armourId?: Id
+  /**
+   * What the player chose to do. Missing on turns recorded before the tactical
+   * arena, which replay without boss moves or guarding — the same reason
+   * `armourId` is optional. Boss moves, damage and healing are all still
+   * derived; only the choice itself has to persist.
+   */
+  action?: 'strike' | 'guard'
+  /** How well the strike was timed. Only meaningful alongside `action`. */
+  timing?: 'weak' | 'good' | 'perfect'
   at: number
   day: string
 }

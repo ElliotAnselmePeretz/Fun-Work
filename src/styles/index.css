@@ -40,24 +40,24 @@ body,
 }
 
 /* ---------------------------------------------------------------------------
-   The world behind the app: a dawn sky over layered ridges. Built from
-   gradients and two inline SVGs so it costs no requests, scales to any screen,
-   and stays cheap enough to sit under a scrolling phone view.
+   The world behind the app: a torch-lit dungeon beyond the quest cards.
+   Gradients, a vignette and two SVG silhouettes keep it atmospheric without
+   adding another image request.
    ------------------------------------------------------------------------ */
 body {
   @apply text-ink font-display antialiased;
   background:
-    radial-gradient(90% 46% at 50% 0%, rgb(255 206 130 / 0.42), transparent 70%),
-    radial-gradient(70% 40% at 8% 8%, rgb(146 190 255 / 0.4), transparent 70%),
-    radial-gradient(60% 34% at 96% 14%, rgb(206 130 255 / 0.26), transparent 70%),
-    linear-gradient(180deg, #bcdcff 0%, #dceaff 22%, #eef1f7 48%, #f8f7fc 74%);
+    radial-gradient(38rem 24rem at 8% 8%, rgb(255 116 33 / 0.2), transparent 68%),
+    radial-gradient(34rem 22rem at 94% 18%, rgb(102 74 220 / 0.24), transparent 70%),
+    radial-gradient(60% 45% at 50% 105%, rgb(24 176 246 / 0.11), transparent 72%),
+    linear-gradient(180deg, #17142d 0%, #0e0d1f 46%, #080812 100%);
   background-attachment: fixed;
   /* Avoid iOS text auto-inflation and rubber-band scroll on the shell. */
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none;
 }
 
-/* Two ridge lines, the far one paler, to give the sky a horizon to sit on. */
+/* Two jagged dungeon walls create depth behind the scrolling app. */
 body::after {
   content: '';
   position: fixed;
@@ -74,8 +74,8 @@ body::after {
     100% 34%,
     100% 48%;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'%3E%3Cpath d='M0%20300%20L0%20290%20L110%20212%20L200%20248%20L320%20170%20L430%20220%20L540%20160%20L660%20208%20L780%20152%20L900%20202%20L1020%20166%20L1140%20214%20L1260%20178%20L1360%20236%20L1440%20292%20L1440%20300%20Z' fill='%23b9cde6' fill-opacity='.34'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'%3E%3Cpath d='M0%20300%20L0%20297%20L140%20234%20L260%20270%20L390%20202%20L520%20252%20L650%20188%20L780%20242%20L910%20196%20L1040%20248%20L1170%20210%20L1300%20256%20L1440%20296%20L1440%20300%20Z' fill='%23a7bcd8' fill-opacity='.26'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'%3E%3Cpath d='M0%20300%20L0%20290%20L110%20212%20L200%20248%20L320%20170%20L430%20220%20L540%20160%20L660%20208%20L780%20152%20L900%20202%20L1020%20166%20L1140%20214%20L1260%20178%20L1360%20236%20L1440%20292%20L1440%20300%20Z' fill='%231f1a3d' fill-opacity='.8'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'%3E%3Cpath d='M0%20300%20L0%20297%20L140%20234%20L260%20270%20L390%20202%20L520%20252%20L650%20188%20L780%20242%20L910%20196%20L1040%20248%20L1170%20210%20L1300%20256%20L1440%20296%20L1440%20300%20Z' fill='%23070610' fill-opacity='.96'/%3E%3C/svg%3E");
 }
 
 body::before {
@@ -85,15 +85,30 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(rgb(108 92 231 / 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(108 92 231 / 0.035) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(to bottom, black, transparent 72%);
+    radial-gradient(circle at center, transparent 34%, rgb(0 0 0 / 0.48) 100%),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    36px 36px,
+    36px 36px;
   animation: background-drift 24s linear infinite;
 }
 
 .app-shell {
   position: relative;
+}
+
+.screen-header {
+  color: #f8f6ff;
+  text-shadow: 0 2px 16px rgb(0 0 0 / 0.42);
+}
+.screen-header .text-ink-soft {
+  color: rgb(238 234 255 / 0.62);
+}
+.text-world {
+  color: #f8f6ff;
+  text-shadow: 0 2px 14px rgb(0 0 0 / 0.35);
 }
 
 .game-card {
@@ -525,6 +540,55 @@ body::before {
   @apply grid h-9 w-9 place-items-center rounded-xl border-2 border-swan bg-white text-xl font-black text-ink-soft transition-colors hover:border-sky hover:text-sky disabled:cursor-not-allowed disabled:opacity-30;
 }
 
+.quest-builder {
+  @apply rounded-3xl border border-swan bg-polar/95 p-3 text-ink;
+  box-shadow: inset 0 1px white;
+}
+.quest-builder-title {
+  @apply mb-2 block px-1 text-[10px] font-black uppercase tracking-[0.16em] text-violet;
+}
+.difficulty-grid {
+  @apply grid grid-cols-2 gap-2;
+}
+.difficulty-option {
+  @apply flex min-h-24 flex-col items-start rounded-2xl border-2 border-swan bg-white p-3 text-left text-ink-soft transition-all;
+}
+.difficulty-option > svg {
+  @apply mb-2 text-violet;
+}
+.difficulty-option > span {
+  @apply text-sm font-black text-ink;
+}
+.difficulty-option > small {
+  @apply mt-0.5 text-[10px] font-bold leading-tight;
+}
+.difficulty-option-active {
+  @apply -translate-y-0.5 border-violet bg-violet/8;
+  box-shadow: 0 7px 18px rgb(108 92 231 / 0.12);
+}
+.journey-presets {
+  @apply mb-3 grid grid-cols-2 gap-2;
+}
+.journey-preset {
+  @apply flex flex-col rounded-2xl border-2 border-swan bg-white px-3 py-2 text-left transition-all;
+}
+.journey-preset strong {
+  @apply text-xs font-black text-ink;
+}
+.journey-preset span {
+  @apply text-[9px] font-bold text-ink-soft;
+}
+.journey-preset-active {
+  @apply border-sky bg-sky/8;
+  box-shadow: 0 5px 14px rgb(28 176 246 / 0.1);
+}
+.quest-builder-summary {
+  @apply mt-3 flex items-center gap-2 rounded-2xl bg-night px-3 py-2.5 text-xs font-black text-white;
+}
+.quest-builder-summary svg {
+  @apply text-gold;
+}
+
 .boss-map {
   @apply relative flex items-center justify-between px-2;
 }
@@ -584,6 +648,135 @@ body::before {
 }
 .boss-stage-loss {
   animation: boss-loss 520ms ease-out;
+}
+.boss-phase {
+  @apply mb-2 flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.14em] text-white/60;
+}
+.boss-phase span {
+  @apply rounded-full border border-white/15 bg-white/8 px-2 py-1;
+}
+.boss-phase strong {
+  color: var(--boss-accent);
+}
+.boss-telegraph {
+  @apply mt-4 max-w-[72%] rounded-2xl border border-white/15 bg-black/25 p-3 text-white backdrop-blur-sm;
+}
+.boss-telegraph-head {
+  @apply flex items-center gap-2 text-xs;
+  color: var(--boss-accent);
+}
+.boss-telegraph-label {
+  @apply ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white/55;
+}
+.boss-telegraph-hint {
+  @apply mt-1 text-[10px] font-bold leading-snug text-white/60;
+}
+.boss-rotation {
+  @apply mt-2 flex gap-1;
+}
+.boss-rotation-step {
+  @apply grid h-6 w-6 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/35;
+}
+.boss-rotation-step-next {
+  color: var(--boss-accent);
+  border-color: color-mix(in srgb, var(--boss-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--boss-accent) 18%, transparent);
+}
+.boss-map-cleared-mark {
+  @apply absolute -bottom-1 -left-1 grid h-4 w-4 place-items-center rounded-full bg-grass text-white;
+}
+.turn-panel {
+  @apply rounded-3xl border border-white/10 bg-night/95 p-4 text-white;
+  box-shadow: 0 16px 34px rgb(0 0 0 / 0.22);
+}
+.turn-actions {
+  @apply mt-3 grid grid-cols-[minmax(0,1fr)_7rem] gap-2;
+}
+.guard-button {
+  @apply flex items-center justify-center gap-2 rounded-2xl border-2 border-sky/50 bg-sky/10 px-3 text-sm font-black uppercase tracking-wide text-sky transition-all active:translate-y-0.5 disabled:opacity-50;
+}
+.turn-hint {
+  @apply mt-2 text-center text-[10px] font-bold leading-snug text-white/45;
+}
+.swing-meter {
+  @apply rounded-2xl border border-white/10 bg-black/20 p-3;
+}
+.swing-track {
+  @apply relative h-8 overflow-hidden rounded-full border border-white/10 bg-black/35;
+}
+.swing-band {
+  @apply absolute inset-y-0 left-1/2 -translate-x-1/2;
+}
+.swing-band-good {
+  width: 40%;
+  background: rgb(28 176 246 / 0.28);
+}
+.swing-band-perfect {
+  width: 11%;
+  background: rgb(255 200 0 / 0.85);
+  box-shadow: 0 0 18px rgb(255 200 0 / 0.45);
+}
+.swing-marker {
+  @apply absolute top-1/2 z-10 h-10 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white;
+  box-shadow: 0 0 10px white;
+}
+.swing-marker-static {
+  background: var(--swing-accent);
+}
+.swing-caption {
+  @apply mt-2 text-center text-[10px] font-bold leading-snug text-white/55;
+}
+.swing-result-perfect {
+  @apply text-gold;
+}
+.swing-result-good {
+  @apply text-sky;
+}
+.swing-result-weak {
+  @apply text-cardinal;
+}
+.guard-flash {
+  @apply pointer-events-none absolute left-1/2 top-1/2 z-20 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full border-8 border-sky/80;
+  box-shadow:
+    0 0 22px rgb(28 176 246 / 0.75),
+    inset 0 0 28px rgb(28 176 246 / 0.35);
+  animation: guard-flash 360ms ease-out both;
+}
+.battle-log {
+  @apply overflow-hidden rounded-3xl border border-swan bg-white p-4 text-ink;
+}
+.battle-log ol {
+  @apply mt-2 divide-y divide-swan;
+}
+.battle-log-row {
+  @apply flex items-center gap-2 py-2 text-[11px] font-bold;
+}
+.battle-log-row-loss {
+  @apply text-cardinal;
+}
+.battle-log-icon {
+  @apply grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-violet/10 text-violet;
+}
+.battle-log-taken {
+  @apply shrink-0 text-[10px] font-black text-ink-soft;
+}
+.advice-icon {
+  @apply grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet/10 text-violet;
+}
+.advice-apply {
+  @apply shrink-0 rounded-xl bg-violet px-3 py-2 text-[10px] font-black uppercase tracking-wide text-white;
+}
+.battle-stat:nth-child(1) {
+  @apply text-cardinal;
+}
+.battle-stat:nth-child(2) {
+  @apply text-violet;
+}
+.battle-stat:nth-child(3) {
+  @apply text-sky;
+}
+.battle-stat:nth-child(4) {
+  @apply text-gold-dark;
 }
 .sword-slash {
   @apply pointer-events-none absolute left-1/2 top-1/2 z-20 h-1 w-48 rounded-full bg-white;
@@ -762,6 +955,16 @@ body::before {
     transform: translate(-20%, -20%) rotate(-35deg) scaleX(1.1);
   }
 }
+@keyframes guard-flash {
+  from {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+}
 @keyframes weapon-hover {
   0%,
   100% {
@@ -877,6 +1080,8 @@ body::before {
   .boss-art,
   .showcase-item-front,
   .sword-slash,
+  .guard-flash,
+  .swing-marker,
   .journey-stop-current .level-node-face,
   .level-node-arrived .level-node-face,
   .level-node-arrived::after,
