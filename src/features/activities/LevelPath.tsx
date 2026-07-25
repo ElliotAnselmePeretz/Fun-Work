@@ -77,6 +77,10 @@ export function LevelPath({ activity, progress, color }: LevelPathProps) {
             {
               '--chapter-accent': section.chapter.accent,
               '--chapter-terrain': `url(${section.chapter.terrain})`,
+              '--chapter-terrain-filter':
+                section.chapter.terrainFilter ?? 'none',
+              '--chapter-terrain-size':
+                section.chapter.terrainSize ?? '256px 256px',
             } as CSSProperties
           }
           aria-label={section.chapter.name}

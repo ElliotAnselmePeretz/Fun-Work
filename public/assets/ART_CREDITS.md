@@ -19,8 +19,10 @@ stays crisp, and centred on a fixed canvas, so each armory card frames alike.
 Boss portraits use the same nearest-neighbour preparation from Dungeon Crawl
 Stone Soup monster tiles.
 Area terrain is an 8×8 patchwork of the pack's own seamless floor tiles, laid
-out with a per-area fixed seed — so a rebuild produces byte-identical ground,
-and the 256px repeat is large enough to hide the pattern.
+out with a per-area fixed seed — so a rebuild produces byte-identical ground.
+Later biomes re-colour and re-scale those same CC0 terrain families in CSS,
+keeping one coherent art language while giving a long campaign twelve distinct
+regions.
 
 Gear art is ordered with the price ladder on purpose: starter pieces are a
 plain knife, a wooden club and a roll of hide, while endgame pieces are gilded

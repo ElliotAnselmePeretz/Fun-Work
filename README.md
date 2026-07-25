@@ -88,15 +88,19 @@ new path; existing activity rows and log history remain compatible. Activity →
 how many sessions each one needs at any time.
 
 Levels are laid out as a winding route rather than a list. The route is split
-into named chapters — Green Hollow, Stoneford, Amber Ridge, Frostfall Pass,
-Sunspire Keep, Starfall Reach — and each is floored with its own terrain
-(grass, cobbles, lava, ice, sandstone, crystal), with the last stop of a
-chapter shown as a larger landmark. Chapters you have not reached are dimmed
-rather than drained, so the road ahead still reads as somewhere to go. A
-three-level path maps exactly to Green Hollow, Stoneford and Amber Ridge. Longer
-paths open up to all six biomes. Chapters are *derived* from the level count, so
-editing levels re-chapters the route immediately; nothing about chapters is
-stored.
+into twelve named chapters — Green Hollow, Stoneford, Amber Ridge, Frostfall
+Pass, Sunspire Keep, Starfall Reach, Mistfen Marsh, Moonstone Coast, Gloamwood
+Ruins, Obsidian Vault, Crimson Rift and Crown of Dawn. Their terrain ranges
+from grass, cobbles, lava, ice, sandstone and crystal to marsh, moonlit coast,
+haunted ruins, deep vaults and endgame rifts. The last stop of a chapter is
+shown as a larger landmark. Chapters you have not reached are dimmed rather
+than drained, so the road ahead still reads as somewhere to go.
+
+A three-level path still maps exactly to Green Hollow, Stoneford and Amber
+Ridge. Longer paths progressively open more regions: the 15-level Campaign
+visits seven, the 24-level Epic visits ten, and a 30-level path reaches all
+twelve. Chapters are *derived* from the level count, so editing levels
+re-chapters the route immediately; nothing about chapters is stored.
 
 The route is one ordered list for assistive tech: the decorative nodes are
 hidden and each stop announces its name, state and position ("Level 3 of 10").

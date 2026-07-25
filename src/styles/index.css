@@ -421,9 +421,10 @@ body::before {
   content: '';
   @apply pointer-events-none absolute inset-0;
   background-image: var(--chapter-terrain);
-  background-size: 256px 256px;
+  background-size: var(--chapter-terrain-size, 256px 256px);
   background-repeat: repeat;
   image-rendering: pixelated;
+  filter: var(--chapter-terrain-filter, none);
   opacity: 0.92;
 }
 .journey-chapter::after {
@@ -444,7 +445,7 @@ body::before {
 }
 /* Chapters still ahead read as unvisited ground: dimmed, not drained. */
 .journey-chapter:not(.journey-chapter-active):not(.journey-chapter-cleared)::before {
-  filter: grayscale(0.45) brightness(1.08);
+  filter: var(--chapter-terrain-filter, none) grayscale(0.45) brightness(1.08);
   opacity: 0.55;
 }
 .journey-chapter-active {

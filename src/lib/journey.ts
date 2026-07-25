@@ -13,6 +13,10 @@ export interface Chapter {
   accent: string
   /** Seamless terrain tile laid under the section. See public/assets/areas. */
   terrain: string
+  /** Re-colours a terrain family into a distinct later-game biome. */
+  terrainFilter?: string
+  /** Changes the repeat rhythm so related terrain families do not look cloned. */
+  terrainSize?: string
 }
 
 const terrain = (id: string) => `/assets/areas/${id}.png`
@@ -54,6 +58,55 @@ export const CHAPTERS: Chapter[] = [
     accent: '#a05cf0',
     terrain: terrain('starfall-reach'),
   },
+  {
+    id: 'mistfen-marsh',
+    name: 'Mistfen Marsh',
+    accent: '#49c998',
+    terrain: terrain('green-hollow'),
+    terrainFilter: 'hue-rotate(54deg) saturate(0.82) brightness(0.68)',
+    terrainSize: '224px 224px',
+  },
+  {
+    id: 'moonstone-coast',
+    name: 'Moonstone Coast',
+    accent: '#55d6ff',
+    terrain: terrain('frostfall-pass'),
+    terrainFilter: 'hue-rotate(28deg) saturate(1.45) brightness(0.82)',
+    terrainSize: '304px 304px',
+  },
+  {
+    id: 'gloamwood-ruins',
+    name: 'Gloamwood Ruins',
+    accent: '#927cff',
+    terrain: terrain('stoneford'),
+    terrainFilter: 'hue-rotate(238deg) saturate(0.74) brightness(0.56)',
+    terrainSize: '232px 232px',
+  },
+  {
+    id: 'obsidian-vault',
+    name: 'Obsidian Vault',
+    accent: '#b598ff',
+    terrain: terrain('stoneford'),
+    terrainFilter: 'grayscale(0.75) contrast(1.5) brightness(0.4)',
+    terrainSize: '192px 192px',
+  },
+  {
+    id: 'crimson-rift',
+    name: 'Crimson Rift',
+    accent: '#ff4d6d',
+    terrain: terrain('ember-ridge'),
+    terrainFilter:
+      'hue-rotate(325deg) saturate(1.45) contrast(1.18) brightness(0.66)',
+    terrainSize: '288px 288px',
+  },
+  {
+    id: 'crown-of-dawn',
+    name: 'Crown of Dawn',
+    accent: '#ffd166',
+    terrain: terrain('sunspire-keep'),
+    terrainFilter: 'sepia(0.18) saturate(1.55) brightness(0.92)',
+    terrainSize: '240px 240px',
+  },
 ]
 
 export function chapterCountFor(levelCount: number): number {
@@ -68,7 +121,7 @@ export function chapterCountFor(levelCount: number): number {
         ? 4
         : levelCount <= 10
           ? 5
-          : CHAPTERS.length
+          : 5 + Math.ceil((levelCount - 10) / 3)
   return Math.min(Math.max(wanted, 1), CHAPTERS.length)
 }
 

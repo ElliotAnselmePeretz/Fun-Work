@@ -136,8 +136,8 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
                 {[
                   { label: 'Quick', count: 3, detail: '3 biomes' },
                   { label: 'Adventure', count: 8, detail: '5 biomes' },
-                  { label: 'Campaign', count: 15, detail: '6 biomes' },
-                  { label: 'Epic', count: 24, detail: '6 biomes' },
+                  { label: 'Campaign', count: 15, detail: '7 biomes' },
+                  { label: 'Epic', count: 24, detail: '10 biomes' },
                 ].map((preset) => (
                   <button
                     key={preset.label}
