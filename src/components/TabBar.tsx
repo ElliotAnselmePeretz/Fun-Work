@@ -21,7 +21,7 @@ interface TabBarProps {
 /** Fixed bottom nav — thumb-reachable, and stays clear of the home indicator. */
 export function TabBar({ current }: TabBarProps) {
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-white/70 bg-white/90 shadow-[0_-8px_30px_rgba(38,33,74,0.08)] backdrop-blur-xl">
+    <nav className="game-tab-bar safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-violet/30 bg-night/95 backdrop-blur-xl">
       <ul className="mx-auto flex max-w-md">
         {TABS.map((tab) => {
           const active = tab.route.name === current.name

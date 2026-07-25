@@ -173,7 +173,9 @@ export function ArenaScreen() {
               <img
                 src={progress.boss.art}
                 alt=""
-                className="boss-map-portrait pixel-art"
+                className={`boss-map-portrait pixel-art ${
+                  progress.defeated ? 'boss-map-portrait-defeated' : ''
+                }`}
               />
             )}
             {progress.defeated && (
@@ -187,7 +189,9 @@ export function ArenaScreen() {
 
       <section
         key={`${activeBoss.boss.id}-${impactToken}`}
-        className={`boss-stage ${resolving ? 'boss-stage-impact' : ''} ${
+        className={`boss-stage ${
+          activeBoss.defeated ? 'boss-stage-defeated' : ''
+        } ${resolving ? 'boss-stage-impact' : ''} ${
           lastImpact === 'loss' ? 'boss-stage-loss' : ''
         }`}
         style={{ '--boss-accent': activeBoss.boss.accent } as CSSProperties}
@@ -196,7 +200,9 @@ export function ArenaScreen() {
         <img
           src={activeBoss.boss.art}
           alt=""
-          className="boss-art pixel-art"
+          className={`boss-art pixel-art ${
+            activeBoss.defeated ? 'boss-art-fallen' : ''
+          }`}
           aria-hidden="true"
         />
         <div className="relative z-10 max-w-[62%]">
@@ -245,21 +251,41 @@ export function ArenaScreen() {
           </div>
         )}
 
-        <div className="boss-health-panel relative z-10 mt-4">
-          <div className="health-row">
-            <div className="mb-2 flex justify-between text-xs font-black uppercase tracking-wide text-white/70">
-              <span>{activeBoss.defeated ? 'Defeated' : 'Boss health'}</span>
-              <span>
-                {activeBoss.remainingHp}/{activeBoss.boss.maxHp} HP
-              </span>
-            </div>
-            <ProgressBar
-              value={activeBoss.defeated ? 0 : 1 - activeBoss.fraction}
-              color={activeBoss.defeated ? '#58cc02' : activeBoss.boss.accent}
-              label={`${activeBoss.boss.name} health`}
-            />
+        {activeBoss.defeated && (
+          <div className="boss-defeat-mark" aria-hidden>
+            <GameIcon name="sword" size={34} strokeWidth={2.4} />
+            <span>Fallen</span>
           </div>
-          {!activeBoss.defeated && (
+        )}
+
+        {activeBoss.defeated ? (
+          <div className="boss-victory-panel relative z-10 mt-5">
+            <span className="boss-victory-icon">
+              <GameIcon name="trophy" size={20} />
+            </span>
+            <span>
+              <strong>Victory secured</strong>
+              <small>
+                Reward claimed · {activeBoss.boss.coinReward} coins
+              </small>
+            </span>
+            <GameIcon name="check" className="ml-auto text-grass" size={23} />
+          </div>
+        ) : (
+          <div className="boss-health-panel relative z-10 mt-4">
+            <div className="health-row">
+              <div className="mb-2 flex justify-between text-xs font-black uppercase tracking-wide text-white/70">
+                <span>Boss health</span>
+                <span>
+                  {activeBoss.remainingHp}/{activeBoss.boss.maxHp} HP
+                </span>
+              </div>
+              <ProgressBar
+                value={1 - activeBoss.fraction}
+                color={activeBoss.boss.accent}
+                label={`${activeBoss.boss.name} health`}
+              />
+            </div>
             <div className="health-row mt-3">
               <div className="mb-2 flex justify-between text-xs font-black uppercase tracking-wide text-white/70">
                 <span>Your health</span>
@@ -273,8 +299,8 @@ export function ArenaScreen() {
                 label="Player health"
               />
             </div>
-          )}
-        </div>
+          </div>
+        )}
         {resolving && lastImpact !== 'guard' && (
           <span className="sword-slash" aria-hidden />
         )}

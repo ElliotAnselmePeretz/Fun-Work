@@ -88,7 +88,7 @@ export function ImportPreview({
                 {group.name}
               </span>
               {existing && (
-                <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-extrabold uppercase text-ink-soft">
+                <span className="rounded-full bg-night/80 px-2 py-0.5 text-[10px] font-extrabold uppercase text-ink-soft">
                   merges
                 </span>
               )}

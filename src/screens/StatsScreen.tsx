@@ -82,7 +82,7 @@ export function StatsScreen() {
           <button
             onClick={() => navigate({ name: 'badges' })}
             aria-label="Open achievements"
-            className="grid h-10 w-10 place-items-center rounded-2xl border border-swan bg-white text-violet shadow-sm"
+            className="grid h-10 w-10 place-items-center rounded-2xl border border-swan bg-night text-beetle shadow-sm"
           >
             <GameIcon name="trophy" size={20} />
           </button>

@@ -131,7 +131,7 @@ export function LevelEditor({
                   value={level.name}
                   aria-label={`Level ${index + 1} name`}
                   onChange={(event) => update(index, { name: event.target.value })}
-                  className="min-w-0 flex-1 rounded-xl border-2 border-transparent bg-white px-2 py-1.5 text-sm font-bold outline-none focus:border-sky"
+                  className="min-w-0 flex-1 rounded-xl border-2 border-transparent bg-[#17142d] px-2 py-1.5 text-sm font-bold text-ink outline-none focus:border-sky"
                 />
 
                 <input
@@ -143,7 +143,7 @@ export function LevelEditor({
                   onChange={(event) =>
                     update(index, { sessionsRequired: Number(event.target.value) })
                   }
-                  className="w-14 shrink-0 rounded-xl border-2 border-swan bg-white px-2 py-1.5 text-center text-sm font-bold outline-none focus:border-sky"
+                  className="w-14 shrink-0 rounded-xl border-2 border-swan bg-[#17142d] px-2 py-1.5 text-center text-sm font-bold text-ink outline-none focus:border-sky"
                 />
 
                 <div className="flex shrink-0 flex-col">

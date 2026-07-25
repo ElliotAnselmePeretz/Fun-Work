@@ -25,7 +25,7 @@ export function SortableActivity({ activity, color }: SortableActivityProps) {
       {...listeners}
     >
       <div
-        className="flex items-center gap-2 rounded-2xl border-2 border-swan bg-white px-3 py-2.5"
+        className="flex items-center gap-2 rounded-2xl border-2 border-swan bg-night px-3 py-2.5"
         style={{ borderLeftColor: color, borderLeftWidth: 6 }}
       >
         <AvatarIcon name={activity.name} id={activity.id} stored={activity.emoji} />

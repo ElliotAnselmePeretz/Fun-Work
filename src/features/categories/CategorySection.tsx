@@ -38,7 +38,7 @@ export function CategorySection({
         <button
           onClick={() => setEditingCategory(true)}
           aria-label={`Edit ${category.name}`}
-          className="grid h-8 w-8 place-items-center rounded-full text-ink-soft hover:bg-white/70"
+          className="grid h-8 w-8 place-items-center rounded-full text-ink-soft hover:bg-night/70"
         >
           <GameIcon name="settings" size={17} />
         </button>
@@ -59,7 +59,7 @@ export function CategorySection({
 
       <button
         onClick={() => setAddingActivity(true)}
-        className="rounded-2xl border-2 border-dashed border-swan py-2.5 text-sm font-extrabold text-ink-soft transition-colors hover:border-hare hover:bg-white"
+        className="rounded-2xl border-2 border-dashed border-swan py-2.5 text-sm font-extrabold text-ink-soft transition-colors hover:border-hare hover:bg-night"
       >
         + Add activity
       </button>

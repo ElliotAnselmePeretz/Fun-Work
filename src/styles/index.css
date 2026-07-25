@@ -7,26 +7,26 @@
    ------------------------------------------------------------------------ */
 @theme {
   --color-grass: #58cc02;
-  --color-grass-dark: #46a302;
+  --color-grass-dark: #82e93d;
   --color-sky: #1cb0f6;
-  --color-sky-dark: #1899d6;
+  --color-sky-dark: #69ceff;
   --color-flame: #ff9600;
-  --color-flame-dark: #e08600;
+  --color-flame-dark: #ffb341;
   --color-gold: #ffc800;
-  --color-gold-dark: #e5a800;
+  --color-gold-dark: #f8ca47;
   --color-cardinal: #ff4b4b;
-  --color-cardinal-dark: #e03d3d;
+  --color-cardinal-dark: #ff7474;
   --color-beetle: #ce82ff;
-  --color-beetle-dark: #b45cf0;
-  --color-violet: #6c5ce7;
-  --color-violet-dark: #5142c5;
-  --color-night: #26214a;
+  --color-beetle-dark: #d9a5ff;
+  --color-violet: #8b7cf6;
+  --color-violet-dark: #7465e8;
+  --color-night: #241e49;
 
-  --color-ink: #302d46;
-  --color-ink-soft: #77738f;
-  --color-hare: #aaa6ba;
-  --color-swan: #e8e5f1;
-  --color-polar: #f8f7fc;
+  --color-ink: #f6f2ff;
+  --color-ink-soft: #bdb6d3;
+  --color-hare: #918aa9;
+  --color-swan: #4b426d;
+  --color-polar: #30295a;
 
   --font-display: 'Nunito', ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
 
@@ -113,9 +113,12 @@ body::before {
 
 .game-card {
   border-width: 1px;
+  background:
+    radial-gradient(circle at 90% 0%, rgb(139 124 246 / 0.12), transparent 9rem),
+    linear-gradient(145deg, rgb(46 39 88 / 0.98), rgb(31 26 63 / 0.98));
   box-shadow:
-    0 1px 2px rgb(38 33 74 / 0.04),
-    0 8px 24px rgb(38 33 74 / 0.055);
+    inset 0 1px rgb(255 255 255 / 0.055),
+    0 12px 30px rgb(0 0 0 / 0.2);
 }
 
 .activity-card {
@@ -125,7 +128,7 @@ body::before {
 }
 .activity-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 0 rgb(57 50 104 / 0.08);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.24);
 }
 
 .section-kicker {
@@ -173,8 +176,8 @@ body::before {
 
 .streak-card {
   background:
-    linear-gradient(120deg, rgb(255 150 0 / 0.1), transparent 55%),
-    white;
+    radial-gradient(circle at 0% 50%, rgb(255 150 0 / 0.17), transparent 12rem),
+    linear-gradient(145deg, #322952, #211b42);
 }
 
 .armory-banner {
@@ -242,14 +245,14 @@ body::before {
   animation: status-in 280ms ease-out both;
 }
 .gear-category-tabs {
-  @apply mb-4 grid grid-cols-3 gap-1 rounded-2xl border border-swan bg-white p-1.5 shadow-sm;
+  @apply mb-4 grid grid-cols-3 gap-1 rounded-2xl border border-swan bg-night/90 p-1.5 shadow-sm;
 }
 .gear-category-tabs button {
   @apply flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 text-xs font-black text-ink-soft transition-all;
 }
 .gear-category-tabs .gear-category-tab-active {
-  @apply bg-night text-white;
-  box-shadow: 0 6px 16px rgb(23 21 46 / 0.2);
+  @apply bg-violet/25 text-white;
+  box-shadow: inset 0 0 0 1px rgb(139 124 246 / 0.3);
 }
 .gear-category-intro {
   @apply mb-4 flex items-end justify-between gap-3;
@@ -272,18 +275,18 @@ body::before {
 .gear-card-owned {
   border-color: rgb(88 204 2 / 0.28);
   background:
-    linear-gradient(110deg, rgb(88 204 2 / 0.06), transparent 42%),
-    white;
+    linear-gradient(110deg, rgb(88 204 2 / 0.1), transparent 42%),
+    linear-gradient(145deg, #302952, #211b42);
 }
 .gear-card-magic {
   background:
-    radial-gradient(circle at 6% 50%, rgb(92 225 230 / 0.13), transparent 8rem),
-    white;
+    radial-gradient(circle at 6% 50%, rgb(92 225 230 / 0.14), transparent 8rem),
+    linear-gradient(145deg, #29264e, #1f1a3e);
 }
 .gear-card-armour {
   background:
-    radial-gradient(circle at 6% 50%, rgb(28 176 246 / 0.1), transparent 8rem),
-    white;
+    radial-gradient(circle at 6% 50%, rgb(28 176 246 / 0.14), transparent 8rem),
+    linear-gradient(145deg, #29264e, #1f1a3e);
 }
 .gear-card-visual {
   @apply relative grid h-24 w-24 place-items-center overflow-hidden rounded-[1.4rem] border border-white/10 bg-night;
@@ -371,8 +374,8 @@ body::before {
 }
 .loadout-advice {
   background:
-    linear-gradient(120deg, rgb(108 92 231 / 0.07), transparent 60%),
-    white;
+    linear-gradient(120deg, rgb(139 124 246 / 0.16), transparent 60%),
+    linear-gradient(145deg, #302952, #211b42);
 }
 .weapon-icon {
   @apply grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-violet/10 bg-violet/8 text-violet;
@@ -409,7 +412,7 @@ body::before {
      scrollable, so scrollIntoView on the current stop would shunt the whole
      chapter sideways and expose a bare strip beside the terrain. */
   overflow: clip;
-  background: white;
+  background: #211b42;
 }
 /* The actual ground: a seamless terrain tile from the same set as the gear.
    It sits under a scrim (below) rather than straight behind the text, so a
@@ -429,9 +432,9 @@ body::before {
   background:
     linear-gradient(
       180deg,
-      rgb(255 255 255 / 0.34),
-      rgb(255 255 255 / 0.12) 45%,
-      rgb(255 255 255 / 0.4)
+      rgb(22 18 44 / 0.22),
+      rgb(22 18 44 / 0.08) 45%,
+      rgb(22 18 44 / 0.38)
     ),
     radial-gradient(
       120% 70% at 50% 100%,
@@ -451,11 +454,11 @@ body::before {
 .journey-banner {
   /* Above the trail, so the route reads as passing behind the signpost. */
   @apply relative z-20 mb-1 flex items-center justify-between gap-2 rounded-full px-3 py-1.5;
-  background: color-mix(in srgb, var(--chapter-accent) 14%, white);
+  background: color-mix(in srgb, var(--chapter-accent) 22%, #241e49);
 }
 .journey-banner-name {
   @apply truncate text-xs font-black uppercase tracking-[0.14em];
-  color: color-mix(in srgb, var(--chapter-accent) 72%, #302d46);
+  color: color-mix(in srgb, var(--chapter-accent) 74%, #f6f2ff);
 }
 .journey-banner-state {
   @apply shrink-0 text-[9px] font-black uppercase tracking-[0.12em] text-ink-soft;
@@ -500,8 +503,8 @@ body::before {
   transition: transform 160ms ease;
 }
 .journey-stop-current .level-node-face {
-  /* A white gap so the progress ring stays legible against a same-hue node. */
-  outline: 4px solid white;
+  /* A dark gap keeps the progress ring distinct from the terrain. */
+  outline: 4px solid #241e49;
 }
 .level-node-landmark .level-node-face {
   @apply h-16 w-16;
@@ -512,12 +515,12 @@ body::before {
 /* The label carries its own backing, so terrain can stay fully saturated
    underneath without ever costing the text its contrast. */
 .journey-stop-name {
-  @apply relative z-10 mt-1 max-w-28 truncate rounded-full bg-white/85 px-2 py-0.5
+  @apply relative z-10 mt-1 max-w-28 truncate rounded-full bg-night/90 px-2 py-0.5
          text-center text-[11px] font-bold text-ink;
   backdrop-filter: blur(2px);
 }
 .journey-stop-locked .journey-stop-name {
-  @apply bg-white/70 text-ink-soft;
+  @apply bg-[#19152f]/85 text-ink-soft;
 }
 
 .journey-stop-current .level-node-face {
@@ -537,12 +540,12 @@ body::before {
 }
 
 .level-stepper {
-  @apply grid h-9 w-9 place-items-center rounded-xl border-2 border-swan bg-white text-xl font-black text-ink-soft transition-colors hover:border-sky hover:text-sky disabled:cursor-not-allowed disabled:opacity-30;
+  @apply grid h-9 w-9 place-items-center rounded-xl border-2 border-swan bg-[#17142d] text-xl font-black text-ink-soft transition-colors hover:border-sky hover:text-sky disabled:cursor-not-allowed disabled:opacity-30;
 }
 
 .quest-builder {
   @apply rounded-3xl border border-swan bg-polar/95 p-3 text-ink;
-  box-shadow: inset 0 1px white;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.06);
 }
 .quest-builder-title {
   @apply mb-2 block px-1 text-[10px] font-black uppercase tracking-[0.16em] text-violet;
@@ -551,7 +554,7 @@ body::before {
   @apply grid grid-cols-2 gap-2;
 }
 .difficulty-option {
-  @apply flex min-h-24 flex-col items-start rounded-2xl border-2 border-swan bg-white p-3 text-left text-ink-soft transition-all;
+  @apply flex min-h-24 flex-col items-start rounded-2xl border-2 border-swan bg-[#17142d] p-3 text-left text-ink-soft transition-all;
 }
 .difficulty-option > svg {
   @apply mb-2 text-violet;
@@ -570,7 +573,7 @@ body::before {
   @apply mb-3 grid grid-cols-2 gap-2;
 }
 .journey-preset {
-  @apply flex flex-col rounded-2xl border-2 border-swan bg-white px-3 py-2 text-left transition-all;
+  @apply flex flex-col rounded-2xl border-2 border-swan bg-[#17142d] px-3 py-2 text-left transition-all;
 }
 .journey-preset strong {
   @apply text-xs font-black text-ink;
@@ -594,17 +597,17 @@ body::before {
 }
 .boss-map::before {
   content: '';
-  @apply absolute left-8 right-8 top-1/2 h-0.5 -translate-y-1/2 bg-swan;
+  @apply absolute left-8 right-8 top-1/2 h-0.5 -translate-y-1/2 bg-violet/35;
 }
 .boss-map-node {
-  @apply relative z-10 grid h-12 w-12 place-items-center rounded-2xl border border-swan bg-white text-ink-soft shadow-sm transition-all disabled:opacity-45;
+  @apply relative z-10 grid h-12 w-12 place-items-center rounded-2xl border border-swan bg-night text-ink-soft shadow-sm transition-all disabled:opacity-45;
 }
 .boss-map-node-active {
   @apply -translate-y-1 border-violet bg-violet text-white;
   box-shadow: 0 8px 20px rgb(108 92 231 / 0.22);
 }
 .boss-map-node-cleared:not(.boss-map-node-active) {
-  @apply border-grass/30 bg-grass/10 text-grass-dark;
+  @apply border-grass/40 bg-grass/15 text-grass-dark;
 }
 .boss-map-index {
   @apply absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-night text-[8px] font-black text-white;
@@ -612,6 +615,11 @@ body::before {
 .boss-map-portrait {
   @apply h-9 w-9 object-contain;
   filter: drop-shadow(0 2px 3px rgb(23 21 46 / 0.22));
+}
+.boss-map-portrait-defeated {
+  transform: translateY(3px) rotate(70deg) scale(0.82);
+  filter: grayscale(0.8) brightness(0.72);
+  opacity: 0.68;
 }
 .boss-stage {
   @apply relative min-h-96 overflow-hidden rounded-[2rem] p-6;
@@ -625,12 +633,53 @@ body::before {
   @apply pointer-events-none absolute inset-x-0 bottom-0 h-32;
   background: linear-gradient(transparent, rgb(11 10 27 / 0.5));
 }
+.boss-stage-defeated {
+  background:
+    radial-gradient(circle at 82% 30%, rgb(88 204 2 / 0.13), transparent 12rem),
+    linear-gradient(145deg, #151329, #242044);
+}
 .boss-art {
   @apply pointer-events-none absolute right-0 top-3 z-[1] h-64 w-[52%] object-contain object-right;
   filter:
     drop-shadow(0 18px 18px rgb(0 0 0 / 0.42))
     saturate(1.05);
   animation: boss-idle 4s ease-in-out infinite;
+}
+.boss-art-fallen {
+  transform-origin: 70% 78%;
+  transform: translate(24px, 46px) rotate(74deg) scale(0.88);
+  filter:
+    grayscale(0.82)
+    brightness(0.58)
+    drop-shadow(0 13px 12px rgb(0 0 0 / 0.5));
+  opacity: 0.66;
+  animation: boss-fall 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.boss-defeat-mark {
+  @apply pointer-events-none absolute right-5 top-40 z-[2] flex flex-col items-center gap-1 text-grass;
+  filter: drop-shadow(0 3px 9px rgb(0 0 0 / 0.6));
+}
+.boss-defeat-mark svg {
+  transform: rotate(135deg);
+}
+.boss-defeat-mark span {
+  @apply rounded-full border border-grass/30 bg-black/45 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.16em];
+}
+.boss-victory-panel {
+  @apply flex max-w-[76%] items-center gap-3 rounded-2xl border border-grass/25 bg-black/30 p-3 text-white backdrop-blur-sm;
+}
+.boss-victory-icon {
+  @apply grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold/15 text-gold;
+}
+.boss-victory-panel strong,
+.boss-victory-panel small {
+  @apply block;
+}
+.boss-victory-panel strong {
+  @apply text-sm font-black;
+}
+.boss-victory-panel small {
+  @apply mt-0.5 text-[9px] font-bold uppercase tracking-wide text-white/50;
 }
 .boss-health-panel {
   @apply rounded-2xl border border-white/10 bg-night/55 p-4 backdrop-blur-md;
@@ -743,7 +792,7 @@ body::before {
   animation: guard-flash 360ms ease-out both;
 }
 .battle-log {
-  @apply overflow-hidden rounded-3xl border border-swan bg-white p-4 text-ink;
+  @apply overflow-hidden rounded-3xl border border-swan bg-night/90 p-4 text-ink;
 }
 .battle-log ol {
   @apply mt-2 divide-y divide-swan;
@@ -787,7 +836,7 @@ body::before {
   animation: sword-slash 320ms ease-out both;
 }
 .weapon-chip {
-  @apply flex min-w-40 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-white p-3 text-ink-soft shadow-sm transition-all;
+  @apply flex min-w-40 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-night p-3 text-ink-soft shadow-sm transition-all;
 }
 .weapon-chip-active {
   @apply -translate-y-0.5 border-violet bg-violet/8 text-violet;
@@ -798,7 +847,7 @@ body::before {
   filter: drop-shadow(0 4px 4px rgb(23 21 46 / 0.18));
 }
 .armour-chip {
-  @apply flex min-w-44 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-white p-3 text-ink-soft shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-65;
+  @apply flex min-w-44 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-night p-3 text-ink-soft shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-65;
 }
 .armour-chip-active {
   @apply -translate-y-0.5 border-sky bg-sky/8 text-sky-dark;
@@ -828,7 +877,13 @@ body::before {
 .arena-complete {
   background:
     radial-gradient(circle at 50% 0%, rgb(255 200 0 / 0.14), transparent 12rem),
-    white;
+    linear-gradient(145deg, #322a58, #211b42);
+}
+
+.game-tab-bar {
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 0.05),
+    0 -12px 34px rgb(0 0 0 / 0.34);
 }
 
 /* Respect the notch / home indicator when installed to the home screen. */
@@ -990,6 +1045,19 @@ body::before {
   }
   50% {
     transform: translateY(-5px) scale(1.015);
+  }
+}
+@keyframes boss-fall {
+  from {
+    transform: translate(0, 0) rotate(0) scale(1);
+    opacity: 1;
+  }
+  55% {
+    transform: translate(16px, 30px) rotate(80deg) scale(0.93);
+  }
+  to {
+    transform: translate(24px, 46px) rotate(74deg) scale(0.88);
+    opacity: 0.66;
   }
 }
 @keyframes node-breathe {

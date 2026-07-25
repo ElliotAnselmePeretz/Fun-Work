@@ -190,7 +190,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
                 </p>
               </div>
             ) : (
-              <div className="mt-3 flex items-center justify-between rounded-2xl bg-white p-3">
+              <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#17142d] p-3">
                 <span>
                   <span className="block text-sm font-extrabold">Number of levels</span>
                   <span className="block text-xs text-ink-soft">

@@ -34,7 +34,7 @@ export function Modal({ open, onClose, title, children, bare = false }: ModalPro
       role="presentation"
     >
       <div
-        className="safe-bottom max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-xl animate-pop-in sm:rounded-3xl"
+        className="modal-surface safe-bottom max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-swan bg-night p-5 shadow-xl animate-pop-in sm:rounded-3xl"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"

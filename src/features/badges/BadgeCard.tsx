@@ -17,7 +17,7 @@ export function BadgeCard({ badge, placeholder }: BadgeCardProps) {
   return (
     <div
       className={`flex flex-col items-center gap-1 rounded-2xl border-2 p-3 text-center ${
-        earned ? 'border-gold/50 bg-gold/10' : 'border-swan bg-white'
+        earned ? 'border-gold/50 bg-gold/10' : 'border-swan bg-night/80'
       }`}
     >
       <span className={`text-3xl ${earned ? '' : 'opacity-30 grayscale'}`} aria-hidden>

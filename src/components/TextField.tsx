@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes, TextareaHTMLAttributes } from 'react'
 
 const FIELD_CLASS =
-  'w-full rounded-2xl border-2 border-swan bg-white px-4 py-3 text-base font-bold ' +
+  'w-full rounded-2xl border-2 border-swan bg-[#17142d] px-4 py-3 text-base font-bold text-ink ' +
   'outline-none transition-colors placeholder:font-normal placeholder:text-hare focus:border-sky'
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {

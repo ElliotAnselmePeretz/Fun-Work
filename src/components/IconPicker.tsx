@@ -36,7 +36,7 @@ export function IconPicker({ value, onChange, name, id = '' }: IconPickerProps) 
             className={`grid h-11 w-11 place-items-center rounded-xl border-2 transition-colors ${
               avatar === selected
                 ? 'border-sky bg-sky/10'
-                : 'border-swan bg-white hover:bg-polar'
+                : 'border-swan bg-[#17142d] hover:bg-polar'
             }`}
           >
             <img
