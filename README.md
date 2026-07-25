@@ -46,20 +46,22 @@ devices. Use Settings → Export to move it.
 - **Activity** — belongs to a category ("Running", "Math AA") and has a ladder
   of progressive levels.
 - **Log** — one tap is one session. A session starts at 10 coins and earns more
-  when a streak multiplier is active. Session and shop-purchase events are the
-  only stored progress history; coin balances, levels, streaks, badges and item
-  ownership are all derived from that history, so they cannot drift out of sync.
+  when a streak multiplier is active. Sessions, shop purchases, and combat turns
+  are the only stored progress history; coin balances, levels, streaks, badges,
+  item ownership, and combat state are all derived from that history.
 - **Streak** — consecutive calendar days with at least one log. Not having
   logged *today* doesn't break it — you still have the rest of the day.
 - **Badges** — awarded automatically for your first log, every level-up,
   streaks of 3/7/14/30/100 days, coin totals, and completing every level of an
   activity.
-- **Armory** — spend derived coins on functional weapons with different damage
-  values. A purchase is appended to the same history rather than mutating a
-  stored balance.
-- **Boss arena** — use owned weapons against a four-boss campaign. Every strike
-  is an event in the same log, so boss health, victories, unlocks and coin
-  rewards are replayed from history rather than stored as counters.
+- **Armory** — spend derived coins on weapons with damage and deterministic
+  critical-hit rhythms, plus armour with guard and max-health bonuses. A
+  purchase is appended to the same history rather than mutating a stored balance.
+- **Boss arena** — use an owned weapon-and-armour loadout against a four-boss
+  campaign. Bosses counterattack, the player can lose, and a defeat resets the
+  current attempt without taking coins. Every turn is a log event, so boss
+  health, player health, critical hits, defeats, victories, unlocks and rewards
+  are all replayed rather than stored as counters.
 
 ### Coins and streak multipliers
 
@@ -183,6 +185,9 @@ export first if you might want it back.
 - **Phase 5 — Arena:** done. Functional weapon upgrades, four derived-health
   boss encounters, battle rewards, clean icon-based navigation, animated
   banners and a lighter visual system with fewer decorative emoji.
+- **Phase 6 — Combat expansion:** done. CC0 boss and weapon artwork, armour
+  loadouts, boss counterattacks, player health, deterministic critical hits,
+  defeat/attempt resets, battle records, and offline-cached game art.
 
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import

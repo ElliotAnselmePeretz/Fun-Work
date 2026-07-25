@@ -61,12 +61,20 @@ export interface PurchaseLogEntry {
   day: string
 }
 
-/** One weapon swing. Boss health and victories are replayed from these events. */
+/**
+ * One combat turn. Boss health, player health, critical hits, and defeats are
+ * replayed from these events; none of those values are stored as counters.
+ */
 export interface BossHitLogEntry {
   id: Id
   kind: 'boss-hit'
   bossId: Id
   weaponId: Id
+  /**
+   * Missing on older ledgers. Legacy hits keep their original no-retaliation
+   * behavior so this combat upgrade cannot revoke an earned boss victory.
+   */
+  armourId?: Id
   at: number
   day: string
 }

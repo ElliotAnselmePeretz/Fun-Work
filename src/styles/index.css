@@ -156,6 +156,12 @@ body::before {
   background: rgb(255 255 255 / 0.04);
   transform: rotate(-12deg);
 }
+.armory-banner-art {
+  @apply pointer-events-none absolute -right-24 bottom-6 z-10 w-80 max-w-none opacity-80;
+  filter: drop-shadow(0 18px 22px rgb(0 0 0 / 0.42));
+  transform: rotate(-20deg);
+  animation: weapon-hover 4.5s ease-in-out infinite;
+}
 .mini-stat {
   @apply flex min-h-24 flex-col items-center justify-center gap-1 p-2 text-center;
 }
@@ -182,6 +188,39 @@ body::before {
 .weapon-card-owned {
   border-color: rgb(88 204 2 / 0.28);
   background: linear-gradient(110deg, rgb(88 204 2 / 0.055), white 45%);
+}
+.gear-tabs {
+  @apply flex shrink-0 rounded-xl border border-swan bg-white p-1 text-[10px] font-black uppercase tracking-wide text-ink-soft;
+}
+.gear-tabs button {
+  @apply rounded-lg px-2.5 py-1.5 transition-colors;
+}
+.gear-tabs .gear-tab-active {
+  @apply bg-violet text-white;
+}
+.gear-art-frame {
+  @apply relative grid h-16 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-violet/10;
+  background:
+    radial-gradient(circle at 50% 50%, rgb(108 92 231 / 0.13), transparent 70%),
+    #f7f7ff;
+}
+.gear-art {
+  @apply block max-h-full max-w-full object-contain;
+}
+.gear-art-weapon {
+  width: 132%;
+  max-width: none;
+  filter: drop-shadow(0 6px 5px rgb(23 21 46 / 0.2));
+}
+.armour-art-frame {
+  background:
+    radial-gradient(circle at 50% 45%, rgb(255 200 0 / 0.16), transparent 70%),
+    #1b1931;
+}
+.gear-art-armour {
+  width: 180%;
+  max-width: none;
+  image-rendering: pixelated;
 }
 .weapon-icon {
   @apply grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-violet/10 bg-violet/8 text-violet;
@@ -229,12 +268,35 @@ body::before {
 .boss-map-index {
   @apply absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-night text-[8px] font-black text-white;
 }
+.boss-map-portrait {
+  @apply h-9 w-9 object-contain;
+  filter: drop-shadow(0 2px 3px rgb(23 21 46 / 0.22));
+}
 .boss-stage {
-  @apply relative min-h-72 overflow-hidden rounded-[2rem] p-6;
+  @apply relative min-h-96 overflow-hidden rounded-[2rem] p-6;
   background:
     radial-gradient(circle at 85% 18%, color-mix(in srgb, var(--boss-accent) 38%, transparent), transparent 13rem),
     linear-gradient(145deg, #17152e, #2c2852);
   box-shadow: 0 22px 48px rgb(23 21 46 / 0.23);
+}
+.boss-stage::after {
+  content: '';
+  @apply pointer-events-none absolute inset-x-0 bottom-0 h-32;
+  background: linear-gradient(transparent, rgb(11 10 27 / 0.5));
+}
+.boss-art {
+  @apply pointer-events-none absolute right-0 top-3 z-[1] h-64 w-[52%] object-contain object-right;
+  filter:
+    drop-shadow(0 18px 18px rgb(0 0 0 / 0.42))
+    saturate(1.05);
+  animation: boss-idle 4s ease-in-out infinite;
+}
+.boss-health-panel {
+  @apply rounded-2xl border border-white/10 bg-night/55 p-4 backdrop-blur-md;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.18);
+}
+.health-row [role='progressbar'] {
+  box-shadow: 0 0 16px rgb(255 255 255 / 0.08);
 }
 .boss-emblem {
   @apply grid h-20 w-20 shrink-0 place-items-center rounded-3xl border border-white/15 bg-white/8 text-white;
@@ -242,6 +304,9 @@ body::before {
 }
 .boss-stage-impact {
   animation: boss-impact 320ms ease-out;
+}
+.boss-stage-loss {
+  animation: boss-loss 520ms ease-out;
 }
 .sword-slash {
   @apply pointer-events-none absolute left-1/2 top-1/2 z-20 h-1 w-48 rounded-full bg-white;
@@ -257,6 +322,40 @@ body::before {
 .weapon-chip-active {
   @apply -translate-y-0.5 border-violet bg-violet/8 text-violet;
   box-shadow: 0 8px 20px rgb(108 92 231 / 0.12);
+}
+.loadout-weapon-art {
+  @apply h-9 w-16 shrink-0 object-contain;
+  filter: drop-shadow(0 4px 4px rgb(23 21 46 / 0.18));
+}
+.armour-chip {
+  @apply flex min-w-44 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-white p-3 text-ink-soft shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-65;
+}
+.armour-chip-active {
+  @apply -translate-y-0.5 border-sky bg-sky/8 text-sky-dark;
+  box-shadow: 0 8px 20px rgb(28 176 246 / 0.12);
+}
+.armour-chip-art {
+  @apply grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-night;
+}
+.armour-chip-art img {
+  width: 190%;
+  max-width: none;
+  image-rendering: pixelated;
+}
+.loadout-lock {
+  @apply flex items-center gap-1 rounded-full bg-swan px-2 py-1 text-[9px] font-black uppercase tracking-wide text-ink-soft;
+}
+.battle-stat {
+  @apply flex min-h-20 flex-col items-center justify-center gap-0.5 p-2 text-center text-violet;
+}
+.battle-stat strong {
+  @apply text-base font-black text-ink;
+}
+.battle-stat span {
+  @apply text-[8px] font-black uppercase tracking-wide text-ink-soft;
+}
+.combat-message-loss {
+  @apply border-cardinal/20 bg-cardinal/8 text-cardinal;
 }
 .arena-complete {
   background:
@@ -388,6 +487,35 @@ body::before {
     transform: translate(-20%, -20%) rotate(-35deg) scaleX(1.1);
   }
 }
+@keyframes weapon-hover {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-20deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-17deg);
+  }
+}
+@keyframes boss-idle {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.015);
+  }
+}
+@keyframes boss-loss {
+  0%,
+  100% {
+    box-shadow: 0 22px 48px rgb(23 21 46 / 0.23);
+  }
+  35% {
+    box-shadow:
+      0 22px 48px rgb(23 21 46 / 0.23),
+      inset 0 0 90px rgb(255 75 75 / 0.72);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .animate-pop-in,
@@ -397,6 +525,9 @@ body::before {
   .status-banner,
   .combat-message,
   .boss-stage-impact,
+  .boss-stage-loss,
+  .boss-art,
+  .armory-banner-art,
   .sword-slash,
   body::before {
     animation: none;

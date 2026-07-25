@@ -11,6 +11,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        // Battle artwork lives in public/assets and must remain available when
+        // the installed PWA is offline.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+      },
       manifest: {
         name: 'Fun-Work',
         short_name: 'Fun-Work',
