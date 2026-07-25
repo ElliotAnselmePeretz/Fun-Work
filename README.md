@@ -99,14 +99,22 @@ drop).
 
 ## Image import (Anthropic API key)
 
-> Not built yet — planned for Phase 3, see Status below.
+Settings → **Import from an image** takes a photo or screenshot of a list and
+uses Claude's vision to extract it, then shows you the same preview as the text
+import before anything is written.
 
-The image import will let you upload a screenshot of a list and have Claude
-extract it into the bulk format above. It is gated behind an API key you enter
-yourself in **Settings**, stored only in your browser's local database.
+It needs your own Anthropic API key, entered in **Settings**:
 
-**No key is ever hardcoded or committed.** If you'd rather not use the feature,
-leave the field empty and it stays disabled.
+1. Create a key at https://console.anthropic.com/settings/keys
+2. Paste it into Settings → Anthropic API key → Save
+
+**No key is ever hardcoded, committed, or bundled.** It is stored in this
+browser's IndexedDB and sent directly from your device to Anthropic — there is
+no server in between. It is stored **unencrypted**, so anyone with access to
+this device (or anything that can run scripts on the page) can read it: use a
+key scoped to just this, and remove it from Settings when you're done. Leave
+the field empty and the feature stays disabled; everything else works without
+it.
 
 ## Project structure
 
@@ -120,7 +128,8 @@ src/
     categories/ Category CRUD and the dashboard section
     import/     Bulk-text parser, import preview, organize logic
     streak/     Streak flame and week strip
-  screens/      Home, Activity, Badges, BulkAdd, Organize, Settings
+  screens/      Home, Activity, Badges, BulkAdd, ImageImport, Organize,
+                Stats, Settings
   lib/          db.ts (Dexie), xp.ts, streak.ts, badges.ts, date.ts,
                 ordering.ts, palette.ts, router.ts
   hooks/        useData (live queries), useRoute, useConfetti
@@ -145,8 +154,12 @@ export first if you might want it back.
   logging with celebrations, level paths, daily streak, badges.
 - **Phase 2 — Bulk input:** done. Paste-to-import with preview, and the
   drag-and-drop organize screen.
-- **Phase 3 — Enhancements:** not started. Screenshot import via the Anthropic
-  API, a level/milestone editor, and stats over time.
+- **Phase 3 — Enhancements:** done. Screenshot import via the Anthropic API, a
+  level/milestone editor (Activity → Edit levels), and a Stats tab.
+
+Verified end to end in a browser except the drag gestures on the Organize
+screen and the image import itself — the first needs a real pointer or finger,
+the second needs your API key.
 
 ## Tech
 
