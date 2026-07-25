@@ -1,5 +1,6 @@
 import { Card } from '../../components/Card'
 import { ProgressRing } from '../../components/ProgressRing'
+import { avatarSrcFor } from '../../lib/avatars'
 import { navigate } from '../../lib/router'
 import { levelFraction } from '../../lib/xp'
 import type { Activity, ActivityProgress } from '../../types'
@@ -26,9 +27,11 @@ export function ActivityCard({ activity, progress, color }: ActivityCardProps) {
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
       >
         <ProgressRing value={levelFraction(progress)} color={color} size={52}>
-          <span className="text-xl" aria-hidden>
-            {activity.emoji}
-          </span>
+          <img
+            src={avatarSrcFor(activity.name, activity.id)}
+            alt=""
+            className="pixel-art h-7 w-7"
+          />
         </ProgressRing>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-extrabold">{activity.name}</span>

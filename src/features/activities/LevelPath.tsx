@@ -67,7 +67,12 @@ export function LevelPath({ activity, progress, color }: LevelPathProps) {
           className={`journey-chapter ${
             section.cleared ? 'journey-chapter-cleared' : ''
           } ${section.active ? 'journey-chapter-active' : ''}`}
-          style={{ '--chapter-accent': section.chapter.accent } as CSSProperties}
+          style={
+            {
+              '--chapter-accent': section.chapter.accent,
+              '--chapter-terrain': `url(${section.chapter.terrain})`,
+            } as CSSProperties
+          }
           aria-label={section.chapter.name}
         >
           <header className="journey-banner">

@@ -22,6 +22,7 @@ import {
   multiplierLabel,
   nextCoinMultiplier,
 } from '../lib/coins'
+import { avatarSrcFor } from '../lib/avatars'
 import { relativeDayLabel, timeLabel } from '../lib/date'
 import { navigate } from '../lib/router'
 
@@ -168,8 +169,15 @@ export function HomeScreen() {
               const reward = coins.rewardsByLogId.get(log.id)?.coins ?? COINS_PER_SESSION
               return (
                 <div key={log.id} className="flex items-center gap-3 px-3 py-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-polar text-lg" aria-hidden>
-                    {activity?.emoji ?? '⭐'}
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-polar">
+                    <img
+                      src={avatarSrcFor(
+                        activity?.name ?? 'deleted',
+                        activity?.id ?? log.activityId,
+                      )}
+                      alt=""
+                      className="pixel-art h-6 w-6"
+                    />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-extrabold">

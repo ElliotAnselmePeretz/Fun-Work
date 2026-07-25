@@ -39,16 +39,45 @@ body,
   height: 100%;
 }
 
+/* ---------------------------------------------------------------------------
+   The world behind the app: a dawn sky over layered ridges. Built from
+   gradients and two inline SVGs so it costs no requests, scales to any screen,
+   and stays cheap enough to sit under a scrolling phone view.
+   ------------------------------------------------------------------------ */
 body {
-  @apply bg-polar text-ink font-display antialiased;
+  @apply text-ink font-display antialiased;
   background:
-    radial-gradient(circle at 10% 0%, rgb(108 92 231 / 0.09), transparent 32rem),
-    radial-gradient(circle at 100% 24%, rgb(28 176 246 / 0.08), transparent 28rem),
-    #f8f7fc;
+    radial-gradient(90% 46% at 50% 0%, rgb(255 206 130 / 0.42), transparent 70%),
+    radial-gradient(70% 40% at 8% 8%, rgb(146 190 255 / 0.4), transparent 70%),
+    radial-gradient(60% 34% at 96% 14%, rgb(206 130 255 / 0.26), transparent 70%),
+    linear-gradient(180deg, #bcdcff 0%, #dceaff 22%, #eef1f7 48%, #f8f7fc 74%);
+  background-attachment: fixed;
   /* Avoid iOS text auto-inflation and rubber-band scroll on the shell. */
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none;
 }
+
+/* Two ridge lines, the far one paler, to give the sky a horizon to sit on. */
+body::after {
+  content: '';
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  height: 62vh;
+  z-index: -2;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position:
+    center 52%,
+    center bottom;
+  background-size:
+    100% 34%,
+    100% 48%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'%3E%3Cpath d='M0%20300%20L0%20290%20L110%20212%20L200%20248%20L320%20170%20L430%20220%20L540%20160%20L660%20208%20L780%20152%20L900%20202%20L1020%20166%20L1140%20214%20L1260%20178%20L1360%20236%20L1440%20292%20L1440%20300%20Z' fill='%23b9cde6' fill-opacity='.34'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'%3E%3Cpath d='M0%20300%20L0%20297%20L140%20234%20L260%20270%20L390%20202%20L520%20252%20L650%20188%20L780%20242%20L910%20196%20L1040%20248%20L1170%20210%20L1300%20256%20L1440%20296%20L1440%20300%20Z' fill='%23a7bcd8' fill-opacity='.26'/%3E%3C/svg%3E");
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -256,7 +285,9 @@ body::before {
     linear-gradient(145deg, #173349, #121126);
 }
 .gear-card-armour .gear-card-visual {
-  background: #050609;
+  background:
+    radial-gradient(circle at 50% 45%, rgb(28 176 246 / 0.26), transparent 68%),
+    linear-gradient(145deg, #1b2740, #101322);
 }
 .gear-card-visual img {
   @apply h-full w-full object-contain p-1.5;
@@ -358,24 +389,45 @@ body::before {
   @apply flex flex-col gap-3;
 }
 .journey-chapter {
-  @apply relative overflow-hidden rounded-[1.75rem] border border-swan/70 px-3 pb-6 pt-3;
+  @apply relative rounded-[1.75rem] border border-swan/70 px-3 pb-6 pt-3;
+  /* `clip`, not `hidden`: an overflow-hidden box is still programmatically
+     scrollable, so scrollIntoView on the current stop would shunt the whole
+     chapter sideways and expose a bare strip beside the terrain. */
+  overflow: clip;
+  background: white;
+}
+/* The actual ground: a seamless terrain tile from the same set as the gear.
+   It sits under a scrim (below) rather than straight behind the text, so a
+   lava or crystal floor never costs the labels their contrast. */
+.journey-chapter::before {
+  content: '';
+  @apply pointer-events-none absolute inset-0;
+  background-image: var(--chapter-terrain);
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  opacity: 0.92;
+}
+.journey-chapter::after {
+  content: '';
+  @apply pointer-events-none absolute inset-0;
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--chapter-accent) 11%, transparent),
-      transparent 45%
+      rgb(255 255 255 / 0.34),
+      rgb(255 255 255 / 0.12) 45%,
+      rgb(255 255 255 / 0.4)
     ),
-    white;
+    radial-gradient(
+      120% 70% at 50% 100%,
+      color-mix(in srgb, var(--chapter-accent) 22%, transparent),
+      transparent 70%
+    );
 }
-.journey-chapter::after {
-  /* A soft horizon so each chapter reads as its own patch of ground. */
-  content: '';
-  @apply pointer-events-none absolute inset-x-0 bottom-0 h-24;
-  background: radial-gradient(
-    120% 100% at 50% 100%,
-    color-mix(in srgb, var(--chapter-accent) 13%, transparent),
-    transparent 70%
-  );
+/* Chapters still ahead read as unvisited ground: dimmed, not drained. */
+.journey-chapter:not(.journey-chapter-active):not(.journey-chapter-cleared)::before {
+  filter: grayscale(0.45) brightness(1.08);
+  opacity: 0.55;
 }
 .journey-chapter-active {
   border-color: color-mix(in srgb, var(--chapter-accent) 45%, transparent);
@@ -401,7 +453,9 @@ body::before {
   @apply relative z-10 flex flex-col;
 }
 .journey-stop {
-  @apply relative flex flex-col items-center;
+  /* Only as wide as the stop itself, so leaning it off-centre cannot widen
+     the chapter it sits in. */
+  @apply relative mx-auto flex w-fit flex-col items-center;
   height: 88px;
   transform: translateX(calc(var(--offset) * 30px));
 }
@@ -440,11 +494,15 @@ body::before {
 .level-node-index {
   @apply text-xl font-black;
 }
+/* The label carries its own backing, so terrain can stay fully saturated
+   underneath without ever costing the text its contrast. */
 .journey-stop-name {
-  @apply relative z-10 mt-1 max-w-28 truncate text-center text-[11px] font-bold text-ink;
+  @apply relative z-10 mt-1 max-w-28 truncate rounded-full bg-white/85 px-2 py-0.5
+         text-center text-[11px] font-bold text-ink;
+  backdrop-filter: blur(2px);
 }
 .journey-stop-locked .journey-stop-name {
-  @apply text-hare;
+  @apply bg-white/70 text-ink-soft;
 }
 
 .journey-stop-current .level-node-face {

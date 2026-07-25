@@ -83,9 +83,11 @@ level. Activity → **Edit levels** lets you resize the path, rename or reorder
 levels, and change how many sessions each one needs at any time.
 
 Levels are laid out as a winding route rather than a list. The route is split
-into named chapters — Green Hollow, Stoneford, Ember Ridge and on — each drawn
-as its own stretch of ground, with the last stop of a chapter shown as a larger
-landmark. Chapters are *derived* from how many levels an activity has (roughly
+into named chapters — Green Hollow, Stoneford, Ember Ridge, Frostfall Pass,
+Sunspire Keep, Starfall Reach — and each is floored with its own terrain
+(grass, cobbles, lava, ice, sandstone, crystal), with the last stop of a
+chapter shown as a larger landmark. Chapters you have not reached are dimmed
+rather than drained, so the road ahead still reads as somewhere to go. Chapters are *derived* from how many levels an activity has (roughly
 four per chapter, up to six chapters), so editing levels re-chapters the route
 immediately; nothing about chapters is stored.
 
@@ -221,6 +223,19 @@ export first if you might want it back.
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import
 itself remains unverified because it requires your API key.
+
+## Art and icons
+
+All the art is CC0 and bundled locally — see
+[`public/assets/ART_CREDITS.md`](public/assets/ART_CREDITS.md). Gear, area
+terrain and activity icons all come from one tileset so the game reads as a
+matched set, and the gear ladder is drawn to match the price ladder: a starter
+knife looks like a starter knife, and endgame pieces look gilded.
+
+Categories and activities have no emoji field to fill in. Their icon is
+*derived* from the name — "Running" gets boots, "Math AA" a scroll — with a
+stable hash as the fallback, so nothing is stored, nothing needs migrating,
+and renaming an activity re-picks its icon immediately (`src/lib/avatars.ts`).
 
 ## Tech
 

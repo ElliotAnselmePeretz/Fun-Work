@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GameIcon } from '../../components/GameIcon'
+import { avatarSrcFor } from '../../lib/avatars'
 import { withAlpha } from '../../lib/palette'
 import type { Activity, ActivityProgress, Category } from '../../types'
 import { ActivityCard } from '../activities/ActivityCard'
@@ -26,9 +27,11 @@ export function CategorySection({
         className="flex items-center gap-2 rounded-3xl border border-white/70 px-3 py-2.5 shadow-sm"
         style={{ backgroundColor: withAlpha(category.color, 0.12) }}
       >
-        <span className="text-xl" aria-hidden>
-          {category.emoji}
-        </span>
+        <img
+          src={avatarSrcFor(category.name, category.id)}
+          alt=""
+          className="pixel-art h-6 w-6 shrink-0"
+        />
         <h2 className="flex-1 truncate font-extrabold" style={{ color: category.color }}>
           {category.name}
         </h2>

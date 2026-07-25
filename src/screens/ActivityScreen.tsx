@@ -47,7 +47,7 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
     <div className="flex flex-col gap-5">
       <ScreenHeader
         back
-        title={`${activity.emoji} ${activity.name}`}
+        title={activity.name}
         subtitle={category?.name}
         action={
           <button

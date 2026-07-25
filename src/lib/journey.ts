@@ -9,17 +9,51 @@ import { levelState, type LevelState } from './xp'
 export interface Chapter {
   id: string
   name: string
-  /** Sets the section's background wash. Node colours stay the category's. */
+  /** Tints the banner and the section's glow. Node colours stay the category's. */
   accent: string
+  /** Seamless terrain tile laid under the section. See public/assets/areas. */
+  terrain: string
 }
 
+const terrain = (id: string) => `/assets/areas/${id}.png`
+
 export const CHAPTERS: Chapter[] = [
-  { id: 'green-hollow', name: 'Green Hollow', accent: '#58cc02' },
-  { id: 'stoneford', name: 'Stoneford', accent: '#1cb0f6' },
-  { id: 'ember-ridge', name: 'Ember Ridge', accent: '#ff9600' },
-  { id: 'frostfall-pass', name: 'Frostfall Pass', accent: '#5ce1e6' },
-  { id: 'sunspire-keep', name: 'Sunspire Keep', accent: '#ffc800' },
-  { id: 'starfall-reach', name: 'Starfall Reach', accent: '#ce82ff' },
+  {
+    id: 'green-hollow',
+    name: 'Green Hollow',
+    accent: '#58cc02',
+    terrain: terrain('green-hollow'),
+  },
+  {
+    id: 'stoneford',
+    name: 'Stoneford',
+    accent: '#a9825c',
+    terrain: terrain('stoneford'),
+  },
+  {
+    id: 'ember-ridge',
+    name: 'Ember Ridge',
+    accent: '#ff6a00',
+    terrain: terrain('ember-ridge'),
+  },
+  {
+    id: 'frostfall-pass',
+    name: 'Frostfall Pass',
+    accent: '#3fb8e0',
+    terrain: terrain('frostfall-pass'),
+  },
+  {
+    id: 'sunspire-keep',
+    name: 'Sunspire Keep',
+    accent: '#e0a020',
+    terrain: terrain('sunspire-keep'),
+  },
+  {
+    id: 'starfall-reach',
+    name: 'Starfall Reach',
+    accent: '#a05cf0',
+    terrain: terrain('starfall-reach'),
+  },
 ]
 
 /** Roughly this many levels per chapter, until we run out of chapters. */

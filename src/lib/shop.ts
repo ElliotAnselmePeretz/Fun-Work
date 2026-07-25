@@ -20,17 +20,22 @@ export interface ShopItem {
   starter?: boolean
   rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary'
   /**
-   * Sprite art, which needs nearest-neighbour scaling to stay crisp. Painted
-   * art must not set this, or it turns blocky. Declared per item rather than
-   * matched on the filename so adding gear cannot silently break the styling.
+   * Sprite art, which needs nearest-neighbour scaling to stay crisp. Every
+   * piece currently sets this — the whole armory is drawn from one tileset so
+   * it reads as a matched collection — but it stays per item so a future
+   * painted piece cannot be silently rendered blocky.
    */
   pixelArt?: boolean
 }
 
 /**
- * Gear is deliberately arranged in price order within each class. Existing
- * ids and their damage values are retained so earlier purchases and boss logs
- * continue to replay exactly as before.
+ * Gear is deliberately arranged in price order within each class, and the art
+ * is ordered with it: starter pieces are plain sticks and hide, endgame pieces
+ * are gilded and ornate, so the tier is legible before reading a single stat.
+ *
+ * Existing ids and their damage values are retained so earlier purchases and
+ * boss logs continue to replay exactly as before. A few display names changed
+ * to match new art; ids never do.
  */
 export const SHOP_ITEMS: ShopItem[] = [
   {
@@ -64,11 +69,11 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     id: 'hunter-bow',
-    name: 'Hunter Bow',
+    name: 'Hand Crossbow',
     icon: 'target',
     gearType: 'weapon',
     image: '/assets/gear/weapons/hunter-bow.png',
-    description: 'Light ranged gear that lands critical hits more often.',
+    description: 'A small braced crossbow that lands critical bolts more often.',
     role: 'Frequent criticals',
     cost: 70,
     damage: 13,
@@ -143,6 +148,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 350,
     damage: 58,
     critEvery: 4,
+    pixelArt: true,
     rarity: 'Epic',
   },
   {
@@ -156,6 +162,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 430,
     damage: 68,
     critEvery: 3,
+    pixelArt: true,
     rarity: 'Epic',
   },
   {
@@ -197,6 +204,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 800,
     damage: 120,
     critEvery: 3,
+    pixelArt: true,
     rarity: 'Legendary',
   },
   {
@@ -210,6 +218,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 1000,
     damage: 150,
     critEvery: 3,
+    pixelArt: true,
     rarity: 'Legendary',
   },
   {
@@ -218,7 +227,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     icon: 'sparkles',
     gearType: 'magic',
     image: '/assets/gear/magic/apprentice-wand.png',
-    description: 'A stubby brass wand. Barely a weapon, but it closes small wounds.',
+    description: 'A stubby hooked wand. Barely a weapon, but it closes small wounds.',
     role: 'First healing',
     cost: 60,
     damage: 7,
@@ -284,15 +293,16 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     id: 'phoenix-signet',
-    name: 'Phoenix Signet',
+    name: 'Phoenix Staff',
     icon: 'flame',
     gearType: 'magic',
-    image: '/assets/gear/magic/phoenix-signet.png',
-    description: 'A burning ring that answers every survived blow with new life.',
+    image: '/assets/gear/magic/phoenix-staff.png',
+    description: 'A gold-crowned staff that answers every survived blow with new life.',
     role: 'Elite sustain',
     cost: 900,
     damage: 72,
     healing: 40,
+    pixelArt: true,
     rarity: 'Legendary',
   },
   {
@@ -306,20 +316,22 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 1150,
     damage: 95,
     healing: 50,
+    pixelArt: true,
     rarity: 'Legendary',
   },
   {
     id: 'traveler-guard',
-    name: 'Traveler Guard',
+    name: 'Traveler Hide',
     icon: 'shield',
     gearType: 'armour',
     image: '/assets/gear/armour/traveler-guard.png',
-    description: 'A simple iron helm issued to every new arena challenger.',
+    description: 'A roll of stitched hide. It is what every challenger starts in.',
     role: 'Starter protection',
     cost: 0,
     defense: 2,
     maxHpBonus: 15,
     starter: true,
+    pixelArt: true,
     rarity: 'Common',
   },
   {
@@ -347,6 +359,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 70,
     defense: 4,
     maxHpBonus: 25,
+    pixelArt: true,
     rarity: 'Common',
   },
   {
@@ -360,6 +373,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 90,
     defense: 5,
     maxHpBonus: 35,
+    pixelArt: true,
     rarity: 'Rare',
   },
   {
@@ -387,6 +401,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 300,
     defense: 10,
     maxHpBonus: 65,
+    pixelArt: true,
     rarity: 'Epic',
   },
   {
@@ -400,6 +415,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 520,
     defense: 16,
     maxHpBonus: 90,
+    pixelArt: true,
     rarity: 'Epic',
   },
   {
@@ -413,19 +429,21 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 750,
     defense: 22,
     maxHpBonus: 120,
+    pixelArt: true,
     rarity: 'Legendary',
   },
   {
     id: 'aegis-bulwark',
-    name: 'Aegis Bulwark',
+    name: 'Aegis Plate',
     icon: 'castle',
     gearType: 'armour',
-    image: '/assets/gear/armour/aegis-bulwark.png',
-    description: 'A warded greatshield. Nothing in the arena hits harder than it holds.',
+    image: '/assets/gear/armour/aegis-plate.png',
+    description: 'Gilded dragon plate. Nothing in the arena hits harder than it holds.',
     role: 'Endgame guard',
     cost: 950,
     defense: 27,
     maxHpBonus: 150,
+    pixelArt: true,
     rarity: 'Legendary',
   },
 ]
