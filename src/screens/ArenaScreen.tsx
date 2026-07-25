@@ -75,8 +75,10 @@ export function ArenaScreen() {
           `${activeBoss.boss.name} defeated. ${result.coinReward} coins added to your ledger.`,
         )
       } else {
+        const healingMessage =
+          result.healing > 0 ? ` You restored ${result.healing} HP.` : ''
         setMessage(
-          `${result.critical ? 'Critical strike! ' : ''}${weapon.name} dealt ${result.playerDamage}; ${activeBoss.boss.name} returned ${result.bossDamage}.`,
+          `${result.critical ? 'Critical strike! ' : ''}${weapon.name} dealt ${result.playerDamage}; ${activeBoss.boss.name} returned ${result.bossDamage}.${healingMessage}`,
         )
       }
     } catch (error) {
@@ -267,7 +269,10 @@ export function ArenaScreen() {
                       {item.name}
                     </span>
                     <span className="block text-[10px] font-bold text-ink-soft">
-                      {item.damage} damage · crit every {item.critEvery}
+                      {item.damage} damage
+                      {item.healing
+                        ? ` · heals ${item.healing}`
+                        : ` · crit every ${item.critEvery}`}
                     </span>
                   </span>
                 </button>

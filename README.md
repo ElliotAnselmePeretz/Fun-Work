@@ -55,8 +55,9 @@ devices. Use Settings → Export to move it.
   streaks of 3/7/14/30/100 days, coin totals, and completing every level of an
   activity.
 - **Armory** — spend derived coins on weapons with damage and deterministic
-  critical-hit rhythms, plus armour with guard and max-health bonuses. A
-  purchase is appended to the same history rather than mutating a stored balance.
+  critical-hit rhythms, healing magic with lower damage, or armour with guard
+  and max-health bonuses. A purchase is appended to the same history rather
+  than mutating a stored balance.
 - **Boss arena** — use an owned weapon-and-armour loadout against a four-boss
   campaign. Bosses counterattack, the player can lose, and a defeat resets the
   current attempt without taking coins. Every turn is a log event, so boss
@@ -188,6 +189,9 @@ export first if you might want it back.
 - **Phase 6 — Combat expansion:** done. CC0 boss and weapon artwork, armour
   loadouts, boss counterattacks, player health, deterministic critical hits,
   defeat/attempt resets, battle records, and offline-cached game art.
+- **Phase 7 — Armory rebuild:** done. Individually cropped equipment art,
+  nine visibly progressive weapons, four healing-magic options, six armour
+  tiers, clearer combat tradeoffs, and mechanically replayed healing.
 
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import

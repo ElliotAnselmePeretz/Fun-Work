@@ -17,6 +17,7 @@ export interface Boss {
 export interface CombatTurn {
   playerDamage: number
   bossDamage: number
+  healing: number
   critical: boolean
   lost: boolean
 }
@@ -129,8 +130,18 @@ export function computeBossProgress(entries: LogEntry[]): BossProgress[] {
       attemptHits += 1
 
       if (remainingHp === 0) {
+        const healing = legacyHit
+          ? 0
+          : Math.min(weapon?.healing ?? 0, playerMaxHp - playerHp)
+        playerHp += healing
         defeated = true
-        lastTurn = { playerDamage, bossDamage: 0, critical, lost: false }
+        lastTurn = {
+          playerDamage,
+          bossDamage: 0,
+          healing,
+          critical,
+          lost: false,
+        }
         continue
       }
 
@@ -141,7 +152,12 @@ export function computeBossProgress(entries: LogEntry[]): BossProgress[] {
         : Math.max(1, boss.attack - (armour?.defense ?? 0))
       playerHp = Math.max(0, playerHp - bossDamage)
       const lost = playerHp === 0
-      lastTurn = { playerDamage, bossDamage, critical, lost }
+      const healing =
+        legacyHit || lost
+          ? 0
+          : Math.min(weapon?.healing ?? 0, playerMaxHp - playerHp)
+      playerHp += healing
+      lastTurn = { playerDamage, bossDamage, healing, critical, lost }
 
       if (lost) {
         losses += 1

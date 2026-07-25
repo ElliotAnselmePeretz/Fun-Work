@@ -9,6 +9,7 @@ import type { BossHitLogEntry, Id } from '../../types'
 export interface AttackResult {
   playerDamage: number
   bossDamage: number
+  healing: number
   critical: boolean
   lost: boolean
   defeated: boolean
@@ -69,6 +70,7 @@ export async function attackBoss(
     return {
       playerDamage: turn?.playerDamage ?? weapon.damage ?? 0,
       bossDamage: turn?.bossDamage ?? 0,
+      healing: turn?.healing ?? 0,
       critical: turn?.critical ?? false,
       lost: turn?.lost ?? false,
       defeated: after?.defeated ?? false,

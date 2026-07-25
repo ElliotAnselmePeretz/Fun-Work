@@ -151,16 +151,37 @@ body::before {
   background-size: 32px 32px;
   mask-image: radial-gradient(circle at 70% 30%, black, transparent 70%);
 }
-.armory-mark {
-  @apply absolute -right-3 bottom-1 grid h-40 w-40 place-items-center rounded-full border border-white/10 text-white/20;
-  background: rgb(255 255 255 / 0.04);
-  transform: rotate(-12deg);
+.armory-banner-rebuilt {
+  min-height: 17rem;
+  background:
+    radial-gradient(circle at 88% 30%, rgb(255 200 0 / 0.22), transparent 11rem),
+    radial-gradient(circle at 60% 110%, rgb(28 176 246 / 0.17), transparent 13rem),
+    linear-gradient(135deg, #15132b, #32275f 62%, #6842b6);
 }
-.armory-banner-art {
-  @apply pointer-events-none absolute -right-24 bottom-6 z-10 w-80 max-w-none opacity-80;
-  filter: drop-shadow(0 18px 22px rgb(0 0 0 / 0.42));
-  transform: rotate(-20deg);
-  animation: weapon-hover 4.5s ease-in-out infinite;
+.armory-showcase {
+  @apply pointer-events-none absolute inset-y-0 right-0 z-10 w-[45%];
+}
+.showcase-item {
+  @apply absolute grid place-items-center overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-2 backdrop-blur-sm;
+  box-shadow:
+    0 18px 32px rgb(0 0 0 / 0.24),
+    inset 0 1px rgb(255 255 255 / 0.12);
+}
+.showcase-item img {
+  @apply h-full w-full object-contain;
+}
+.showcase-item-back {
+  @apply right-3 top-5 h-24 w-24;
+  transform: rotate(8deg);
+}
+.showcase-item-middle {
+  @apply right-24 top-16 h-20 w-20;
+  transform: rotate(-8deg);
+}
+.showcase-item-front {
+  @apply bottom-4 right-8 h-28 w-28;
+  transform: rotate(4deg);
+  animation: gear-float 4.5s ease-in-out infinite;
 }
 .mini-stat {
   @apply flex min-h-24 flex-col items-center justify-center gap-1 p-2 text-center;
@@ -176,51 +197,135 @@ body::before {
   @apply flex items-center gap-2 rounded-2xl border border-grass/20 bg-grass/10 px-4 py-3 text-sm font-extrabold text-grass-dark;
   animation: status-in 280ms ease-out both;
 }
-.weapon-card {
-  @apply flex items-center gap-3 p-3;
+.gear-category-tabs {
+  @apply mb-4 grid grid-cols-3 gap-1 rounded-2xl border border-swan bg-white p-1.5 shadow-sm;
+}
+.gear-category-tabs button {
+  @apply flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 text-xs font-black text-ink-soft transition-all;
+}
+.gear-category-tabs .gear-category-tab-active {
+  @apply bg-night text-white;
+  box-shadow: 0 6px 16px rgb(23 21 46 / 0.2);
+}
+.gear-category-intro {
+  @apply mb-4 flex items-end justify-between gap-3;
+}
+.collection-count {
+  @apply shrink-0 rounded-full bg-violet/8 px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-violet;
+}
+.gear-card {
+  @apply grid items-center gap-4 p-4;
+  grid-template-columns: 6rem minmax(0, 1fr) 6rem;
   transition:
-    transform 160ms ease,
-    border-color 160ms ease;
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
-.weapon-card:hover {
+.gear-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgb(23 21 46 / 0.09);
 }
-.weapon-card-owned {
+.gear-card-owned {
   border-color: rgb(88 204 2 / 0.28);
-  background: linear-gradient(110deg, rgb(88 204 2 / 0.055), white 45%);
-}
-.gear-tabs {
-  @apply flex shrink-0 rounded-xl border border-swan bg-white p-1 text-[10px] font-black uppercase tracking-wide text-ink-soft;
-}
-.gear-tabs button {
-  @apply rounded-lg px-2.5 py-1.5 transition-colors;
-}
-.gear-tabs .gear-tab-active {
-  @apply bg-violet text-white;
-}
-.gear-art-frame {
-  @apply relative grid h-16 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-violet/10;
   background:
-    radial-gradient(circle at 50% 50%, rgb(108 92 231 / 0.13), transparent 70%),
-    #f7f7ff;
+    linear-gradient(110deg, rgb(88 204 2 / 0.06), transparent 42%),
+    white;
 }
-.gear-art {
-  @apply block max-h-full max-w-full object-contain;
-}
-.gear-art-weapon {
-  width: 132%;
-  max-width: none;
-  filter: drop-shadow(0 6px 5px rgb(23 21 46 / 0.2));
-}
-.armour-art-frame {
+.gear-card-magic {
   background:
-    radial-gradient(circle at 50% 45%, rgb(255 200 0 / 0.16), transparent 70%),
-    #1b1931;
+    radial-gradient(circle at 6% 50%, rgb(92 225 230 / 0.13), transparent 8rem),
+    white;
 }
-.gear-art-armour {
-  width: 180%;
-  max-width: none;
+.gear-card-armour {
+  background:
+    radial-gradient(circle at 6% 50%, rgb(28 176 246 / 0.1), transparent 8rem),
+    white;
+}
+.gear-card-visual {
+  @apply relative grid h-24 w-24 place-items-center overflow-hidden rounded-[1.4rem] border border-white/10 bg-night;
+  background:
+    radial-gradient(circle at 50% 45%, rgb(108 92 231 / 0.3), transparent 68%),
+    linear-gradient(145deg, #242044, #121126);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 0.1),
+    0 8px 18px rgb(23 21 46 / 0.16);
+}
+.gear-card-magic .gear-card-visual {
+  background:
+    radial-gradient(circle at 50% 45%, rgb(92 225 230 / 0.28), transparent 68%),
+    linear-gradient(145deg, #173349, #121126);
+}
+.gear-card-armour .gear-card-visual {
+  background: #050609;
+}
+.gear-card-visual img {
+  @apply h-full w-full object-contain p-1.5;
+  filter: drop-shadow(0 7px 7px rgb(0 0 0 / 0.34));
+}
+.gear-card-visual img[src*='/weapons/']:not([src$='storm-hammer.png']):not([src$='voidbreaker.png']),
+.gear-card-visual img[src*='/magic/']:not([src$='codex-of-renewal.png']) {
   image-rendering: pixelated;
+}
+.gear-rank {
+  @apply absolute left-1.5 top-1.5 z-10 rounded-md bg-black/50 px-1.5 py-0.5 text-[8px] font-black tracking-wider text-white/70 backdrop-blur-sm;
+}
+.gear-card-body {
+  @apply min-w-0;
+}
+.gear-stats {
+  @apply mt-3 flex flex-wrap gap-1.5;
+}
+.gear-stat {
+  @apply flex min-w-20 items-center justify-between gap-2 rounded-lg px-2 py-1.5;
+}
+.gear-stat small {
+  @apply text-[8px] font-black uppercase tracking-wide opacity-65;
+}
+.gear-stat strong {
+  @apply text-xs font-black;
+}
+.gear-stat-damage {
+  @apply bg-cardinal/8 text-cardinal;
+}
+.gear-stat-critical {
+  @apply bg-violet/8 text-violet;
+}
+.gear-stat-heal,
+.gear-stat-health {
+  @apply bg-grass/10 text-grass-dark;
+}
+.gear-stat-guard {
+  @apply bg-sky/10 text-sky-dark;
+}
+.gear-power {
+  @apply mt-3 flex items-center gap-2;
+}
+.gear-power > span {
+  @apply shrink-0 text-[8px] font-black uppercase tracking-wide text-ink-soft;
+}
+.gear-power > div {
+  @apply h-1.5 flex-1 overflow-hidden rounded-full bg-swan;
+}
+.gear-power i {
+  @apply block h-full rounded-full bg-violet;
+  min-width: 3%;
+}
+.gear-card-magic .gear-power i {
+  @apply bg-sky;
+}
+.gear-card-armour .gear-power i {
+  @apply bg-grass;
+}
+.gear-card-action {
+  @apply flex flex-col items-stretch justify-center gap-1.5;
+}
+.gear-shortfall {
+  @apply text-center text-[8px] font-black uppercase tracking-wide text-ink-soft;
+}
+.loadout-advice {
+  background:
+    linear-gradient(120deg, rgb(108 92 231 / 0.07), transparent 60%),
+    white;
 }
 .weapon-icon {
   @apply grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-violet/10 bg-violet/8 text-violet;
@@ -338,8 +443,7 @@ body::before {
   @apply grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-night;
 }
 .armour-chip-art img {
-  width: 190%;
-  max-width: none;
+  @apply h-full w-full object-contain p-0.5;
   image-rendering: pixelated;
 }
 .loadout-lock {
@@ -496,6 +600,15 @@ body::before {
     transform: translateY(-8px) rotate(-17deg);
   }
 }
+@keyframes gear-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(4deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(1deg);
+  }
+}
 @keyframes boss-idle {
   0%,
   100% {
@@ -517,6 +630,37 @@ body::before {
   }
 }
 
+@media (max-width: 440px) {
+  .armory-banner-rebuilt {
+    min-height: 18rem;
+  }
+  .armory-showcase {
+    width: 42%;
+  }
+  .showcase-item-back {
+    @apply right-2 h-20 w-20;
+  }
+  .showcase-item-middle {
+    @apply right-16 top-20 h-16 w-16;
+  }
+  .showcase-item-front {
+    @apply bottom-5 right-3 h-24 w-24;
+  }
+  .gear-card {
+    @apply gap-3;
+    grid-template-columns: 5rem minmax(0, 1fr);
+  }
+  .gear-card-visual {
+    @apply h-20 w-20;
+  }
+  .gear-card-action {
+    grid-column: 1 / -1;
+  }
+  .gear-card-action .owned-label {
+    @apply py-1.5;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-pop-in,
   .animate-float-up,
@@ -527,7 +671,7 @@ body::before {
   .boss-stage-impact,
   .boss-stage-loss,
   .boss-art,
-  .armory-banner-art,
+  .showcase-item-front,
   .sword-slash,
   body::before {
     animation: none;
