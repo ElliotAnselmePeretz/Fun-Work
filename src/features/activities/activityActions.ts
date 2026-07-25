@@ -13,6 +13,8 @@ export interface ActivityDraft {
    * ladder, which is the fast path for adding an activity.
    */
   levelNames?: string[]
+  /** Used when custom milestone names are omitted. */
+  levelCount?: number
 }
 
 export async function createActivity(draft: ActivityDraft): Promise<Id> {
@@ -28,7 +30,10 @@ export async function createActivity(draft: ActivityDraft): Promise<Id> {
     categoryId: draft.categoryId,
     name: draft.name.trim(),
     emoji: draft.emoji || '⭐',
-    levels: names.length > 0 ? makeLevelsFromNames(names) : makeDefaultLevels(),
+    levels:
+      names.length > 0
+        ? makeLevelsFromNames(names)
+        : makeDefaultLevels(draft.levelCount),
     order: nextOrder(siblings),
     createdAt: Date.now(),
   }

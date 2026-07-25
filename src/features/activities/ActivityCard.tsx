@@ -19,7 +19,7 @@ export function ActivityCard({ activity, progress, color }: ActivityCardProps) {
       `Level ${progress.currentLevelIndex + 1}`)
 
   return (
-    <Card className="flex items-center gap-3 p-3">
+    <Card className="activity-card flex items-center gap-3 p-3">
       <button
         type="button"
         onClick={() => navigate({ name: 'activity', activityId: activity.id })}

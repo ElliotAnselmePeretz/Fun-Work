@@ -1,13 +1,14 @@
 import { evaluateBadges } from '../../lib/badges'
+import { computeCoinSummary, isSessionLog } from '../../lib/coins'
 import { dayKey } from '../../lib/date'
 import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
 import { computeStreak } from '../../lib/streak'
-import { computeProgress, XP_PER_SESSION } from '../../lib/xp'
-import type { Badge, Id, LogEntry } from '../../types'
+import { computeProgress } from '../../lib/xp'
+import type { Badge, Id, SessionLogEntry } from '../../types'
 
 export interface LogResult {
-  xpGained: number
+  coinsGained: number
   /** Set when this log cleared a level — the name of the level just finished. */
   levelCleared: string | null
   newBadges: Badge[]
@@ -26,16 +27,18 @@ export async function logSession(activityId: Id, note?: string): Promise<LogResu
       const activity = await db.activities.get(activityId)
       if (!activity) throw new Error(`Unknown activity: ${activityId}`)
 
-      const priorLogs = await db.logs.where('activityId').equals(activityId).toArray()
+      const priorLogs = (
+        await db.logs.where('activityId').equals(activityId).toArray()
+      ).filter(isSessionLog)
       const before = computeProgress(activity, priorLogs)
 
       const now = Date.now()
-      const entry: LogEntry = {
+      const entry: SessionLogEntry = {
         id: newId(),
+        kind: 'session',
         activityId,
         at: now,
         day: dayKey(now),
-        xp: XP_PER_SESSION,
         ...(note?.trim() ? { note: note.trim() } : {}),
       }
       await db.logs.add(entry)
@@ -46,21 +49,25 @@ export async function logSession(activityId: Id, note?: string): Promise<LogResu
           ? (activity.levels[before.currentLevelIndex]?.name ?? null)
           : null
 
-      const [activities, allLogs, earned] = await Promise.all([
+      const [activities, ledgerEntries, earned] = await Promise.all([
         db.activities.toArray(),
         db.logs.toArray(),
         db.badges.toArray(),
       ])
+      const allLogs = ledgerEntries.filter(isSessionLog)
 
       const newBadges = evaluateBadges({
         activities,
         logs: allLogs,
+        ledgerEntries,
         streak: computeStreak(allLogs),
         earnedIds: new Set(earned.map((badge) => badge.id)),
       })
       if (newBadges.length > 0) await db.badges.bulkAdd(newBadges)
 
-      return { xpGained: entry.xp, levelCleared, newBadges }
+      const coinsGained =
+        computeCoinSummary(ledgerEntries).rewardsByLogId.get(entry.id)?.coins ?? 0
+      return { coinsGained, levelCleared, newBadges }
     },
   )
 }
@@ -75,14 +82,16 @@ export async function deleteLog(logId: Id): Promise<void> {
  * progress retroactively, e.g. renaming levels or deleting a log.
  */
 export async function refreshBadges(): Promise<Badge[]> {
-  const [activities, logs, earned] = await Promise.all([
+  const [activities, ledgerEntries, earned] = await Promise.all([
     db.activities.toArray(),
     db.logs.toArray(),
     db.badges.toArray(),
   ])
+  const logs = ledgerEntries.filter(isSessionLog)
   const newBadges = evaluateBadges({
     activities,
     logs,
+    ledgerEntries,
     streak: computeStreak(logs),
     earnedIds: new Set(earned.map((badge) => badge.id)),
   })

@@ -1,10 +1,9 @@
-import type { Activity, ActivityProgress, Level, LogEntry } from '../types'
+import type { Activity, ActivityProgress, Level, SessionLogEntry } from '../types'
 import { newId } from './id'
 
-/** Every logged session is worth the same. Simple beats clever here. */
-export const XP_PER_SESSION = 10
-
 export const DEFAULT_LEVEL_COUNT = 10
+export const MIN_LEVEL_COUNT = 1
+export const MAX_LEVEL_COUNT = 30
 
 /**
  * Sessions needed for level `i` (0-based). Gently escalating: early levels
@@ -40,10 +39,9 @@ export function makeLevelsFromNames(names: string[]): Level[] {
  */
 export function computeProgress(
   activity: Activity,
-  logs: LogEntry[],
+  logs: SessionLogEntry[],
 ): ActivityProgress {
   const totalSessions = logs.length
-  const totalXp = logs.reduce((sum, log) => sum + log.xp, 0)
 
   let remaining = totalSessions
   let levelIndex = 0
@@ -60,7 +58,6 @@ export function computeProgress(
   return {
     activityId: activity.id,
     totalSessions,
-    totalXp,
     currentLevelIndex: levelIndex,
     sessionsIntoLevel: isComplete ? 0 : remaining,
     sessionsForLevel: isComplete ? 0 : activity.levels[levelIndex].sessionsRequired,

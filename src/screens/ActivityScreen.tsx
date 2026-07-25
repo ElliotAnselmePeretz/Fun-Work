@@ -7,7 +7,13 @@ import { LevelEditor } from '../features/activities/LevelEditor'
 import { LevelPath } from '../features/activities/LevelPath'
 import { LogButton } from '../features/activities/LogButton'
 import { deleteLog } from '../features/activities/logActions'
-import { useActivity, useActivityLogs, useCategories } from '../hooks/useData'
+import {
+  useActivity,
+  useActivityLogs,
+  useCategories,
+  useCoinSummary,
+} from '../hooks/useData'
+import { COINS_PER_SESSION } from '../lib/coins'
 import { relativeDayLabel, timeLabel } from '../lib/date'
 import { computeProgress, levelFraction } from '../lib/xp'
 
@@ -19,10 +25,11 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
   const activity = useActivity(activityId)
   const logs = useActivityLogs(activityId)
   const categories = useCategories()
+  const coins = useCoinSummary()
   const [editing, setEditing] = useState(false)
   const [editingLevels, setEditingLevels] = useState(false)
 
-  if (activity === undefined || !logs || !categories) return null
+  if (activity === undefined || !logs || !categories || !coins) return null
   if (activity === null) {
     return <ScreenHeader back title="Not found" subtitle="This activity was deleted." />
   }
@@ -70,7 +77,9 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
         />
         <div className="flex justify-between text-xs font-bold text-ink-soft">
           <span>{progress.totalSessions} sessions</span>
-          <span>{progress.totalXp.toLocaleString()} XP</span>
+          <span>
+            {(coins.earnedByActivityId.get(activity.id) ?? 0).toLocaleString()} coins
+          </span>
         </div>
       </Card>
 
@@ -105,8 +114,8 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
                     {timeLabel(log.at)}
                   </span>
                 </span>
-                <span className="text-xs font-extrabold" style={{ color }}>
-                  +{log.xp}
+                <span className="rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark">
+                  +{coins.rewardsByLogId.get(log.id)?.coins ?? COINS_PER_SESSION} 🪙
                 </span>
                 <button
                   onClick={() => deleteLog(log.id)}

@@ -34,22 +34,42 @@ export interface Activity {
 }
 
 /** One completion. The unit of progress — one tap, one row. */
-export interface LogEntry {
+export interface SessionLogEntry {
   id: Id
+  /** Missing on older backups; anything except `purchase` is a session. */
+  kind?: 'session'
   activityId: Id
   /** Epoch ms. */
   at: number
   /** Local calendar day as YYYY-MM-DD, for streak and stats grouping. */
   day: string
-  xp: number
+  /** Legacy field kept so existing backups remain importable. Coins are derived. */
+  xp?: number
   note?: string
 }
+
+/**
+ * A shop purchase is a ledger event, not a stored balance. Available coins and
+ * ownership are always re-derived from session and purchase history.
+ */
+export interface PurchaseLogEntry {
+  id: Id
+  kind: 'purchase'
+  itemId: Id
+  coinCost: number
+  at: number
+  day: string
+}
+
+export type LogEntry = SessionLogEntry | PurchaseLogEntry
 
 export type BadgeKind =
   | 'first-log'
   | 'level-up'
   | 'streak'
   | 'activity-complete'
+  | 'coin-total'
+  /** Kept for older IndexedDB rows; presented as coin badges at read time. */
   | 'xp-total'
 
 export interface Badge {
@@ -72,11 +92,10 @@ export interface Settings {
   dailyGoal: number
 }
 
-/** Derived, never stored — computed from logs. See lib/xp.ts. */
+/** Derived, never stored — computed from session logs. See lib/xp.ts. */
 export interface ActivityProgress {
   activityId: Id
   totalSessions: number
-  totalXp: number
   /** Index into activity.levels. Equals levels.length when fully complete. */
   currentLevelIndex: number
   /** Sessions completed within the current level. */

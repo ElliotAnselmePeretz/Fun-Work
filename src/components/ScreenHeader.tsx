@@ -22,7 +22,7 @@ export function ScreenHeader({ title, subtitle, back, action }: ScreenHeaderProp
         </button>
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-2xl font-extrabold">{title}</h1>
+        <h1 className="truncate text-2xl font-black tracking-tight">{title}</h1>
         {subtitle && (
           <p className="truncate text-sm font-bold text-ink-soft">{subtitle}</p>
         )}

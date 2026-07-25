@@ -1,10 +1,18 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo } from 'react'
+import { computeCoinSummary, isSessionLog } from '../lib/coins'
 import { db, DEFAULT_SETTINGS } from '../lib/db'
 import { byOrder } from '../lib/ordering'
 import { computeStreak } from '../lib/streak'
 import { computeProgress } from '../lib/xp'
-import type { Activity, ActivityProgress, Category, LogEntry } from '../types'
+import type {
+  Activity,
+  ActivityProgress,
+  Badge,
+  Category,
+  LogEntry,
+  SessionLogEntry,
+} from '../types'
 
 /**
  * Live reads of the whole dataset. The volumes here are tiny — a few hundred
@@ -21,13 +29,24 @@ export function useActivities(): Activity[] | undefined {
   return useLiveQuery(async () => (await db.activities.toArray()).sort(byOrder), [])
 }
 
-export function useLogs(): LogEntry[] | undefined {
+/** Session completions only. Purchase ledger entries are intentionally hidden. */
+export function useLogs(): SessionLogEntry[] | undefined {
+  return useLiveQuery(
+    async () => (await db.logs.toArray()).filter(isSessionLog),
+    [],
+  )
+}
+
+export function useLedgerEntries(): LogEntry[] | undefined {
   return useLiveQuery(() => db.logs.toArray(), [])
 }
 
 export function useBadges() {
   return useLiveQuery(
-    async () => (await db.badges.toArray()).sort((a, b) => b.earnedAt - a.earnedAt),
+    async () =>
+      (await db.badges.toArray())
+        .map(presentCoinBadge)
+        .sort((a, b) => b.earnedAt - a.earnedAt),
     [],
   )
 }
@@ -43,9 +62,12 @@ export function useActivity(activityId: string): Activity | undefined | null {
   )
 }
 
-export function useActivityLogs(activityId: string): LogEntry[] | undefined {
+export function useActivityLogs(activityId: string): SessionLogEntry[] | undefined {
   return useLiveQuery(
-    async () => db.logs.where('activityId').equals(activityId).toArray(),
+    async () =>
+      (await db.logs.where('activityId').equals(activityId).toArray()).filter(
+        isSessionLog,
+      ),
     [activityId],
   )
 }
@@ -55,11 +77,11 @@ export function useStreak() {
   return useMemo(() => (logs ? computeStreak(logs) : undefined), [logs])
 }
 
-export function useTotalXp(): number | undefined {
-  const logs = useLogs()
+export function useCoinSummary() {
+  const entries = useLedgerEntries()
   return useMemo(
-    () => (logs ? logs.reduce((sum, log) => sum + log.xp, 0) : undefined),
-    [logs],
+    () => (entries ? computeCoinSummary(entries) : undefined),
+    [entries],
   )
 }
 
@@ -70,7 +92,7 @@ export function useProgressMap(): Map<string, ActivityProgress> | undefined {
 
   return useMemo(() => {
     if (!activities || !logs) return undefined
-    const byActivity = new Map<string, LogEntry[]>()
+    const byActivity = new Map<string, SessionLogEntry[]>()
     for (const log of logs) {
       const bucket = byActivity.get(log.activityId)
       if (bucket) bucket.push(log)
@@ -86,9 +108,25 @@ export function useProgressMap(): Map<string, ActivityProgress> | undefined {
 }
 
 /** Most recent logs first, capped. Powers the dashboard's recent list. */
-export function useRecentLogs(limit = 8): LogEntry[] | undefined {
+export function useRecentLogs(limit = 8): SessionLogEntry[] | undefined {
   return useLiveQuery(
-    async () => db.logs.orderBy('at').reverse().limit(limit).toArray(),
+    async () =>
+      (await db.logs.orderBy('at').reverse().toArray())
+        .filter(isSessionLog)
+        .slice(0, limit),
     [limit],
   )
+}
+
+function presentCoinBadge(badge: Badge): Badge {
+  if (badge.kind !== 'xp-total') return badge
+  const target = Number(badge.id.split(':').at(-1))
+  const amount = Number.isFinite(target) ? target.toLocaleString() : ''
+  return {
+    ...badge,
+    kind: 'coin-total',
+    title: `${amount} Coins`,
+    description: `Earned ${amount} total coins.`,
+    emoji: '🪙',
+  }
 }

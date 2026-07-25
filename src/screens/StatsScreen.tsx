@@ -3,7 +3,14 @@ import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
 import { ProgressBar } from '../components/ProgressBar'
 import { ScreenHeader } from '../components/ScreenHeader'
-import { useActivities, useCategories, useLogs, useStreak } from '../hooks/useData'
+import {
+  useActivities,
+  useCategories,
+  useCoinSummary,
+  useLogs,
+  useStreak,
+} from '../hooks/useData'
+import { multiplierLabel, nextCoinMultiplier } from '../lib/coins'
 import { dayKeyToDate } from '../lib/date'
 import { recentDayWindow } from '../lib/streak'
 
@@ -14,6 +21,7 @@ export function StatsScreen() {
   const categories = useCategories()
   const activities = useActivities()
   const streak = useStreak()
+  const coins = useCoinSummary()
 
   const perDay = useMemo(() => {
     if (!logs) return null
@@ -26,23 +34,27 @@ export function StatsScreen() {
   }, [logs])
 
   const perCategory = useMemo(() => {
-    if (!logs || !categories || !activities) return null
-    const categoryOf = new Map(
-      activities.map((activity) => [activity.id, activity.categoryId]),
-    )
-    const xp = new Map<string, number>()
-    for (const log of logs) {
-      const categoryId = categoryOf.get(log.activityId)
-      if (categoryId) xp.set(categoryId, (xp.get(categoryId) ?? 0) + log.xp)
+    if (!categories || !activities || !coins) return null
+    const categoryCoins = new Map<string, number>()
+    for (const activity of activities) {
+      categoryCoins.set(
+        activity.categoryId,
+        (categoryCoins.get(activity.categoryId) ?? 0) +
+          (coins.earnedByActivityId.get(activity.id) ?? 0),
+      )
     }
-    const total = [...xp.values()].reduce((sum, value) => sum + value, 0)
+    const total = [...categoryCoins.values()].reduce((sum, value) => sum + value, 0)
     return categories
-      .map((category) => ({ category, xp: xp.get(category.id) ?? 0, total }))
-      .filter((row) => row.xp > 0)
-      .sort((a, b) => b.xp - a.xp)
-  }, [logs, categories, activities])
+      .map((category) => ({
+        category,
+        coinTotal: categoryCoins.get(category.id) ?? 0,
+        total,
+      }))
+      .filter((row) => row.coinTotal > 0)
+      .sort((a, b) => b.coinTotal - a.coinTotal)
+  }, [categories, activities, coins])
 
-  if (!logs || !perDay || !perCategory || !streak) return null
+  if (!logs || !perDay || !perCategory || !streak || !coins) return null
 
   if (logs.length === 0) {
     return (
@@ -58,16 +70,15 @@ export function StatsScreen() {
   }
 
   const busiest = Math.max(...perDay.map((entry) => entry.count), 1)
-  const totalXp = logs.reduce((sum, log) => sum + log.xp, 0)
-
   return (
     <div className="flex flex-col gap-5">
       <ScreenHeader title="Stats" subtitle={`${logs.length} sessions logged`} />
 
-      <div className="grid grid-cols-3 gap-2">
-        <Stat label="Total XP" value={totalXp.toLocaleString()} />
+      <div className="grid grid-cols-2 gap-2">
+        <Stat label="Coins earned" value={`🪙 ${coins.earned.toLocaleString()}`} />
+        <Stat label="Spendable" value={coins.balance.toLocaleString()} />
         <Stat label="Streak" value={`${streak.current}d`} />
-        <Stat label="Best" value={`${streak.longest}d`} />
+        <Stat label="Next boost" value={multiplierLabel(nextCoinMultiplier(streak))} />
       </div>
 
       <section>
@@ -105,23 +116,24 @@ export function StatsScreen() {
 
       <section>
         <h2 className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
-          XP per category
+          Coins per category
         </h2>
         <Card className="flex flex-col gap-3 p-4">
-          {perCategory.map(({ category, xp, total }) => (
+          {perCategory.map(({ category, coinTotal, total }) => (
             <div key={category.id}>
               <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
                 <span className="truncate font-extrabold">
                   {category.emoji} {category.name}
                 </span>
                 <span className="shrink-0 text-xs font-bold text-ink-soft">
-                  {xp.toLocaleString()} XP · {Math.round((xp / total) * 100)}%
+                  {coinTotal.toLocaleString()} 🪙 ·{' '}
+                  {Math.round((coinTotal / total) * 100)}%
                 </span>
               </div>
               <ProgressBar
-                value={xp / total}
+                value={coinTotal / total}
                 color={category.color}
-                label={`${category.name} share of total XP`}
+                label={`${category.name} share of earned coins`}
               />
             </div>
           ))}

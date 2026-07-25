@@ -12,7 +12,7 @@ export function Card({ children, className = '', style, onClick }: CardProps) {
   const interactive = onClick !== undefined
   return (
     <div
-      className={`rounded-2xl border-2 border-swan bg-white ${
+      className={`game-card rounded-3xl border-2 border-swan/90 bg-white ${
         interactive ? 'cursor-pointer active:translate-y-[2px] transition-transform' : ''
       } ${className}`}
       style={style}

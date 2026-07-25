@@ -1,8 +1,9 @@
-import type { Activity, Badge, LogEntry, StreakInfo } from '../types'
+import type { Activity, Badge, LogEntry, SessionLogEntry, StreakInfo } from '../types'
+import { computeCoinSummary } from './coins'
 import { computeProgress } from './xp'
 
 export const STREAK_THRESHOLDS = [3, 7, 14, 30, 100] as const
-export const XP_THRESHOLDS = [100, 500, 1000, 5000] as const
+export const COIN_THRESHOLDS = [100, 500, 1000, 5000] as const
 
 /**
  * Badge ids are deterministic rather than random, so re-running the evaluation
@@ -15,12 +16,14 @@ export const badgeId = {
     `level:${activityId}:${levelIndex}`,
   streak: (days: number) => `streak:${days}`,
   activityComplete: (activityId: string) => `complete:${activityId}`,
-  xpTotal: (xp: number) => `xp:${xp}`,
+  /** Keeps the old prefix so already-earned XP badges migrate without duplicates. */
+  coinTotal: (coins: number) => `xp:${coins}`,
 }
 
 interface EvaluateInput {
   activities: Activity[]
-  logs: LogEntry[]
+  logs: SessionLogEntry[]
+  ledgerEntries: LogEntry[]
   streak: StreakInfo
   earnedIds: Set<string>
 }
@@ -29,6 +32,7 @@ interface EvaluateInput {
 export function evaluateBadges({
   activities,
   logs,
+  ledgerEntries,
   streak,
   earnedIds,
 }: EvaluateInput): Badge[] {
@@ -59,15 +63,15 @@ export function evaluateBadges({
     }
   }
 
-  const totalXp = logs.reduce((sum, log) => sum + log.xp, 0)
-  for (const xp of XP_THRESHOLDS) {
-    if (totalXp >= xp) {
+  const totalCoins = computeCoinSummary(ledgerEntries).earned
+  for (const coins of COIN_THRESHOLDS) {
+    if (totalCoins >= coins) {
       candidates.push({
-        id: badgeId.xpTotal(xp),
-        kind: 'xp-total',
-        title: `${xp.toLocaleString()} XP`,
-        description: `Banked ${xp.toLocaleString()} total XP.`,
-        emoji: '⚡',
+        id: badgeId.coinTotal(coins),
+        kind: 'coin-total',
+        title: `${coins.toLocaleString()} Coins`,
+        description: `Earned ${coins.toLocaleString()} total coins.`,
+        emoji: '🪙',
       })
     }
   }

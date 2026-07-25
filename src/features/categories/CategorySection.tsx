@@ -22,7 +22,7 @@ export function CategorySection({
   return (
     <section className="flex flex-col gap-2">
       <header
-        className="flex items-center gap-2 rounded-2xl px-3 py-2"
+        className="flex items-center gap-2 rounded-3xl border border-white/70 px-3 py-2.5 shadow-sm"
         style={{ backgroundColor: withAlpha(category.color, 0.12) }}
       >
         <span className="text-xl" aria-hidden>

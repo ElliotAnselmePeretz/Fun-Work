@@ -3,7 +3,7 @@ import { EmptyState } from '../components/EmptyState'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { BadgeCard } from '../features/badges/BadgeCard'
 import { useBadges } from '../hooks/useData'
-import { badgeId, STREAK_THRESHOLDS, XP_THRESHOLDS } from '../lib/badges'
+import { badgeId, COIN_THRESHOLDS, STREAK_THRESHOLDS } from '../lib/badges'
 
 /**
  * Locked placeholders for the badges whose targets are knowable up front.
@@ -23,11 +23,11 @@ const LOCKED_PLACEHOLDERS = [
     description: `Keep the flame alive ${days} days running.`,
     emoji: days >= 30 ? '🔥' : '✨',
   })),
-  ...XP_THRESHOLDS.map((xp) => ({
-    id: badgeId.xpTotal(xp),
-    title: `${xp.toLocaleString()} XP`,
-    description: `Bank ${xp.toLocaleString()} total XP.`,
-    emoji: '⚡',
+  ...COIN_THRESHOLDS.map((coins) => ({
+    id: badgeId.coinTotal(coins),
+    title: `${coins.toLocaleString()} Coins`,
+    description: `Earn ${coins.toLocaleString()} total coins.`,
+    emoji: '🪙',
   })),
 ]
 

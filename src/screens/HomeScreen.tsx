@@ -9,38 +9,81 @@ import { StreakFlame } from '../features/streak/StreakFlame'
 import {
   useActivities,
   useCategories,
+  useCoinSummary,
   useProgressMap,
   useRecentLogs,
   useStreak,
-  useTotalXp,
 } from '../hooks/useData'
+import {
+  COINS_PER_SESSION,
+  multiplierLabel,
+  nextCoinMultiplier,
+} from '../lib/coins'
 import { relativeDayLabel, timeLabel } from '../lib/date'
 import { navigate } from '../lib/router'
+import { activeCompanion } from '../lib/shop'
 
 export function HomeScreen() {
   const categories = useCategories()
   const activities = useActivities()
   const progressMap = useProgressMap()
   const streak = useStreak()
-  const totalXp = useTotalXp()
+  const coins = useCoinSummary()
   const recent = useRecentLogs(6)
   const [addingCategory, setAddingCategory] = useState(false)
 
   // Dexie's live queries resolve async; render nothing rather than flashing an
   // empty state at someone who actually has data.
-  if (!categories || !activities || !progressMap || !streak) return null
+  if (!categories || !activities || !progressMap || !streak || !coins) return null
 
   const activityById = new Map(activities.map((activity) => [activity.id, activity]))
-  const categoryById = new Map(categories.map((category) => [category.id, category]))
+  const nextMultiplier = nextCoinMultiplier(streak)
+  const nextReward = Math.round(COINS_PER_SESSION * nextMultiplier)
+  const companion = activeCompanion(coins.ownedItemIds)
+  const hasStars = coins.ownedItemIds.has('star-trail')
+  const hasGoldFrame = coins.ownedItemIds.has('golden-frame')
+  const hasCrown = coins.ownedItemIds.has('habit-royalty')
 
   return (
     <div className="flex flex-col gap-5">
       <ScreenHeader
-        title="Fun-Work"
-        subtitle={`${totalXp?.toLocaleString() ?? 0} XP total`}
+        title={`${hasCrown ? '👑 ' : ''}Fun-Work`}
+        subtitle="Turn today into a win"
+        action={
+          <button
+            onClick={() => navigate({ name: 'shop' })}
+            className="coin-pill"
+            aria-label={`${coins.balance} coins. Open reward shop`}
+          >
+            <span aria-hidden>🪙</span>
+            {coins.balance.toLocaleString()}
+          </button>
+        }
       />
 
-      <Card className="p-4">
+      <section
+        className={`quest-hero ${hasStars ? 'quest-hero-stars' : ''} ${
+          hasGoldFrame ? 'quest-hero-gold' : ''
+        }`}
+      >
+        <div className="relative z-10 max-w-[72%]">
+          <p className="section-kicker text-white/70">Today's quest</p>
+          <h2 className="mt-1 text-2xl font-black leading-tight text-white">
+            {streak.loggedToday ? 'Keep the momentum going!' : 'Make one move to level up.'}
+          </h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="quest-chip">
+              {multiplierLabel(nextMultiplier)} streak boost
+            </span>
+            <span className="quest-chip">+{nextReward} 🪙 next session</span>
+          </div>
+        </div>
+        <div className="quest-mascot" aria-hidden>
+          {companion?.emoji ?? (streak.current >= 7 ? '🚀' : '⚔️')}
+        </div>
+      </section>
+
+      <Card className="streak-card p-4">
         <StreakFlame streak={streak} />
       </Card>
 
@@ -97,16 +140,22 @@ export function HomeScreen() {
 
       {recent && recent.length > 0 && (
         <section>
-          <h2 className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
-            Recent
-          </h2>
-          <Card className="divide-y-2 divide-swan">
+          <div className="mb-2 flex items-end justify-between">
+            <div>
+              <p className="section-kicker">Adventure log</p>
+              <h2 className="text-lg font-black">Recent wins</h2>
+            </div>
+            <span className="text-xs font-bold text-ink-soft">
+              {coins.earned.toLocaleString()} earned
+            </span>
+          </div>
+          <Card className="divide-y-2 divide-swan/80 overflow-hidden">
             {recent.map((log) => {
               const activity = activityById.get(log.activityId)
-              const category = activity ? categoryById.get(activity.categoryId) : undefined
+              const reward = coins.rewardsByLogId.get(log.id)?.coins ?? COINS_PER_SESSION
               return (
-                <div key={log.id} className="flex items-center gap-3 px-3 py-2.5">
-                  <span className="text-lg" aria-hidden>
+                <div key={log.id} className="flex items-center gap-3 px-3 py-3">
+                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-polar text-lg" aria-hidden>
                     {activity?.emoji ?? '⭐'}
                   </span>
                   <span className="min-w-0 flex-1">
@@ -118,10 +167,9 @@ export function HomeScreen() {
                     </span>
                   </span>
                   <span
-                    className="shrink-0 text-xs font-extrabold"
-                    style={{ color: category?.color ?? '#afafaf' }}
+                    className="shrink-0 rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark"
                   >
-                    +{log.xp}
+                    +{reward} 🪙
                   </span>
                 </div>
               )

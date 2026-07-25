@@ -8,6 +8,7 @@ import { HomeScreen } from './screens/HomeScreen'
 import { ImageImportScreen } from './screens/ImageImportScreen'
 import { OrganizeScreen } from './screens/OrganizeScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
+import { ShopScreen } from './screens/ShopScreen'
 import { StatsScreen } from './screens/StatsScreen'
 
 function CurrentScreen() {
@@ -20,6 +21,8 @@ function CurrentScreen() {
       return <ActivityScreen key={route.activityId} activityId={route.activityId} />
     case 'badges':
       return <BadgesScreen />
+    case 'shop':
+      return <ShopScreen />
     case 'bulk-add':
       return <BulkAddScreen />
     case 'image-add':
@@ -39,7 +42,7 @@ export default function App() {
   const route = useRoute()
 
   return (
-    <div className="mx-auto min-h-full max-w-md">
+    <div className="app-shell mx-auto min-h-full max-w-md">
       {/* Bottom padding clears the fixed tab bar. */}
       <main className="safe-top px-4 pb-28 pt-4">
         <CurrentScreen />

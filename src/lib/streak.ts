@@ -1,4 +1,4 @@
-import type { LogEntry, StreakInfo } from '../types'
+import type { SessionLogEntry, StreakInfo } from '../types'
 import { addDays, todayKey } from './date'
 
 /**
@@ -8,7 +8,7 @@ import { addDays, todayKey } from './date'
  * rest of the day. So the run is allowed to start at either today or
  * yesterday; anything older means the chain is already broken.
  */
-export function computeStreak(logs: LogEntry[]): StreakInfo {
+export function computeStreak(logs: SessionLogEntry[]): StreakInfo {
   const days = new Set(logs.map((log) => log.day))
   const sorted = [...days].sort().reverse()
   const today = todayKey()

@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { Modal } from '../../components/Modal'
 import { arrayMove } from '../../lib/ordering'
-import { defaultSessionsForLevel } from '../../lib/xp'
+import {
+  defaultSessionsForLevel,
+  MAX_LEVEL_COUNT,
+  MIN_LEVEL_COUNT,
+} from '../../lib/xp'
 import type { Activity, Level } from '../../types'
 import { makeLevel, setLevels } from './activityActions'
 import { refreshBadges } from './logActions'
@@ -38,6 +42,21 @@ export function LevelEditor({
     setDraft(arrayMove(levels, index, to))
   }
 
+  const resize = (count: number) => {
+    const nextCount = Math.min(MAX_LEVEL_COUNT, Math.max(MIN_LEVEL_COUNT, count))
+    if (nextCount <= levels.length) {
+      setDraft(levels.slice(0, nextCount))
+      return
+    }
+    setDraft([
+      ...levels,
+      ...Array.from({ length: nextCount - levels.length }, (_, offset) => {
+        const index = levels.length + offset
+        return makeLevel(`Level ${index + 1}`, defaultSessionsForLevel(index))
+      }),
+    ])
+  }
+
   const save = async () => {
     const cleaned = levels
       .map((level, index) => ({
@@ -60,6 +79,36 @@ export function LevelEditor({
           {levels.length} levels · {totalSessions} sessions to finish. Levels you've
           already cleared are marked — editing those can change what level you're on.
         </p>
+
+        <div className="flex items-center justify-between rounded-2xl bg-polar p-3">
+          <span>
+            <span className="block text-sm font-extrabold">Level count</span>
+            <span className="block text-xs text-ink-soft">Match the path to your milestones.</span>
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => resize(levels.length - 1)}
+              disabled={levels.length <= MIN_LEVEL_COUNT}
+              aria-label="Remove last level"
+              className="level-stepper"
+            >
+              −
+            </button>
+            <output className="w-8 text-center text-xl font-black text-sky">
+              {levels.length}
+            </output>
+            <button
+              type="button"
+              onClick={() => resize(levels.length + 1)}
+              disabled={levels.length >= MAX_LEVEL_COUNT}
+              aria-label="Add another level"
+              className="level-stepper"
+            >
+              +
+            </button>
+          </div>
+        </div>
 
         <ul className="flex flex-col gap-2">
           {levels.map((level, index) => {
@@ -124,22 +173,6 @@ export function LevelEditor({
             )
           })}
         </ul>
-
-        <Button
-          variant="ghost"
-          className="border-2 border-dashed border-swan"
-          onClick={() =>
-            setDraft([
-              ...levels,
-              makeLevel(
-                `Level ${levels.length + 1}`,
-                defaultSessionsForLevel(levels.length),
-              ),
-            ])
-          }
-        >
-          + Add level
-        </Button>
 
         <Button size="lg" onClick={save} disabled={levels.length === 0}>
           Save levels

@@ -33,7 +33,7 @@ export async function updateCategory(
 
 /**
  * Deleting a category deletes its activities and their logs — otherwise the
- * logs would keep counting toward XP and streaks with nothing to point at.
+ * logs would keep counting toward coins and streaks with nothing to point at.
  */
 export async function deleteCategory(id: Id): Promise<void> {
   await db.transaction('rw', [db.categories, db.activities, db.logs], async () => {

@@ -45,20 +45,36 @@ devices. Use Settings → Export to move it.
   emoji and color.
 - **Activity** — belongs to a category ("Running", "Math AA") and has a ladder
   of progressive levels.
-- **Log** — one tap is one session, worth 10 XP. Logs are the only thing
-  actually stored; XP, levels, streaks and badges are all derived from them, so
-  they can never drift out of sync.
+- **Log** — one tap is one session. A session starts at 10 coins and earns more
+  when a streak multiplier is active. Session and shop-purchase events are the
+  only stored progress history; coin balances, levels, streaks, badges and item
+  ownership are all derived from that history, so they cannot drift out of sync.
 - **Streak** — consecutive calendar days with at least one log. Not having
   logged *today* doesn't break it — you still have the rest of the day.
 - **Badges** — awarded automatically for your first log, every level-up,
-  streaks of 3/7/14/30/100 days, XP totals, and completing every level of an
+  streaks of 3/7/14/30/100 days, coin totals, and completing every level of an
   activity.
+- **Reward shop** — spend derived coins on collectibles, companions and visual
+  upgrades. A purchase is appended to the same history rather than mutating a
+  stored balance.
+
+### Coins and streak multipliers
+
+Every session starts at 10 coins. Consecutive active days raise the reward for
+every session on that day:
+
+- Days 1–2: 1×
+- Days 3–6: 1.5×
+- Days 7–13: 2×
+- Days 14–29: 2.5×
+- Day 30 and beyond: 3×
 
 ### Levels
 
-New activities get 10 auto-generated levels that take gradually more sessions
-(2, 3, 5, 6, 8…). If you'd rather name your own milestones, tick **Name my own
-milestones** when creating the activity and type one per line.
+When creating an activity, choose any quick ladder size from 1–30 levels, or
+switch to named milestones and type one per line. Every milestone becomes one
+level. Activity → **Edit levels** lets you resize the path, rename or reorder
+levels, and change how many sessions each one needs at any time.
 
 ## Bulk import format
 
@@ -127,11 +143,12 @@ src/
     badges/     Badge cards and the celebration modal
     categories/ Category CRUD and the dashboard section
     import/     Bulk-text parser, import preview, organize logic
+    shop/       Coin-ledger purchase action
     streak/     Streak flame and week strip
   screens/      Home, Activity, Badges, BulkAdd, ImageImport, Organize,
-                Stats, Settings
-  lib/          db.ts (Dexie), xp.ts, streak.ts, badges.ts, date.ts,
-                ordering.ts, palette.ts, router.ts
+                Shop, Stats, Settings
+  lib/          db.ts (Dexie), coins.ts, shop.ts, xp.ts, streak.ts,
+                badges.ts, date.ts, ordering.ts, palette.ts, router.ts
   hooks/        useData (live queries), useRoute, useConfetti
   store/        Ephemeral UI state (celebration queue)
   types/        Shared types
@@ -156,6 +173,9 @@ export first if you might want it back.
   drag-and-drop organize screen.
 - **Phase 3 — Enhancements:** done. Screenshot import via the Anthropic API, a
   level/milestone editor (Activity → Edit levels), and a Stats tab.
+- **Phase 4 — Quest economy:** done. Adjustable 1–30-level paths, named
+  milestone ladders, derived coins with streak multipliers, a reward shop, and
+  a richer game-like home and navigation design.
 
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import

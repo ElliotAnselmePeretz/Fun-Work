@@ -3,7 +3,11 @@ import { Button } from '../../components/Button'
 import { EmojiPicker } from '../../components/EmojiPicker'
 import { Modal } from '../../components/Modal'
 import { TextArea, TextField } from '../../components/TextField'
-import { DEFAULT_LEVEL_COUNT } from '../../lib/xp'
+import {
+  DEFAULT_LEVEL_COUNT,
+  MAX_LEVEL_COUNT,
+  MIN_LEVEL_COUNT,
+} from '../../lib/xp'
 import type { Activity, Category } from '../../types'
 import { createActivity, deleteActivity, updateActivity } from './activityActions'
 
@@ -26,6 +30,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
   const [emoji, setEmoji] = useState(activity?.emoji ?? '⭐')
   const [showMilestones, setShowMilestones] = useState(false)
   const [milestones, setMilestones] = useState('')
+  const [levelCount, setLevelCount] = useState(DEFAULT_LEVEL_COUNT)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const milestoneNames = milestones
@@ -43,6 +48,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
         name,
         emoji,
         levelNames: showMilestones ? milestoneNames : undefined,
+        levelCount: showMilestones ? undefined : levelCount,
       })
     }
     onClose()
@@ -74,7 +80,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
         <EmojiPicker value={emoji} onChange={setEmoji} extra={['⭐', '🏃', '📖', '🎹']} />
 
         {!editing && (
-          <div className="rounded-2xl border-2 border-swan p-3">
+          <div className="rounded-3xl border-2 border-swan bg-polar/70 p-3">
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
@@ -84,16 +90,16 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
               />
               <span>
                 <span className="block text-sm font-extrabold">
-                  Name my own milestones
+                  Build from named milestones
                 </span>
                 <span className="block text-xs text-ink-soft">
-                  Leave this off and you get {DEFAULT_LEVEL_COUNT} levels that get
-                  gradually longer. You can rename them any time.
+                  Each milestone becomes a level. Leave this off to choose a quick
+                  ladder size instead.
                 </span>
               </span>
             </label>
 
-            {showMilestones && (
+            {showMilestones ? (
               <div className="mt-3">
                 <TextArea
                   label="One milestone per line"
@@ -107,6 +113,42 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
                   {milestoneNames.length === 1 ? '' : 's'}
                   {milestoneNames.length === 0 && ' — falls back to the default ladder'}
                 </p>
+              </div>
+            ) : (
+              <div className="mt-3 flex items-center justify-between rounded-2xl bg-white p-3">
+                <span>
+                  <span className="block text-sm font-extrabold">Number of levels</span>
+                  <span className="block text-xs text-ink-soft">
+                    You can rename every level later.
+                  </span>
+                </span>
+                <div className="flex items-center gap-2" aria-label="Number of levels">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setLevelCount((count) => Math.max(MIN_LEVEL_COUNT, count - 1))
+                    }
+                    disabled={levelCount <= MIN_LEVEL_COUNT}
+                    aria-label="Remove one level"
+                    className="level-stepper"
+                  >
+                    −
+                  </button>
+                  <output className="w-8 text-center text-xl font-black text-sky">
+                    {levelCount}
+                  </output>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setLevelCount((count) => Math.min(MAX_LEVEL_COUNT, count + 1))
+                    }
+                    disabled={levelCount >= MAX_LEVEL_COUNT}
+                    aria-label="Add one level"
+                    className="level-stepper"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             )}
           </div>

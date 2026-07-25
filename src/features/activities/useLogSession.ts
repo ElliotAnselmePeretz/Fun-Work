@@ -5,7 +5,7 @@ import { logSession } from './logActions'
 
 /**
  * Wraps the log write with its feedback: a confetti burst at the tap point, a
- * floating XP number, and any level-up or badge celebration queued for the
+ * floating coin reward, and any level-up or badge celebration queued for the
  * modal. Components get one `log()` call and don't orchestrate any of it.
  */
 export function useLogSession() {
@@ -13,6 +13,7 @@ export function useLogSession() {
   const enqueueBadges = useUiStore((state) => state.enqueueBadges)
   const setLevelUp = useUiStore((state) => state.setLevelUp)
   const [popupToken, setPopupToken] = useState<number | null>(null)
+  const [popupCoins, setPopupCoins] = useState(0)
   const [pending, setPending] = useState(false)
 
   const log = useCallback(
@@ -22,6 +23,7 @@ export function useLogSession() {
       try {
         const result = await logSession(activityId)
 
+        setPopupCoins(result.coinsGained)
         setPopupToken(Date.now())
         const x = event ? event.clientX / window.innerWidth : 0.5
         const y = event ? event.clientY / window.innerHeight : 0.6
@@ -40,5 +42,5 @@ export function useLogSession() {
     [burst, celebrate, enqueueBadges, pending, setLevelUp],
   )
 
-  return { log, popupToken, pending }
+  return { log, popupToken, popupCoins, pending }
 }
