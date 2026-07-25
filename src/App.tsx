@@ -3,7 +3,9 @@ import { CelebrationModal } from './features/badges/CelebrationModal'
 import { useRoute } from './hooks/useRoute'
 import { ActivityScreen } from './screens/ActivityScreen'
 import { BadgesScreen } from './screens/BadgesScreen'
+import { BulkAddScreen } from './screens/BulkAddScreen'
 import { HomeScreen } from './screens/HomeScreen'
+import { OrganizeScreen } from './screens/OrganizeScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 
 function CurrentScreen() {
@@ -16,6 +18,10 @@ function CurrentScreen() {
       return <ActivityScreen key={route.activityId} activityId={route.activityId} />
     case 'badges':
       return <BadgesScreen />
+    case 'bulk-add':
+      return <BulkAddScreen />
+    case 'organize':
+      return <OrganizeScreen />
     case 'settings':
       return <SettingsScreen />
     default:
