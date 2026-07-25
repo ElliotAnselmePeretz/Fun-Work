@@ -19,6 +19,12 @@ export interface ShopItem {
   maxHpBonus?: number
   starter?: boolean
   rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary'
+  /**
+   * Sprite art, which needs nearest-neighbour scaling to stay crisp. Painted
+   * art must not set this, or it turns blocky. Declared per item rather than
+   * matched on the filename so adding gear cannot silently break the styling.
+   */
+  pixelArt?: boolean
 }
 
 /**
@@ -39,6 +45,21 @@ export const SHOP_ITEMS: ShopItem[] = [
     damage: 8,
     critEvery: 5,
     starter: true,
+    pixelArt: true,
+    rarity: 'Common',
+  },
+  {
+    id: 'oak-club',
+    name: 'Oak Club',
+    icon: 'hammer',
+    gearType: 'weapon',
+    image: '/assets/gear/weapons/oak-club.png',
+    description: 'A stripped branch with a weighted end. Cheap, clumsy, effective.',
+    role: 'First upgrade',
+    cost: 30,
+    damage: 11,
+    critEvery: 6,
+    pixelArt: true,
     rarity: 'Common',
   },
   {
@@ -52,6 +73,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 70,
     damage: 13,
     critEvery: 4,
+    pixelArt: true,
     rarity: 'Common',
   },
   {
@@ -65,6 +87,21 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 120,
     damage: 20,
     critEvery: 5,
+    pixelArt: true,
+    rarity: 'Rare',
+  },
+  {
+    id: 'twin-fang',
+    name: 'Twin Fang',
+    icon: 'swords',
+    gearType: 'weapon',
+    image: '/assets/gear/weapons/twin-fang.png',
+    description: 'A paired blade with a gilded crossguard and a quick second bite.',
+    role: 'Duelist blade',
+    cost: 170,
+    damage: 27,
+    critEvery: 4,
+    pixelArt: true,
     rarity: 'Rare',
   },
   {
@@ -78,6 +115,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 220,
     damage: 36,
     critEvery: 4,
+    pixelArt: true,
     rarity: 'Rare',
   },
   {
@@ -91,6 +129,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 280,
     damage: 44,
     critEvery: 5,
+    pixelArt: true,
     rarity: 'Rare',
   },
   {
@@ -107,6 +146,19 @@ export const SHOP_ITEMS: ShopItem[] = [
     rarity: 'Epic',
   },
   {
+    id: 'siege-crossbow',
+    name: 'Siege Crossbow',
+    icon: 'target',
+    gearType: 'weapon',
+    image: '/assets/gear/weapons/siege-crossbow.png',
+    description: 'A braced arbalest that punches a critical bolt through plate.',
+    role: 'Precision ranged',
+    cost: 430,
+    damage: 68,
+    critEvery: 3,
+    rarity: 'Epic',
+  },
+  {
     id: 'flamebrand',
     name: 'Flamebrand',
     icon: 'flame',
@@ -117,6 +169,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 480,
     damage: 75,
     critEvery: 4,
+    pixelArt: true,
     rarity: 'Epic',
   },
   {
@@ -129,6 +182,20 @@ export const SHOP_ITEMS: ShopItem[] = [
     role: 'Elite finisher',
     cost: 600,
     damage: 95,
+    critEvery: 3,
+    pixelArt: true,
+    rarity: 'Legendary',
+  },
+  {
+    id: 'earthsplitter',
+    name: 'Earthsplitter',
+    icon: 'axe',
+    gearType: 'weapon',
+    image: '/assets/gear/weapons/earthsplitter.png',
+    description: 'A twin-headed greataxe that lands somewhere between a hit and an earthquake.',
+    role: 'Late-game axe',
+    cost: 800,
+    damage: 120,
     critEvery: 3,
     rarity: 'Legendary',
   },
@@ -146,6 +213,20 @@ export const SHOP_ITEMS: ShopItem[] = [
     rarity: 'Legendary',
   },
   {
+    id: 'apprentice-wand',
+    name: 'Apprentice Wand',
+    icon: 'sparkles',
+    gearType: 'magic',
+    image: '/assets/gear/magic/apprentice-wand.png',
+    description: 'A stubby brass wand. Barely a weapon, but it closes small wounds.',
+    role: 'First healing',
+    cost: 60,
+    damage: 7,
+    healing: 6,
+    pixelArt: true,
+    rarity: 'Common',
+  },
+  {
     id: 'druid-branch',
     name: 'Druid Branch',
     icon: 'sparkles',
@@ -156,6 +237,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 160,
     damage: 10,
     healing: 10,
+    pixelArt: true,
     rarity: 'Rare',
   },
   {
@@ -169,6 +251,21 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 340,
     damage: 26,
     healing: 16,
+    pixelArt: true,
+    rarity: 'Epic',
+  },
+  {
+    id: 'tidecaller-staff',
+    name: 'Tidecaller Staff',
+    icon: 'zap',
+    gearType: 'magic',
+    image: '/assets/gear/magic/tidecaller-staff.png',
+    description: 'Frost magic that chills the arena and knits wounds between blows.',
+    role: 'Sustained pressure',
+    cost: 470,
+    damage: 40,
+    healing: 22,
+    pixelArt: true,
     rarity: 'Epic',
   },
   {
@@ -182,6 +279,20 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 700,
     damage: 55,
     healing: 30,
+    pixelArt: true,
+    rarity: 'Legendary',
+  },
+  {
+    id: 'phoenix-signet',
+    name: 'Phoenix Signet',
+    icon: 'flame',
+    gearType: 'magic',
+    image: '/assets/gear/magic/phoenix-signet.png',
+    description: 'A burning ring that answers every survived blow with new life.',
+    role: 'Elite sustain',
+    cost: 900,
+    damage: 72,
+    healing: 40,
     rarity: 'Legendary',
   },
   {
@@ -212,6 +323,20 @@ export const SHOP_ITEMS: ShopItem[] = [
     rarity: 'Common',
   },
   {
+    id: 'oak-buckler',
+    name: 'Oak Buckler',
+    icon: 'shield',
+    gearType: 'armour',
+    image: '/assets/gear/armour/oak-buckler.png',
+    description: 'Banded oak on a leather strap. It will not last, but it helps today.',
+    role: 'First shield',
+    cost: 35,
+    defense: 3,
+    maxHpBonus: 20,
+    pixelArt: true,
+    rarity: 'Common',
+  },
+  {
     id: 'hide-vest',
     name: 'Hide Vest',
     icon: 'shield',
@@ -235,6 +360,20 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 90,
     defense: 5,
     maxHpBonus: 35,
+    rarity: 'Rare',
+  },
+  {
+    id: 'ranger-scale',
+    name: 'Ranger Scale',
+    icon: 'shield',
+    gearType: 'armour',
+    image: '/assets/gear/armour/ranger-scale.png',
+    description: 'Light silvered scale that trades bulk for a deeper health pool.',
+    role: 'Mid-tier scale',
+    cost: 180,
+    defense: 7,
+    maxHpBonus: 50,
+    pixelArt: true,
     rarity: 'Rare',
   },
   {
@@ -274,6 +413,19 @@ export const SHOP_ITEMS: ShopItem[] = [
     cost: 750,
     defense: 22,
     maxHpBonus: 120,
+    rarity: 'Legendary',
+  },
+  {
+    id: 'aegis-bulwark',
+    name: 'Aegis Bulwark',
+    icon: 'castle',
+    gearType: 'armour',
+    image: '/assets/gear/armour/aegis-bulwark.png',
+    description: 'A warded greatshield. Nothing in the arena hits harder than it holds.',
+    role: 'Endgame guard',
+    cost: 950,
+    defense: 27,
+    maxHpBonus: 150,
     rarity: 'Legendary',
   },
 ]

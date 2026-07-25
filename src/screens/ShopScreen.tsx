@@ -237,7 +237,11 @@ function GearCard({
     >
       <div className="gear-card-visual">
         <span className="gear-rank">{String(index + 1).padStart(2, '0')}</span>
-        <img src={item.image} alt={item.name} />
+        <img
+          src={item.image}
+          alt={item.name}
+          className={item.pixelArt ? 'pixel-art' : undefined}
+        />
       </div>
 
       <div className="gear-card-body">

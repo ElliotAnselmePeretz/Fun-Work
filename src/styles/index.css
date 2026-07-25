@@ -262,8 +262,9 @@ body::before {
   @apply h-full w-full object-contain p-1.5;
   filter: drop-shadow(0 7px 7px rgb(0 0 0 / 0.34));
 }
-.gear-card-visual img[src*='/weapons/']:not([src$='storm-hammer.png']):not([src$='voidbreaker.png']),
-.gear-card-visual img[src*='/magic/']:not([src$='codex-of-renewal.png']) {
+/* Sprite art only. Painted art must scale smoothly, so this keys off the
+   item's own pixelArt flag rather than guessing from the file name. */
+.pixel-art {
   image-rendering: pixelated;
 }
 .gear-rank {
@@ -347,6 +348,119 @@ body::before {
 }
 .rarity-legendary {
   @apply bg-gold/20 text-gold-dark;
+}
+
+/* ---------------------------------------------------------------------------
+   The level journey: a winding route through named chapters.
+   Geometry constants here mirror STEP and STOP_HEIGHT in LevelPath.tsx.
+   ------------------------------------------------------------------------ */
+.journey {
+  @apply flex flex-col gap-3;
+}
+.journey-chapter {
+  @apply relative overflow-hidden rounded-[1.75rem] border border-swan/70 px-3 pb-6 pt-3;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--chapter-accent) 11%, transparent),
+      transparent 45%
+    ),
+    white;
+}
+.journey-chapter::after {
+  /* A soft horizon so each chapter reads as its own patch of ground. */
+  content: '';
+  @apply pointer-events-none absolute inset-x-0 bottom-0 h-24;
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    color-mix(in srgb, var(--chapter-accent) 13%, transparent),
+    transparent 70%
+  );
+}
+.journey-chapter-active {
+  border-color: color-mix(in srgb, var(--chapter-accent) 45%, transparent);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--chapter-accent) 16%, transparent);
+}
+.journey-banner {
+  /* Above the trail, so the route reads as passing behind the signpost. */
+  @apply relative z-20 mb-1 flex items-center justify-between gap-2 rounded-full px-3 py-1.5;
+  background: color-mix(in srgb, var(--chapter-accent) 14%, white);
+}
+.journey-banner-name {
+  @apply truncate text-xs font-black uppercase tracking-[0.14em];
+  color: color-mix(in srgb, var(--chapter-accent) 72%, #302d46);
+}
+.journey-banner-state {
+  @apply shrink-0 text-[9px] font-black uppercase tracking-[0.12em] text-ink-soft;
+}
+.journey-chapter-cleared .journey-banner-state {
+  @apply text-grass-dark;
+}
+
+.journey-stops {
+  @apply relative z-10 flex flex-col;
+}
+.journey-stop {
+  @apply relative flex flex-col items-center;
+  height: 88px;
+  transform: translateX(calc(var(--offset) * 30px));
+}
+/* The leg back to the previous stop. Anchored at this node's centre and
+   rotated so it lands on the previous one. */
+.journey-link {
+  @apply pointer-events-none absolute left-1/2 z-0 w-1 rounded-full text-swan;
+  bottom: 28px;
+  transform-origin: 50% 100%;
+  background-image: repeating-linear-gradient(
+    to top,
+    currentColor 0 6px,
+    transparent 6px 12px
+  );
+}
+
+.level-node {
+  @apply relative z-10 grid place-items-center;
+}
+.level-node-ring {
+  @apply absolute rounded-full;
+  inset: -10px;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+}
+.level-node-face {
+  @apply grid h-14 w-14 place-items-center rounded-full;
+  transition: transform 160ms ease;
+}
+.journey-stop-current .level-node-face {
+  /* A white gap so the progress ring stays legible against a same-hue node. */
+  outline: 4px solid white;
+}
+.level-node-landmark .level-node-face {
+  @apply h-16 w-16;
+}
+.level-node-index {
+  @apply text-xl font-black;
+}
+.journey-stop-name {
+  @apply relative z-10 mt-1 max-w-28 truncate text-center text-[11px] font-bold text-ink;
+}
+.journey-stop-locked .journey-stop-name {
+  @apply text-hare;
+}
+
+.journey-stop-current .level-node-face {
+  animation: node-breathe 2.6s ease-in-out infinite;
+}
+.level-node-arrived .level-node-face {
+  animation: node-arrive 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.level-node-arrived::after {
+  /* One expanding ring where the traveller just arrived, in the category's
+     own colour so it stays visible whatever that colour is. */
+  content: '';
+  @apply pointer-events-none absolute rounded-full border-4;
+  border-color: var(--node-accent, currentColor);
+  inset: -4px;
+  animation: node-arrive-ring 900ms ease-out both;
 }
 
 .level-stepper {
@@ -444,7 +558,6 @@ body::before {
 }
 .armour-chip-art img {
   @apply h-full w-full object-contain p-0.5;
-  image-rendering: pixelated;
 }
 .loadout-lock {
   @apply flex items-center gap-1 rounded-full bg-swan px-2 py-1 text-[9px] font-black uppercase tracking-wide text-ink-soft;
@@ -618,6 +731,39 @@ body::before {
     transform: translateY(-5px) scale(1.015);
   }
 }
+@keyframes node-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.04);
+  }
+}
+@keyframes node-arrive {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.28) rotate(-6deg);
+  }
+  70% {
+    transform: scale(0.94) rotate(3deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes node-arrive-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
 @keyframes boss-loss {
   0%,
   100% {
@@ -673,7 +819,14 @@ body::before {
   .boss-art,
   .showcase-item-front,
   .sword-slash,
+  .journey-stop-current .level-node-face,
+  .level-node-arrived .level-node-face,
+  .level-node-arrived::after,
   body::before {
     animation: none;
+  }
+  /* Arrival still needs to be visible without motion, so it keeps its ring. */
+  .level-node-arrived::after {
+    opacity: 0.9;
   }
 }

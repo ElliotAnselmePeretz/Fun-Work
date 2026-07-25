@@ -75,12 +75,24 @@ every session on that day:
 - Days 14–29: 2.5×
 - Day 30 and beyond: 3×
 
-### Levels
+### Levels and the journey
 
 When creating an activity, choose any quick ladder size from 1–30 levels, or
 switch to named milestones and type one per line. Every milestone becomes one
 level. Activity → **Edit levels** lets you resize the path, rename or reorder
 levels, and change how many sessions each one needs at any time.
+
+Levels are laid out as a winding route rather than a list. The route is split
+into named chapters — Green Hollow, Stoneford, Ember Ridge and on — each drawn
+as its own stretch of ground, with the last stop of a chapter shown as a larger
+landmark. Chapters are *derived* from how many levels an activity has (roughly
+four per chapter, up to six chapters), so editing levels re-chapters the route
+immediately; nothing about chapters is stored.
+
+The route is one ordered list for assistive tech: the decorative nodes are
+hidden and each stop announces its name, state and position ("Level 3 of 10").
+Under `prefers-reduced-motion` the animations stop but the arrival ring stays
+visible, so a level-up still reads without movement.
 
 ## Bulk import format
 
@@ -154,8 +166,9 @@ src/
     streak/     Streak flame and week strip
   screens/      Home, Activity, Arena, Badges, BulkAdd, ImageImport, Organize,
                 Shop, Stats, Settings
-  lib/          db.ts (Dexie), bosses.ts, coins.ts, shop.ts, xp.ts, streak.ts,
-                badges.ts, date.ts, ordering.ts, palette.ts, router.ts
+  lib/          db.ts (Dexie), bosses.ts, coins.ts, shop.ts, loadout.ts,
+                journey.ts, xp.ts, streak.ts, badges.ts, date.ts, ordering.ts,
+                palette.ts, router.ts
   hooks/        useData (live queries), useRoute, useConfetti
   store/        Ephemeral UI state (celebration queue)
   types/        Shared types
@@ -165,6 +178,18 @@ src/
 The rules live in `src/lib` as pure functions over the log history, separate
 from the React components that render them — which is why they're
 straightforward to test and reason about.
+
+`lib/loadout.ts` is both a shipped module and the balance harness. It measures a
+loadout by replaying synthetic hits through the same `computeBossProgress` the
+arena uses, so a balance answer can never disagree with a real fight. With the
+dev server running you can check the whole catalog from the browser console:
+
+```js
+const { BOSSES } = await import('/src/lib/bosses.ts')
+const { simulateLoadout } = await import('/src/lib/loadout.ts')
+const { getWeapon, getArmour } = await import('/src/lib/shop.ts')
+simulateLoadout(BOSSES[3], getWeapon('habit-royalty'), getArmour('aegis-bulwark'))
+```
 
 ## Data and backups
 

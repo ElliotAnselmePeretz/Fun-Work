@@ -16,6 +16,7 @@ import {
 } from '../hooks/useData'
 import { COINS_PER_SESSION } from '../lib/coins'
 import { relativeDayLabel, timeLabel } from '../lib/date'
+import { summarizeJourney } from '../lib/journey'
 import { computeProgress, levelFraction } from '../lib/xp'
 
 interface ActivityScreenProps {
@@ -38,6 +39,7 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
   const category = categories.find((c) => c.id === activity.categoryId)
   const color = category?.color ?? '#58cc02'
   const progress = computeProgress(activity, logs)
+  const journey = summarizeJourney(activity, progress)
   const currentLevel = activity.levels[progress.currentLevelIndex]
   const recent = [...logs].sort((a, b) => b.at - a.at).slice(0, 20)
 
@@ -82,7 +84,10 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
           label="Progress to next level"
         />
         <div className="flex justify-between text-xs font-bold text-ink-soft">
-          <span>{progress.totalSessions} sessions</span>
+          <span>
+            {journey.levelsCleared}/{journey.levelTotal} stops ·{' '}
+            {journey.chaptersCleared}/{journey.chapterTotal} chapters
+          </span>
           <span>
             {(coins.earnedByActivityId.get(activity.id) ?? 0).toLocaleString()} coins
           </span>
@@ -92,7 +97,9 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
       <section>
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">
-            Path
+            {journey.currentChapter
+              ? `Journey · ${journey.currentChapter.name}`
+              : 'Journey · complete'}
           </h2>
           <button
             onClick={() => setEditingLevels(true)}

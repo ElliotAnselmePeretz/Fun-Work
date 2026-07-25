@@ -263,7 +263,11 @@ export function ArenaScreen() {
                     weapon?.id === item.id ? 'weapon-chip-active' : ''
                   }`}
                 >
-                  <img src={item.image} alt="" className="loadout-weapon-art" />
+                  <img
+                    src={item.image}
+                    alt=""
+                    className={`loadout-weapon-art ${item.pixelArt ? 'pixel-art' : ''}`}
+                  />
                   <span className="min-w-0 text-left">
                     <span className="block truncate text-xs font-black">
                       {item.name}
@@ -302,7 +306,11 @@ export function ArenaScreen() {
                   }`}
                 >
                   <span className="armour-chip-art">
-                    <img src={item.image} alt="" />
+                    <img
+                      src={item.image}
+                      alt=""
+                      className={item.pixelArt ? 'pixel-art' : undefined}
+                    />
                   </span>
                   <span className="min-w-0 text-left">
                     <span className="block truncate text-xs font-black">
