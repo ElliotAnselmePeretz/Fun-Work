@@ -3,6 +3,7 @@ import { hrefFor, type Route } from '../lib/router'
 const TABS: { route: Route; label: string; emoji: string }[] = [
   { route: { name: 'home' }, label: 'Home', emoji: '🏠' },
   { route: { name: 'badges' }, label: 'Badges', emoji: '🏅' },
+  { route: { name: 'stats' }, label: 'Stats', emoji: '📊' },
   { route: { name: 'settings' }, label: 'Settings', emoji: '⚙️' },
 ]
 

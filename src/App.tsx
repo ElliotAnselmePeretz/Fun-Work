@@ -5,8 +5,10 @@ import { ActivityScreen } from './screens/ActivityScreen'
 import { BadgesScreen } from './screens/BadgesScreen'
 import { BulkAddScreen } from './screens/BulkAddScreen'
 import { HomeScreen } from './screens/HomeScreen'
+import { ImageImportScreen } from './screens/ImageImportScreen'
 import { OrganizeScreen } from './screens/OrganizeScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
+import { StatsScreen } from './screens/StatsScreen'
 
 function CurrentScreen() {
   const route = useRoute()
@@ -20,8 +22,12 @@ function CurrentScreen() {
       return <BadgesScreen />
     case 'bulk-add':
       return <BulkAddScreen />
+    case 'image-add':
+      return <ImageImportScreen />
     case 'organize':
       return <OrganizeScreen />
+    case 'stats':
+      return <StatsScreen />
     case 'settings':
       return <SettingsScreen />
     default:

@@ -1,0 +1,143 @@
+import { useMemo } from 'react'
+import { Card } from '../components/Card'
+import { EmptyState } from '../components/EmptyState'
+import { ProgressBar } from '../components/ProgressBar'
+import { ScreenHeader } from '../components/ScreenHeader'
+import { useActivities, useCategories, useLogs, useStreak } from '../hooks/useData'
+import { dayKeyToDate } from '../lib/date'
+import { recentDayWindow } from '../lib/streak'
+
+const WINDOW_DAYS = 30
+
+export function StatsScreen() {
+  const logs = useLogs()
+  const categories = useCategories()
+  const activities = useActivities()
+  const streak = useStreak()
+
+  const perDay = useMemo(() => {
+    if (!logs) return null
+    const counts = new Map<string, number>()
+    for (const log of logs) counts.set(log.day, (counts.get(log.day) ?? 0) + 1)
+    return recentDayWindow(WINDOW_DAYS).map((day) => ({
+      day,
+      count: counts.get(day) ?? 0,
+    }))
+  }, [logs])
+
+  const perCategory = useMemo(() => {
+    if (!logs || !categories || !activities) return null
+    const categoryOf = new Map(
+      activities.map((activity) => [activity.id, activity.categoryId]),
+    )
+    const xp = new Map<string, number>()
+    for (const log of logs) {
+      const categoryId = categoryOf.get(log.activityId)
+      if (categoryId) xp.set(categoryId, (xp.get(categoryId) ?? 0) + log.xp)
+    }
+    const total = [...xp.values()].reduce((sum, value) => sum + value, 0)
+    return categories
+      .map((category) => ({ category, xp: xp.get(category.id) ?? 0, total }))
+      .filter((row) => row.xp > 0)
+      .sort((a, b) => b.xp - a.xp)
+  }, [logs, categories, activities])
+
+  if (!logs || !perDay || !perCategory || !streak) return null
+
+  if (logs.length === 0) {
+    return (
+      <div className="flex flex-col gap-5">
+        <ScreenHeader title="Stats" />
+        <EmptyState
+          emoji="📊"
+          title="Nothing to chart yet"
+          description="Log a few sessions and your activity over time shows up here."
+        />
+      </div>
+    )
+  }
+
+  const busiest = Math.max(...perDay.map((entry) => entry.count), 1)
+  const totalXp = logs.reduce((sum, log) => sum + log.xp, 0)
+
+  return (
+    <div className="flex flex-col gap-5">
+      <ScreenHeader title="Stats" subtitle={`${logs.length} sessions logged`} />
+
+      <div className="grid grid-cols-3 gap-2">
+        <Stat label="Total XP" value={totalXp.toLocaleString()} />
+        <Stat label="Streak" value={`${streak.current}d`} />
+        <Stat label="Best" value={`${streak.longest}d`} />
+      </div>
+
+      <section>
+        <h2 className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
+          Last {WINDOW_DAYS} days
+        </h2>
+        <Card className="p-4">
+          {/* Column heights are relative to the busiest day in the window, so
+              the shape stays readable whatever the absolute volume. */}
+          <div className="flex h-28 items-end gap-[3px]" role="img"
+            aria-label={`Sessions per day over the last ${WINDOW_DAYS} days`}>
+            {perDay.map((entry) => (
+              <div
+                key={entry.day}
+                title={`${entry.day}: ${entry.count} session${entry.count === 1 ? '' : 's'}`}
+                className="flex-1 rounded-t-sm bg-grass transition-[height]"
+                style={{
+                  height: `${Math.max(entry.count === 0 ? 3 : 8, (entry.count / busiest) * 100)}%`,
+                  opacity: entry.count === 0 ? 0.25 : 1,
+                }}
+              />
+            ))}
+          </div>
+          <div className="mt-2 flex justify-between text-[10px] font-bold text-ink-soft">
+            <span>
+              {dayKeyToDate(perDay[0].day).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+              })}
+            </span>
+            <span>Today</span>
+          </div>
+        </Card>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
+          XP per category
+        </h2>
+        <Card className="flex flex-col gap-3 p-4">
+          {perCategory.map(({ category, xp, total }) => (
+            <div key={category.id}>
+              <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
+                <span className="truncate font-extrabold">
+                  {category.emoji} {category.name}
+                </span>
+                <span className="shrink-0 text-xs font-bold text-ink-soft">
+                  {xp.toLocaleString()} XP · {Math.round((xp / total) * 100)}%
+                </span>
+              </div>
+              <ProgressBar
+                value={xp / total}
+                color={category.color}
+                label={`${category.name} share of total XP`}
+              />
+            </div>
+          ))}
+        </Card>
+      </section>
+    </div>
+  )
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <Card className="flex flex-col items-center gap-0.5 p-3">
+      <span className="text-xl font-extrabold">{value}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wide text-ink-soft">
+        {label}
+      </span>
+    </Card>
+  )
+}

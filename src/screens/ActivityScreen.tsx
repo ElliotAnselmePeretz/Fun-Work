@@ -3,6 +3,7 @@ import { Card } from '../components/Card'
 import { ProgressBar } from '../components/ProgressBar'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { ActivityForm } from '../features/activities/ActivityForm'
+import { LevelEditor } from '../features/activities/LevelEditor'
 import { LevelPath } from '../features/activities/LevelPath'
 import { LogButton } from '../features/activities/LogButton'
 import { deleteLog } from '../features/activities/logActions'
@@ -19,6 +20,7 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
   const logs = useActivityLogs(activityId)
   const categories = useCategories()
   const [editing, setEditing] = useState(false)
+  const [editingLevels, setEditingLevels] = useState(false)
 
   if (activity === undefined || !logs || !categories) return null
   if (activity === null) {
@@ -73,9 +75,17 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
       </Card>
 
       <section>
-        <h2 className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
-          Path
-        </h2>
+        <div className="mb-2 flex items-baseline justify-between">
+          <h2 className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">
+            Path
+          </h2>
+          <button
+            onClick={() => setEditingLevels(true)}
+            className="text-xs font-extrabold uppercase tracking-wide text-sky"
+          >
+            Edit levels
+          </button>
+        </div>
         <LevelPath activity={activity} progress={progress} color={color} />
       </section>
 
@@ -109,6 +119,15 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
             ))}
           </Card>
         </section>
+      )}
+
+      {editingLevels && (
+        <LevelEditor
+          open
+          activity={activity}
+          currentLevelIndex={progress.currentLevelIndex}
+          onClose={() => setEditingLevels(false)}
+        />
       )}
 
       {editing && category && (

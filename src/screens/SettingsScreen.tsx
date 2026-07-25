@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { ScreenHeader } from '../components/ScreenHeader'
-import { useBadges, useCategories, useLogs } from '../hooks/useData'
+import { ApiKeyCard } from '../features/settings/ApiKeyCard'
+import { useBadges, useCategories, useLogs, useSettings } from '../hooks/useData'
 import { clearAllData, exportBackup, importBackup, type BackupFile } from '../lib/db'
 import { navigate } from '../lib/router'
 
@@ -10,6 +11,7 @@ export function SettingsScreen() {
   const categories = useCategories()
   const logs = useLogs()
   const badges = useBadges()
+  const settings = useSettings()
   const [confirmingReset, setConfirmingReset] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
@@ -78,7 +80,12 @@ export function SettingsScreen() {
         <Button variant="secondary" onClick={() => navigate({ name: 'bulk-add' })}>
           Open bulk add
         </Button>
+        <Button variant="secondary" onClick={() => navigate({ name: 'image-add' })}>
+          Import from an image
+        </Button>
       </Card>
+
+      {settings && <ApiKeyCard settings={settings} />}
 
       <Card className="flex flex-col gap-3 p-4">
         <h2 className="font-extrabold text-cardinal">Danger zone</h2>

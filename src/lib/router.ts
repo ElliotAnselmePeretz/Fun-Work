@@ -8,6 +8,7 @@ export type Route =
   | { name: 'activity'; activityId: string }
   | { name: 'badges' }
   | { name: 'bulk-add' }
+  | { name: 'image-add' }
   | { name: 'organize' }
   | { name: 'stats' }
   | { name: 'settings' }
@@ -23,6 +24,8 @@ export function parseHash(hash: string): Route {
       return { name: 'badges' }
     case 'bulk-add':
       return { name: 'bulk-add' }
+    case 'image-add':
+      return { name: 'image-add' }
     case 'organize':
       return { name: 'organize' }
     case 'stats':
