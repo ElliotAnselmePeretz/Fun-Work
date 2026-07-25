@@ -1,0 +1,36 @@
+import type { CSSProperties, ReactNode } from 'react'
+
+interface CardProps {
+  children: ReactNode
+  className?: string
+  style?: CSSProperties
+  onClick?: () => void
+}
+
+/** The standard white rounded surface with a soft bottom edge. */
+export function Card({ children, className = '', style, onClick }: CardProps) {
+  const interactive = onClick !== undefined
+  return (
+    <div
+      className={`rounded-2xl border-2 border-swan bg-white ${
+        interactive ? 'cursor-pointer active:translate-y-[2px] transition-transform' : ''
+      } ${className}`}
+      style={style}
+      onClick={onClick}
+      {...(interactive
+        ? {
+            role: 'button',
+            tabIndex: 0,
+            onKeyDown: (event: React.KeyboardEvent) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onClick()
+              }
+            },
+          }
+        : {})}
+    >
+      {children}
+    </div>
+  )
+}
