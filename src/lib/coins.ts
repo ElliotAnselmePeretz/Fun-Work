@@ -4,6 +4,7 @@ import type {
   SessionLogEntry,
   StreakInfo,
 } from '../types'
+import { totalBossRewards } from './bosses'
 import { addDays } from './date'
 
 export const COINS_PER_SESSION = 10
@@ -17,8 +18,10 @@ export interface CoinReward {
 }
 
 export interface CoinSummary {
-  /** All coins ever earned from sessions. Purchases never reduce this. */
+  /** All coins ever earned from sessions and boss victories. */
   earned: number
+  sessionEarned: number
+  bossEarned: number
   spent: number
   /** Spendable coins. Clamped at zero if old session logs are later deleted. */
   balance: number
@@ -28,7 +31,7 @@ export interface CoinSummary {
 }
 
 export function isSessionLog(log: LogEntry): log is SessionLogEntry {
-  return log.kind !== 'purchase'
+  return log.kind === undefined || log.kind === 'session'
 }
 
 export function isPurchaseLog(log: LogEntry): log is PurchaseLogEntry {
@@ -69,13 +72,13 @@ export function computeCoinSummary(entries: LogEntry[]): CoinSummary {
   const rewardsByLogId = new Map<string, CoinReward>()
   const earnedByActivityId = new Map<string, number>()
 
-  let earned = 0
+  let sessionEarned = 0
   for (const log of sessions) {
     const streakDays = streakByDay.get(log.day) ?? 1
     const multiplier = coinMultiplierForStreak(streakDays)
     const coins = Math.round(COINS_PER_SESSION * multiplier)
     rewardsByLogId.set(log.id, { coins, multiplier, streakDays })
-    earned += coins
+    sessionEarned += coins
     earnedByActivityId.set(
       log.activityId,
       (earnedByActivityId.get(log.activityId) ?? 0) + coins,
@@ -84,9 +87,13 @@ export function computeCoinSummary(entries: LogEntry[]): CoinSummary {
 
   const purchases = entries.filter(isPurchaseLog)
   const spent = purchases.reduce((sum, purchase) => sum + purchase.coinCost, 0)
+  const bossEarned = totalBossRewards(entries)
+  const earned = sessionEarned + bossEarned
 
   return {
     earned,
+    sessionEarned,
+    bossEarned,
     spent,
     balance: Math.max(0, earned - spent),
     rewardsByLogId,

@@ -54,9 +54,12 @@ devices. Use Settings → Export to move it.
 - **Badges** — awarded automatically for your first log, every level-up,
   streaks of 3/7/14/30/100 days, coin totals, and completing every level of an
   activity.
-- **Reward shop** — spend derived coins on collectibles, companions and visual
-  upgrades. A purchase is appended to the same history rather than mutating a
+- **Armory** — spend derived coins on functional weapons with different damage
+  values. A purchase is appended to the same history rather than mutating a
   stored balance.
+- **Boss arena** — use owned weapons against a four-boss campaign. Every strike
+  is an event in the same log, so boss health, victories, unlocks and coin
+  rewards are replayed from history rather than stored as counters.
 
 ### Coins and streak multipliers
 
@@ -143,11 +146,12 @@ src/
     badges/     Badge cards and the celebration modal
     categories/ Category CRUD and the dashboard section
     import/     Bulk-text parser, import preview, organize logic
-    shop/       Coin-ledger purchase action
+    arena/      Boss attack log action
+    shop/       Coin-ledger weapon purchase action
     streak/     Streak flame and week strip
-  screens/      Home, Activity, Badges, BulkAdd, ImageImport, Organize,
+  screens/      Home, Activity, Arena, Badges, BulkAdd, ImageImport, Organize,
                 Shop, Stats, Settings
-  lib/          db.ts (Dexie), coins.ts, shop.ts, xp.ts, streak.ts,
+  lib/          db.ts (Dexie), bosses.ts, coins.ts, shop.ts, xp.ts, streak.ts,
                 badges.ts, date.ts, ordering.ts, palette.ts, router.ts
   hooks/        useData (live queries), useRoute, useConfetti
   store/        Ephemeral UI state (celebration queue)
@@ -176,6 +180,9 @@ export first if you might want it back.
 - **Phase 4 — Quest economy:** done. Adjustable 1–30-level paths, named
   milestone ladders, derived coins with streak multipliers, a reward shop, and
   a richer game-like home and navigation design.
+- **Phase 5 — Arena:** done. Functional weapon upgrades, four derived-health
+  boss encounters, battle rewards, clean icon-based navigation, animated
+  banners and a lighter visual system with fewer decorative emoji.
 
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import
@@ -184,4 +191,4 @@ itself remains unverified because it requires your API key.
 ## Tech
 
 React 19, TypeScript, Vite, Tailwind CSS v4, Dexie (IndexedDB), Zustand,
-dnd-kit, canvas-confetti, vite-plugin-pwa.
+dnd-kit, Lucide, canvas-confetti, vite-plugin-pwa.

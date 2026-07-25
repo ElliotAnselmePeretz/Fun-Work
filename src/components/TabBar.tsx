@@ -1,11 +1,12 @@
+import { GameIcon, type GameIconName } from './GameIcon'
 import { hrefFor, type Route } from '../lib/router'
 
-const TABS: { route: Route; label: string; emoji: string }[] = [
-  { route: { name: 'home' }, label: 'Home', emoji: '🏠' },
-  { route: { name: 'shop' }, label: 'Shop', emoji: '🛍️' },
-  { route: { name: 'badges' }, label: 'Badges', emoji: '🏅' },
-  { route: { name: 'stats' }, label: 'Stats', emoji: '📊' },
-  { route: { name: 'settings' }, label: 'Settings', emoji: '⚙️' },
+const TABS: { route: Route; label: string; icon: GameIconName }[] = [
+  { route: { name: 'home' }, label: 'Home', icon: 'home' },
+  { route: { name: 'arena' }, label: 'Arena', icon: 'swords' },
+  { route: { name: 'shop' }, label: 'Armory', icon: 'store' },
+  { route: { name: 'stats' }, label: 'Stats', icon: 'chart' },
+  { route: { name: 'settings' }, label: 'Settings', icon: 'settings' },
 ]
 
 interface TabBarProps {
@@ -28,8 +29,8 @@ export function TabBar({ current }: TabBarProps) {
                   active ? 'text-violet' : 'text-hare'
                 }`}
               >
-                <span className={`text-xl transition-transform ${active ? '-translate-y-0.5 scale-110' : ''}`} aria-hidden>
-                  {tab.emoji}
+                <span className={`transition-transform ${active ? '-translate-y-0.5 scale-110' : ''}`} aria-hidden>
+                  <GameIcon name={tab.icon} size={21} strokeWidth={active ? 2.8 : 2.2} />
                 </span>
                 {tab.label}
                 {active && (

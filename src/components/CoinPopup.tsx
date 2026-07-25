@@ -11,9 +11,11 @@ export function CoinPopup({ token, amount }: CoinPopupProps) {
     <span
       key={token}
       aria-hidden
-      className="animate-float-up pointer-events-none absolute left-1/2 top-0 z-20 -translate-x-1/2 whitespace-nowrap text-lg font-black text-gold drop-shadow"
+      className="animate-float-up pointer-events-none absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap text-lg font-black text-gold drop-shadow"
     >
-      +{amount} 🪙
+      <GameIcon name="coins" size={18} />
+      +{amount}
     </span>
   )
 }
+import { GameIcon } from './GameIcon'

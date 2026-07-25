@@ -36,7 +36,7 @@ export interface Activity {
 /** One completion. The unit of progress — one tap, one row. */
 export interface SessionLogEntry {
   id: Id
-  /** Missing on older backups; anything except `purchase` is a session. */
+  /** Missing on older backups; missing or `session` means a completion. */
   kind?: 'session'
   activityId: Id
   /** Epoch ms. */
@@ -61,7 +61,17 @@ export interface PurchaseLogEntry {
   day: string
 }
 
-export type LogEntry = SessionLogEntry | PurchaseLogEntry
+/** One weapon swing. Boss health and victories are replayed from these events. */
+export interface BossHitLogEntry {
+  id: Id
+  kind: 'boss-hit'
+  bossId: Id
+  weaponId: Id
+  at: number
+  day: string
+}
+
+export type LogEntry = SessionLogEntry | PurchaseLogEntry | BossHitLogEntry
 
 export type BadgeKind =
   | 'first-log'

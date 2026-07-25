@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
+import { GameIcon } from '../components/GameIcon'
 import { ProgressBar } from '../components/ProgressBar'
 import { ScreenHeader } from '../components/ScreenHeader'
 import {
@@ -12,6 +13,7 @@ import {
 } from '../hooks/useData'
 import { multiplierLabel, nextCoinMultiplier } from '../lib/coins'
 import { dayKeyToDate } from '../lib/date'
+import { navigate } from '../lib/router'
 import { recentDayWindow } from '../lib/streak'
 
 const WINDOW_DAYS = 30
@@ -72,10 +74,22 @@ export function StatsScreen() {
   const busiest = Math.max(...perDay.map((entry) => entry.count), 1)
   return (
     <div className="flex flex-col gap-5">
-      <ScreenHeader title="Stats" subtitle={`${logs.length} sessions logged`} />
+      <ScreenHeader
+        title="Stats"
+        subtitle={`${logs.length} sessions logged`}
+        action={
+          <button
+            onClick={() => navigate({ name: 'badges' })}
+            aria-label="Open achievements"
+            className="grid h-10 w-10 place-items-center rounded-2xl border border-swan bg-white text-violet shadow-sm"
+          >
+            <GameIcon name="trophy" size={20} />
+          </button>
+        }
+      />
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="Coins earned" value={`🪙 ${coins.earned.toLocaleString()}`} />
+        <Stat label="Coins earned" value={coins.earned.toLocaleString()} icon="coins" />
         <Stat label="Spendable" value={coins.balance.toLocaleString()} />
         <Stat label="Streak" value={`${streak.current}d`} />
         <Stat label="Next boost" value={multiplierLabel(nextCoinMultiplier(streak))} />
@@ -126,7 +140,7 @@ export function StatsScreen() {
                   {category.emoji} {category.name}
                 </span>
                 <span className="shrink-0 text-xs font-bold text-ink-soft">
-                  {coinTotal.toLocaleString()} 🪙 ·{' '}
+                  {coinTotal.toLocaleString()} coins ·{' '}
                   {Math.round((coinTotal / total) * 100)}%
                 </span>
               </div>
@@ -143,10 +157,21 @@ export function StatsScreen() {
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  icon,
+}: {
+  label: string
+  value: string
+  icon?: 'coins'
+}) {
   return (
     <Card className="flex flex-col items-center gap-0.5 p-3">
-      <span className="text-xl font-extrabold">{value}</span>
+      <span className="flex items-center gap-1.5 text-xl font-extrabold">
+        {icon && <GameIcon name={icon} size={18} className="text-gold-dark" />}
+        {value}
+      </span>
       <span className="text-[10px] font-bold uppercase tracking-wide text-ink-soft">
         {label}
       </span>

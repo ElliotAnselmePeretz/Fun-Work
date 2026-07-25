@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
+import { GameIcon } from '../components/GameIcon'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { CategoryForm } from '../features/categories/CategoryForm'
 import { CategorySection } from '../features/categories/CategorySection'
@@ -10,10 +11,12 @@ import {
   useActivities,
   useCategories,
   useCoinSummary,
+  useLedgerEntries,
   useProgressMap,
   useRecentLogs,
   useStreak,
 } from '../hooks/useData'
+import { computeBossProgress } from '../lib/bosses'
 import {
   COINS_PER_SESSION,
   multiplierLabel,
@@ -21,7 +24,6 @@ import {
 } from '../lib/coins'
 import { relativeDayLabel, timeLabel } from '../lib/date'
 import { navigate } from '../lib/router'
-import { activeCompanion } from '../lib/shop'
 
 export function HomeScreen() {
   const categories = useCategories()
@@ -29,25 +31,27 @@ export function HomeScreen() {
   const progressMap = useProgressMap()
   const streak = useStreak()
   const coins = useCoinSummary()
+  const ledger = useLedgerEntries()
   const recent = useRecentLogs(6)
   const [addingCategory, setAddingCategory] = useState(false)
 
   // Dexie's live queries resolve async; render nothing rather than flashing an
   // empty state at someone who actually has data.
-  if (!categories || !activities || !progressMap || !streak || !coins) return null
+  if (!categories || !activities || !progressMap || !streak || !coins || !ledger) {
+    return null
+  }
 
   const activityById = new Map(activities.map((activity) => [activity.id, activity]))
   const nextMultiplier = nextCoinMultiplier(streak)
   const nextReward = Math.round(COINS_PER_SESSION * nextMultiplier)
-  const companion = activeCompanion(coins.ownedItemIds)
-  const hasStars = coins.ownedItemIds.has('star-trail')
-  const hasGoldFrame = coins.ownedItemIds.has('golden-frame')
-  const hasCrown = coins.ownedItemIds.has('habit-royalty')
+  const bosses = computeBossProgress(ledger)
+  const activeBoss = bosses.find((progress) => !progress.defeated && !progress.locked)
+  const defeatedBosses = bosses.filter((progress) => progress.defeated).length
 
   return (
     <div className="flex flex-col gap-5">
       <ScreenHeader
-        title={`${hasCrown ? '👑 ' : ''}Fun-Work`}
+        title="Fun-Work"
         subtitle="Turn today into a win"
         action={
           <button
@@ -55,31 +59,40 @@ export function HomeScreen() {
             className="coin-pill"
             aria-label={`${coins.balance} coins. Open reward shop`}
           >
-            <span aria-hidden>🪙</span>
+            <GameIcon name="coins" size={17} />
             {coins.balance.toLocaleString()}
           </button>
         }
       />
 
-      <section
-        className={`quest-hero ${hasStars ? 'quest-hero-stars' : ''} ${
-          hasGoldFrame ? 'quest-hero-gold' : ''
-        }`}
-      >
-        <div className="relative z-10 max-w-[72%]">
-          <p className="section-kicker text-white/70">Today's quest</p>
+      <section className="quest-hero">
+        <div className="banner-grid" aria-hidden />
+        <div className="relative z-10 max-w-[74%]">
+          <p className="banner-kicker">Daily campaign</p>
           <h2 className="mt-1 text-2xl font-black leading-tight text-white">
-            {streak.loggedToday ? 'Keep the momentum going!' : 'Make one move to level up.'}
+            {streak.loggedToday ? 'Momentum secured.' : 'One session starts the run.'}
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="quest-chip">
+              <GameIcon name="flame" size={14} />
               {multiplierLabel(nextMultiplier)} streak boost
             </span>
-            <span className="quest-chip">+{nextReward} 🪙 next session</span>
+            <span className="quest-chip">
+              <GameIcon name="coins" size={14} />
+              +{nextReward} next session
+            </span>
           </div>
+          <button
+            onClick={() => navigate({ name: 'arena' })}
+            className="mt-5 flex items-center gap-2 text-sm font-black text-white"
+          >
+            <GameIcon name="swords" size={17} />
+            {activeBoss ? `Fight ${activeBoss.boss.name}` : 'View completed arena'}
+          </button>
         </div>
-        <div className="quest-mascot" aria-hidden>
-          {companion?.emoji ?? (streak.current >= 7 ? '🚀' : '⚔️')}
+        <div className="quest-emblem" aria-hidden>
+          <GameIcon name="shield" size={54} strokeWidth={1.35} />
+          <span>{defeatedBosses}/{bosses.length}</span>
         </div>
       </section>
 
@@ -89,7 +102,7 @@ export function HomeScreen() {
 
       {categories.length === 0 ? (
         <EmptyState
-          emoji="🌱"
+          emoji="·"
           title="Nothing here yet"
           description="Create a category to group what you're tracking — like Physical or Schoolwork. Or paste a whole list at once."
         >
@@ -166,10 +179,9 @@ export function HomeScreen() {
                       {relativeDayLabel(log.day)} · {timeLabel(log.at)}
                     </span>
                   </span>
-                  <span
-                    className="shrink-0 rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark"
-                  >
-                    +{reward} 🪙
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark">
+                    <GameIcon name="coins" size={13} />
+                    +{reward}
                   </span>
                 </div>
               )

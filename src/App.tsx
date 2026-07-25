@@ -1,7 +1,9 @@
 import { TabBar } from './components/TabBar'
 import { CelebrationModal } from './features/badges/CelebrationModal'
 import { useRoute } from './hooks/useRoute'
+import { hrefFor } from './lib/router'
 import { ActivityScreen } from './screens/ActivityScreen'
+import { ArenaScreen } from './screens/ArenaScreen'
 import { BadgesScreen } from './screens/BadgesScreen'
 import { BulkAddScreen } from './screens/BulkAddScreen'
 import { HomeScreen } from './screens/HomeScreen'
@@ -19,6 +21,8 @@ function CurrentScreen() {
       // Keyed so switching activities remounts rather than reusing scroll and
       // level-path state from the previous one.
       return <ActivityScreen key={route.activityId} activityId={route.activityId} />
+    case 'arena':
+      return <ArenaScreen />
     case 'badges':
       return <BadgesScreen />
     case 'shop':
@@ -45,7 +49,9 @@ export default function App() {
     <div className="app-shell mx-auto min-h-full max-w-md">
       {/* Bottom padding clears the fixed tab bar. */}
       <main className="safe-top px-4 pb-28 pt-4">
-        <CurrentScreen />
+        <div key={hrefFor(route)} className="page-enter">
+          <CurrentScreen />
+        </div>
       </main>
       <TabBar current={route} />
       <CelebrationModal />

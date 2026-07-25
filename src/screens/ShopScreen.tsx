@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { GameIcon } from '../components/GameIcon'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { purchaseItem } from '../features/shop/shopActions'
 import { useCoinSummary, useStreak } from '../hooks/useData'
 import { multiplierLabel, nextCoinMultiplier } from '../lib/coins'
-import { SHOP_ITEMS } from '../lib/shop'
+import { navigate } from '../lib/router'
+import { isItemOwned, SHOP_ITEMS } from '../lib/shop'
 
 export function ShopScreen() {
   const coins = useCoinSummary()
@@ -15,15 +17,19 @@ export function ShopScreen() {
 
   if (!coins || !streak) return null
 
+  const ownedCount = SHOP_ITEMS.filter((item) =>
+    isItemOwned(item, coins.ownedItemIds),
+  ).length
+
   const buy = async (itemId: string) => {
     setBuying(itemId)
     setMessage(null)
     try {
       await purchaseItem(itemId)
       const item = SHOP_ITEMS.find((candidate) => candidate.id === itemId)
-      setMessage(`${item?.emoji ?? '✨'} ${item?.name ?? 'Item'} added to your collection!`)
+      setMessage(`${item?.name ?? 'Weapon'} unlocked and ready for the arena.`)
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not buy that item.')
+      setMessage(error instanceof Error ? error.message : 'Could not buy that weapon.')
     } finally {
       setBuying(null)
     }
@@ -32,93 +38,126 @@ export function ShopScreen() {
   return (
     <div className="flex flex-col gap-5">
       <ScreenHeader
-        title="Reward Shop"
-        subtitle={`${coins.ownedItemIds.size}/${SHOP_ITEMS.length} treasures collected`}
+        title="The Armory"
+        subtitle={`${ownedCount}/${SHOP_ITEMS.length} weapons unlocked`}
       />
 
-      <section className="coin-vault relative overflow-hidden rounded-[2rem] p-5 text-white">
-        <div className="absolute -right-6 -top-8 text-8xl opacity-20" aria-hidden>
-          🪙
+      <section className="armory-banner">
+        <div className="banner-grid" aria-hidden />
+        <div className="relative z-10">
+          <p className="banner-kicker">Build your loadout</p>
+          <h2 className="mt-1 max-w-56 text-3xl font-black tracking-tight text-white">
+            Better habits. Stronger gear.
+          </h2>
+          <p className="mt-2 max-w-60 text-sm font-bold leading-relaxed text-white/60">
+            Earn coins from sessions, unlock weapons, then take them into battle.
+          </p>
+          <Button
+            size="sm"
+            className="mt-5 inline-flex items-center gap-2"
+            onClick={() => navigate({ name: 'arena' })}
+          >
+            <GameIcon name="swords" size={17} />
+            Enter Arena
+          </Button>
         </div>
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-white/70">
-          Your coin pouch
-        </p>
-        <div className="mt-1 flex items-end gap-2">
-          <span className="text-4xl font-black">{coins.balance.toLocaleString()}</span>
-          <span className="pb-1 text-2xl" aria-hidden>🪙</span>
-        </div>
-        <div className="mt-4 flex gap-2 text-xs font-extrabold">
-          <span className="rounded-full bg-white/15 px-3 py-1.5">
-            {coins.earned.toLocaleString()} earned
-          </span>
-          <span className="rounded-full bg-white/15 px-3 py-1.5">
-            {multiplierLabel(nextCoinMultiplier(streak))} next reward
-          </span>
+        <div className="armory-mark" aria-hidden>
+          <GameIcon name="sword" size={72} strokeWidth={1.2} />
         </div>
       </section>
 
+      <div className="grid grid-cols-3 gap-2">
+        <Card className="mini-stat">
+          <GameIcon name="coins" size={18} className="text-gold-dark" />
+          <strong>{coins.balance.toLocaleString()}</strong>
+          <span>Available</span>
+        </Card>
+        <Card className="mini-stat">
+          <GameIcon name="trophy" size={18} className="text-violet" />
+          <strong>{coins.bossEarned.toLocaleString()}</strong>
+          <span>Battle coins</span>
+        </Card>
+        <Card className="mini-stat">
+          <GameIcon name="flame" size={18} className="text-flame" />
+          <strong>{multiplierLabel(nextCoinMultiplier(streak))}</strong>
+          <span>Next boost</span>
+        </Card>
+      </div>
+
       {message && (
-        <p role="status" className="rounded-2xl bg-gold/15 px-4 py-3 text-sm font-extrabold text-gold-dark">
+        <p role="status" className="status-banner">
+          <GameIcon name="check" size={18} />
           {message}
         </p>
       )}
 
       <section>
-        <div className="mb-3 flex items-end justify-between gap-3">
-          <div>
-            <p className="section-kicker">Quest rewards</p>
-            <h2 className="text-xl font-black">Spend your wins</h2>
-          </div>
-          <span className="text-xs font-bold text-ink-soft">Yours forever</span>
+        <div className="mb-3">
+          <p className="section-kicker">Weapon forge</p>
+          <h2 className="text-xl font-black">Choose your next upgrade</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           {SHOP_ITEMS.map((item) => {
-            const owned = coins.ownedItemIds.has(item.id)
+            const owned = isItemOwned(item, coins.ownedItemIds)
             const affordable = coins.balance >= item.cost
             return (
               <Card
                 key={item.id}
-                className={`shop-item flex min-h-56 flex-col p-3 ${
-                  owned ? 'shop-item-owned' : ''
-                }`}
+                className={`weapon-card ${owned ? 'weapon-card-owned' : ''}`}
               >
-                <div className="mb-2 flex items-start justify-between gap-2">
-                  <span className="shop-item-emoji" aria-hidden>{item.emoji}</span>
-                  <span className={`rarity rarity-${item.rarity.toLowerCase()}`}>
-                    {item.rarity}
-                  </span>
+                <div className="weapon-icon">
+                  <GameIcon name={item.icon} size={31} strokeWidth={1.8} />
                 </div>
-                <h3 className="font-black leading-tight">{item.name}</h3>
-                <p className="mt-1 flex-1 text-xs leading-relaxed text-ink-soft">
-                  {item.description}
-                </p>
-                {owned ? (
-                  <div className="mt-3 rounded-xl bg-grass/10 py-2 text-center text-xs font-black uppercase tracking-wide text-grass-dark">
-                    Owned ✓
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="truncate font-black">{item.name}</h3>
+                    <span className={`rarity rarity-${item.rarity.toLowerCase()}`}>
+                      {item.rarity}
+                    </span>
                   </div>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant={affordable ? 'primary' : 'ghost'}
-                    className={`mt-3 w-full ${affordable ? '' : 'border-2 border-swan'}`}
-                    disabled={buying !== null || !affordable}
-                    onClick={() => void buy(item.id)}
-                    aria-label={`Buy ${item.name} for ${item.cost} coins`}
-                  >
-                    {buying === item.id ? 'Buying…' : `${item.cost} 🪙`}
-                  </Button>
-                )}
+                  <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                    {item.description}
+                  </p>
+                  <div className="mt-2 flex items-center gap-3 text-[11px] font-black uppercase tracking-wide">
+                    <span className="flex items-center gap-1 text-cardinal">
+                      <GameIcon name="target" size={13} />
+                      {item.damage} damage
+                    </span>
+                    {item.starter && <span className="text-grass-dark">Starter gear</span>}
+                  </div>
+                </div>
+                <div className="flex w-24 shrink-0 flex-col items-stretch justify-center">
+                  {owned ? (
+                    <div className="owned-label">
+                      <GameIcon name="check" size={15} />
+                      Owned
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant={affordable ? 'primary' : 'ghost'}
+                      className={affordable ? '' : 'border-2 border-swan'}
+                      disabled={buying !== null || !affordable}
+                      onClick={() => void buy(item.id)}
+                      aria-label={`Buy ${item.name} for ${item.cost} coins`}
+                    >
+                      {buying === item.id ? (
+                        'Forging…'
+                      ) : (
+                        <span className="flex items-center justify-center gap-1">
+                          <GameIcon name="coins" size={14} />
+                          {item.cost}
+                        </span>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </Card>
             )
           })}
         </div>
       </section>
-
-      <p className="px-4 text-center text-xs leading-relaxed text-ink-soft">
-        Your balance and collection are rebuilt from your history—there is no stored
-        coin counter to get out of sync.
-      </p>
     </div>
   )
 }

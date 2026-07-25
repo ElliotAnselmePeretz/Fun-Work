@@ -6,6 +6,7 @@
 export type Route =
   | { name: 'home' }
   | { name: 'activity'; activityId: string }
+  | { name: 'arena' }
   | { name: 'shop' }
   | { name: 'badges' }
   | { name: 'bulk-add' }
@@ -23,6 +24,8 @@ export function parseHash(hash: string): Route {
       return param ? { name: 'activity', activityId: param } : { name: 'home' }
     case 'badges':
       return { name: 'badges' }
+    case 'arena':
+      return { name: 'arena' }
     case 'shop':
       return { name: 'shop' }
     case 'bulk-add':

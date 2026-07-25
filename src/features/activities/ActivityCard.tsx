@@ -34,7 +34,7 @@ export function ActivityCard({ activity, progress, color }: ActivityCardProps) {
           <span className="block truncate font-extrabold">{activity.name}</span>
           <span className="block truncate text-xs font-bold text-ink-soft">
             {progress.isComplete ? (
-              <span className="text-gold">🏆 {levelName}</span>
+              <span className="text-gold-dark">{levelName}</span>
             ) : (
               <>
                 {levelName} · {progress.sessionsIntoLevel}/{progress.sessionsForLevel}

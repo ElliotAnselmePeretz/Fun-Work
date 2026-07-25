@@ -1,3 +1,4 @@
+import { GameIcon } from '../../components/GameIcon'
 import { recentDayWindow } from '../../lib/streak'
 import { weekdayLabel } from '../../lib/date'
 import type { StreakInfo } from '../../types'
@@ -15,10 +16,11 @@ export function StreakFlame({ streak }: StreakFlameProps) {
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <span
-          className={`text-4xl ${streak.loggedToday ? 'animate-flame' : 'grayscale opacity-50'}`}
-          aria-hidden
+          className={`grid h-12 w-12 place-items-center rounded-2xl bg-flame/10 text-flame ${
+            streak.loggedToday ? 'animate-flame' : 'opacity-40'
+          }`}
         >
-          🔥
+          <GameIcon name="flame" size={28} fill="currentColor" />
         </span>
         <div className="leading-none">
           <div className="text-3xl font-extrabold text-flame">{streak.current}</div>

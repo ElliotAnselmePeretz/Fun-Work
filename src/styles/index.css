@@ -49,13 +49,29 @@ body {
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none;
 }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgb(108 92 231 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(108 92 231 / 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+  animation: background-drift 24s linear infinite;
+}
 
 .app-shell {
   position: relative;
 }
 
 .game-card {
-  box-shadow: 0 4px 0 rgb(57 50 104 / 0.07);
+  border-width: 1px;
+  box-shadow:
+    0 1px 2px rgb(38 33 74 / 0.04),
+    0 8px 24px rgb(38 33 74 / 0.055);
 }
 
 .activity-card {
@@ -71,6 +87,12 @@ body {
 .section-kicker {
   @apply text-[10px] font-black uppercase tracking-[0.18em] text-violet;
 }
+.banner-kicker {
+  @apply text-[10px] font-black uppercase tracking-[0.2em] text-white/55;
+}
+.page-enter {
+  animation: page-rise 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
 .coin-pill {
   @apply flex shrink-0 items-center gap-1.5 rounded-full border-2 border-gold/50 bg-gold/15 px-3 py-2 text-sm font-black text-gold-dark transition-transform active:scale-95;
@@ -80,11 +102,10 @@ body {
 .quest-hero {
   @apply relative min-h-52 overflow-hidden rounded-[2rem] p-5;
   background:
-    radial-gradient(circle at 80% 10%, rgb(255 255 255 / 0.2), transparent 10rem),
-    linear-gradient(135deg, #6c5ce7 0%, #4c8df6 55%, #22b8cf 120%);
+    radial-gradient(circle at 80% 10%, rgb(92 225 230 / 0.25), transparent 13rem),
+    linear-gradient(135deg, #26214a 0%, #413779 52%, #4c8df6 130%);
   box-shadow:
-    0 8px 0 rgb(81 66 197 / 0.18),
-    0 18px 38px rgb(77 65 170 / 0.16);
+    0 18px 42px rgb(38 33 74 / 0.19);
 }
 .quest-hero::before {
   content: '';
@@ -93,27 +114,17 @@ body {
   height: 11rem;
   right: -4rem;
   bottom: -5rem;
-  border: 2rem solid rgb(255 255 255 / 0.08);
+  border: 2rem solid rgb(255 255 255 / 0.06);
   border-radius: 999px;
 }
-.quest-hero-stars::after {
-  content: '✦  ·  ✦      ✦  ·';
-  @apply absolute inset-x-0 top-3 text-center text-lg tracking-[0.75em] text-white/25;
-  animation: star-drift 4s ease-in-out infinite;
-}
-.quest-hero-gold {
-  border: 3px solid #ffc800;
-  box-shadow:
-    0 8px 0 rgb(229 168 0 / 0.35),
-    0 18px 38px rgb(77 65 170 / 0.16);
-}
 .quest-chip {
-  @apply rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-xs font-black text-white backdrop-blur-sm;
+  @apply flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-black text-white backdrop-blur-sm;
 }
-.quest-mascot {
-  @apply absolute bottom-3 right-4 z-10 grid h-24 w-24 place-items-center rounded-full border-2 border-white/20 bg-white/15 text-6xl backdrop-blur-sm;
-  filter: drop-shadow(0 8px 14px rgb(38 33 74 / 0.24));
-  animation: mascot-bob 3s ease-in-out infinite;
+.quest-emblem {
+  @apply absolute bottom-5 right-5 z-10 grid h-24 w-24 place-items-center rounded-full border border-white/15 bg-white/10 text-white/70 backdrop-blur-sm;
+}
+.quest-emblem span {
+  @apply absolute bottom-2 rounded-full bg-night/70 px-2 py-0.5 text-[10px] font-black text-white;
 }
 
 .streak-card {
@@ -122,33 +133,61 @@ body {
     white;
 }
 
-.coin-vault {
+.armory-banner {
+  @apply relative min-h-64 overflow-hidden rounded-[2rem] p-6;
   background:
-    radial-gradient(circle at 85% 10%, rgb(255 200 0 / 0.35), transparent 12rem),
-    linear-gradient(135deg, #26214a, #5142c5);
-  box-shadow:
-    0 8px 0 rgb(38 33 74 / 0.18),
-    0 18px 36px rgb(38 33 74 / 0.13);
+    radial-gradient(circle at 92% 20%, rgb(255 200 0 / 0.16), transparent 12rem),
+    linear-gradient(135deg, #17152e, #30265f 68%, #5c3dad);
+  box-shadow: 0 20px 44px rgb(38 33 74 / 0.22);
 }
-
-.shop-item {
-  position: relative;
-  overflow: hidden;
+.banner-grid,
+.boss-stage-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.11) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(circle at 70% 30%, black, transparent 70%);
+}
+.armory-mark {
+  @apply absolute -right-3 bottom-1 grid h-40 w-40 place-items-center rounded-full border border-white/10 text-white/20;
+  background: rgb(255 255 255 / 0.04);
+  transform: rotate(-12deg);
+}
+.mini-stat {
+  @apply flex min-h-24 flex-col items-center justify-center gap-1 p-2 text-center;
+}
+.mini-stat strong {
+  @apply text-lg font-black;
+}
+.mini-stat span {
+  @apply text-[9px] font-black uppercase tracking-wide text-ink-soft;
+}
+.status-banner,
+.combat-message {
+  @apply flex items-center gap-2 rounded-2xl border border-grass/20 bg-grass/10 px-4 py-3 text-sm font-extrabold text-grass-dark;
+  animation: status-in 280ms ease-out both;
+}
+.weapon-card {
+  @apply flex items-center gap-3 p-3;
   transition:
     transform 160ms ease,
     border-color 160ms ease;
 }
-.shop-item:hover {
+.weapon-card:hover {
   transform: translateY(-2px);
 }
-.shop-item-owned {
-  border-color: rgb(88 204 2 / 0.45);
-  background:
-    linear-gradient(145deg, rgb(88 204 2 / 0.08), transparent 55%),
-    white;
+.weapon-card-owned {
+  border-color: rgb(88 204 2 / 0.28);
+  background: linear-gradient(110deg, rgb(88 204 2 / 0.055), white 45%);
 }
-.shop-item-emoji {
-  @apply grid h-14 w-14 place-items-center rounded-2xl bg-violet/10 text-4xl;
+.weapon-icon {
+  @apply grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-violet/10 bg-violet/8 text-violet;
+}
+.owned-label {
+  @apply flex items-center justify-center gap-1 rounded-xl bg-grass/10 px-2 py-2 text-[10px] font-black uppercase tracking-wide text-grass-dark;
 }
 .rarity {
   @apply rounded-full px-2 py-1 text-[9px] font-black uppercase tracking-wide;
@@ -170,6 +209,61 @@ body {
   @apply grid h-9 w-9 place-items-center rounded-xl border-2 border-swan bg-white text-xl font-black text-ink-soft transition-colors hover:border-sky hover:text-sky disabled:cursor-not-allowed disabled:opacity-30;
 }
 
+.boss-map {
+  @apply relative flex items-center justify-between px-2;
+}
+.boss-map::before {
+  content: '';
+  @apply absolute left-8 right-8 top-1/2 h-0.5 -translate-y-1/2 bg-swan;
+}
+.boss-map-node {
+  @apply relative z-10 grid h-12 w-12 place-items-center rounded-2xl border border-swan bg-white text-ink-soft shadow-sm transition-all disabled:opacity-45;
+}
+.boss-map-node-active {
+  @apply -translate-y-1 border-violet bg-violet text-white;
+  box-shadow: 0 8px 20px rgb(108 92 231 / 0.22);
+}
+.boss-map-node-cleared:not(.boss-map-node-active) {
+  @apply border-grass/30 bg-grass/10 text-grass-dark;
+}
+.boss-map-index {
+  @apply absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-night text-[8px] font-black text-white;
+}
+.boss-stage {
+  @apply relative min-h-72 overflow-hidden rounded-[2rem] p-6;
+  background:
+    radial-gradient(circle at 85% 18%, color-mix(in srgb, var(--boss-accent) 38%, transparent), transparent 13rem),
+    linear-gradient(145deg, #17152e, #2c2852);
+  box-shadow: 0 22px 48px rgb(23 21 46 / 0.23);
+}
+.boss-emblem {
+  @apply grid h-20 w-20 shrink-0 place-items-center rounded-3xl border border-white/15 bg-white/8 text-white;
+  box-shadow: inset 0 0 24px rgb(255 255 255 / 0.04);
+}
+.boss-stage-impact {
+  animation: boss-impact 320ms ease-out;
+}
+.sword-slash {
+  @apply pointer-events-none absolute left-1/2 top-1/2 z-20 h-1 w-48 rounded-full bg-white;
+  box-shadow:
+    0 0 12px white,
+    0 0 32px var(--boss-accent);
+  transform: translate(-50%, -50%) rotate(-35deg);
+  animation: sword-slash 320ms ease-out both;
+}
+.weapon-chip {
+  @apply flex min-w-40 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-white p-3 text-ink-soft shadow-sm transition-all;
+}
+.weapon-chip-active {
+  @apply -translate-y-0.5 border-violet bg-violet/8 text-violet;
+  box-shadow: 0 8px 20px rgb(108 92 231 / 0.12);
+}
+.arena-complete {
+  background:
+    radial-gradient(circle at 50% 0%, rgb(255 200 0 / 0.14), transparent 12rem),
+    white;
+}
+
 /* Respect the notch / home indicator when installed to the home screen. */
 .safe-top {
   padding-top: env(safe-area-inset-top);
@@ -184,7 +278,7 @@ body {
   @apply relative rounded-2xl font-extrabold uppercase tracking-wide
          transition-[transform,box-shadow] duration-75
          disabled:opacity-50;
-  box-shadow: 0 4px 0 var(--btn-edge, transparent);
+  box-shadow: 0 3px 0 var(--btn-edge, transparent);
 }
 .btn-3d:active:not(:disabled) {
   transform: translateY(3px);
@@ -248,16 +342,50 @@ body {
     transform: translateY(-6px) rotate(2deg);
   }
 }
-
-@keyframes star-drift {
+@keyframes page-rise {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes status-in {
+  from {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+@keyframes background-drift {
+  to {
+    background-position: 28px 28px;
+  }
+}
+@keyframes boss-impact {
   0%,
   100% {
-    transform: translateX(-4px);
-    opacity: 0.45;
+    transform: translateX(0);
   }
-  50% {
-    transform: translateX(6px);
-    opacity: 0.85;
+  30% {
+    transform: translateX(-7px);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+}
+@keyframes sword-slash {
+  from {
+    opacity: 0;
+    transform: translate(-80%, -80%) rotate(-35deg) scaleX(0.2);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-20%, -20%) rotate(-35deg) scaleX(1.1);
   }
 }
 
@@ -265,8 +393,12 @@ body {
   .animate-pop-in,
   .animate-float-up,
   .animate-flame,
-  .quest-mascot,
-  .quest-hero-stars::after {
+  .page-enter,
+  .status-banner,
+  .combat-message,
+  .boss-stage-impact,
+  .sword-slash,
+  body::before {
     animation: none;
   }
 }

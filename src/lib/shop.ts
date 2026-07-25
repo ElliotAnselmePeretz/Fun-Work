@@ -1,71 +1,75 @@
+import type { GameIconName } from '../components/GameIcon'
 import type { Id } from '../types'
-
-export type ShopItemKind = 'collectible' | 'companion' | 'effect' | 'title'
 
 export interface ShopItem {
   id: Id
   name: string
-  emoji: string
+  icon: GameIconName
   description: string
   cost: number
-  kind: ShopItemKind
+  damage: number
+  starter?: boolean
   rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary'
 }
 
-/** Static catalog; ownership is derived from purchase entries in the log. */
+/**
+ * A functional armory. Existing item ids are deliberately retained so anyone
+ * who bought an earlier cosmetic keeps ownership after upgrading to weapons.
+ */
 export const SHOP_ITEMS: ShopItem[] = [
   {
     id: 'lucky-pouch',
-    name: 'Lucky Pouch',
-    emoji: '👝',
-    description: 'A shiny first treasure for your quest shelf.',
-    cost: 40,
-    kind: 'collectible',
+    name: 'Training Blade',
+    icon: 'sword',
+    description: 'Balanced and dependable. Included for every new adventurer.',
+    cost: 0,
+    damage: 8,
+    starter: true,
     rarity: 'Common',
   },
   {
     id: 'forest-fox',
-    name: 'Forest Fox',
-    emoji: '🦊',
-    description: 'A clever companion who cheers from your quest banner.',
+    name: 'Iron Edge',
+    icon: 'sword',
+    description: 'Forged for early hunts with a stronger, cleaner strike.',
     cost: 120,
-    kind: 'companion',
+    damage: 20,
     rarity: 'Rare',
   },
   {
     id: 'star-trail',
-    name: 'Star Trail',
-    emoji: '✨',
-    description: 'Adds a sparkling trail to your home quest banner.',
+    name: 'Arc Saber',
+    icon: 'zap',
+    description: 'A charged blade that cuts through armored targets.',
     cost: 220,
-    kind: 'effect',
+    damage: 36,
     rarity: 'Rare',
   },
   {
     id: 'golden-frame',
-    name: 'Golden Frame',
-    emoji: '🏆',
-    description: 'Gives your quest banner a champion-grade golden edge.',
+    name: 'Titan Hammer',
+    icon: 'hammer',
+    description: 'Slow, heavy, and built to crack a boss guard in one swing.',
     cost: 350,
-    kind: 'effect',
+    damage: 58,
     rarity: 'Epic',
   },
   {
     id: 'quest-dragon',
-    name: 'Quest Dragon',
-    emoji: '🐉',
-    description: 'A legendary companion for serious streak keepers.',
+    name: 'Sunforged Blade',
+    icon: 'sparkles',
+    description: 'A radiant greatsword for the toughest arena encounters.',
     cost: 600,
-    kind: 'companion',
+    damage: 95,
     rarity: 'Legendary',
   },
   {
     id: 'habit-royalty',
-    name: 'Habit Royalty',
-    emoji: '👑',
-    description: 'Adds a crown to your Fun-Work title for good.',
+    name: 'Voidbreaker',
+    icon: 'axe',
+    description: 'Endgame gear with enough force to finish legendary bosses.',
     cost: 1000,
-    kind: 'title',
+    damage: 150,
     rarity: 'Legendary',
   },
 ]
@@ -74,9 +78,10 @@ export function getShopItem(itemId: Id): ShopItem | undefined {
   return SHOP_ITEMS.find((item) => item.id === itemId)
 }
 
-export function activeCompanion(owned: Set<string>): ShopItem | undefined {
-  return (
-    SHOP_ITEMS.find((item) => item.id === 'quest-dragon' && owned.has(item.id)) ??
-    SHOP_ITEMS.find((item) => item.id === 'forest-fox' && owned.has(item.id))
-  )
+export function isItemOwned(item: ShopItem, ownedItemIds: Set<string>): boolean {
+  return item.starter === true || ownedItemIds.has(item.id)
+}
+
+export function ownedWeapons(ownedItemIds: Set<string>): ShopItem[] {
+  return SHOP_ITEMS.filter((item) => isItemOwned(item, ownedItemIds))
 }

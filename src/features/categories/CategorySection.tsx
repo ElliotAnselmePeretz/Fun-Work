@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GameIcon } from '../../components/GameIcon'
 import { withAlpha } from '../../lib/palette'
 import type { Activity, ActivityProgress, Category } from '../../types'
 import { ActivityCard } from '../activities/ActivityCard'
@@ -36,7 +37,7 @@ export function CategorySection({
           aria-label={`Edit ${category.name}`}
           className="grid h-8 w-8 place-items-center rounded-full text-ink-soft hover:bg-white/70"
         >
-          ⚙️
+          <GameIcon name="settings" size={17} />
         </button>
       </header>
 

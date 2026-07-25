@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Card } from '../components/Card'
+import { GameIcon } from '../components/GameIcon'
 import { ProgressBar } from '../components/ProgressBar'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { ActivityForm } from '../features/activities/ActivityForm'
@@ -52,16 +53,21 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
             aria-label="Edit activity"
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-swan/60"
           >
-            ⚙️
+            <GameIcon name="settings" size={20} />
           </button>
         }
       />
 
       <Card className="flex flex-col gap-3 p-4">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="font-extrabold">
+          <span className="flex items-center gap-2 font-extrabold">
             {progress.isComplete
-              ? '🏆 Every level complete'
+              ? (
+                  <>
+                    <GameIcon name="trophy" size={18} className="text-gold-dark" />
+                    Every level complete
+                  </>
+                )
               : (currentLevel?.name ?? 'Level')}
           </span>
           <span className="text-sm font-bold text-ink-soft">
@@ -114,8 +120,9 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
                     {timeLabel(log.at)}
                   </span>
                 </span>
-                <span className="rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark">
-                  +{coins.rewardsByLogId.get(log.id)?.coins ?? COINS_PER_SESSION} 🪙
+                <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark">
+                  <GameIcon name="coins" size={13} />
+                  +{coins.rewardsByLogId.get(log.id)?.coins ?? COINS_PER_SESSION}
                 </span>
                 <button
                   onClick={() => deleteLog(log.id)}
