@@ -7,6 +7,8 @@ steps, keep a daily streak, and earn badges.
 Everything is stored **on your device**. There is no backend, no account and no
 login, and nothing is uploaded.
 
+**Live app:** https://elliotanselmeperetz.github.io/Fun-Work/
+
 ## Install and run
 
 ```bash
@@ -24,6 +26,10 @@ npm run build
 ```
 
 Builds to `dist/`. Preview the production build with `npm run preview`.
+
+Pushes to `main` automatically build and publish the app through GitHub Pages.
+The workflow uses `/Fun-Work/` as Vite's production base path while local
+development continues to use `/`.
 
 To use it on your phone during development, run `npm run dev -- --host` and open
 the Network URL it prints.
