@@ -64,7 +64,7 @@ export function StatsScreen() {
       <div className="flex flex-col gap-5">
         <ScreenHeader title="Stats" />
         <EmptyState
-          emoji="📊"
+          icon="map"
           title="Nothing to chart yet"
           description="Log a few sessions and your activity over time shows up here."
         />

@@ -72,16 +72,29 @@ export function useActivityLogs(activityId: string): SessionLogEntry[] | undefin
   )
 }
 
+/**
+ * The streak, built from habit sessions only. Work items are one-off jobs, so
+ * counting them would let a burst of admin carry a daily practice — and every
+ * trial keyed to this streak with it.
+ */
 export function useStreak() {
   const logs = useLogs()
-  return useMemo(() => (logs ? computeStreak(logs) : undefined), [logs])
+  const activities = useActivities()
+  return useMemo(() => {
+    if (!logs || !activities) return undefined
+    const workIds = new Set(
+      activities.filter((a) => a.kind === 'work').map((a) => a.id),
+    )
+    return computeStreak(logs.filter((log) => !workIds.has(log.activityId)))
+  }, [logs, activities])
 }
 
 export function useCoinSummary() {
   const entries = useLedgerEntries()
+  const activities = useActivities()
   return useMemo(
-    () => (entries ? computeCoinSummary(entries) : undefined),
-    [entries],
+    () => (entries && activities ? computeCoinSummary(entries, activities) : undefined),
+    [entries, activities],
   )
 }
 
@@ -127,6 +140,5 @@ function presentCoinBadge(badge: Badge): Badge {
     kind: 'coin-total',
     title: `${amount} Coins`,
     description: `Earned ${amount} total coins.`,
-    emoji: '🪙',
   }
 }

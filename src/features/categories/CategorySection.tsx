@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { GameIcon } from '../../components/GameIcon'
 import { avatarSrcFor } from '../../lib/avatars'
 import { withAlpha } from '../../lib/palette'
-import type { Activity, ActivityProgress, Category } from '../../types'
+import type {
+  Activity,
+  ActivityKind,
+  ActivityProgress,
+  Category,
+} from '../../types'
 import { ActivityCard } from '../activities/ActivityCard'
 import { ActivityForm } from '../activities/ActivityForm'
 import { CategoryForm } from './CategoryForm'
@@ -11,12 +16,15 @@ interface CategorySectionProps {
   category: Category
   activities: Activity[]
   progressMap: Map<string, ActivityProgress>
+  /** Which section this is rendered in; drives the add form. */
+  kind?: ActivityKind
 }
 
 export function CategorySection({
   category,
   activities,
   progressMap,
+  kind = 'work',
 }: CategorySectionProps) {
   const [addingActivity, setAddingActivity] = useState(false)
   const [editingCategory, setEditingCategory] = useState(false)
@@ -68,6 +76,7 @@ export function CategorySection({
         <ActivityForm
           open
           category={category}
+          kind={kind}
           onClose={() => setAddingActivity(false)}
         />
       )}

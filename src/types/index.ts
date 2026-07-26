@@ -23,6 +23,37 @@ export interface Level {
 
 export type ActivityDifficulty = 'gentle' | 'standard' | 'hard' | 'legendary'
 
+/**
+ * The two halves of the app.
+ *
+ * A **habit** is a standing commitment — "the gym, four times a week". You
+ * tick it off, and the only question is whether you kept pace this week. It
+ * has no levels, no difficulty and no journey, because it is never finished.
+ *
+ * **Work** is the opposite: something you are working *through* and will one
+ * day be done with. That is what carries levels, a difficulty rating and the
+ * journey through the biomes.
+ */
+export type ActivityKind = 'habit' | 'work'
+
+/**
+ * The commitment behind a habit: how many times a week you agreed to do it.
+ *
+ * This is a *definition*, so it is stored. How many you have actually done,
+ * and whether that keeps pace, is always derived. See lib/goals.ts.
+ */
+export interface HabitGoal {
+  /** Times a week you agreed to do this. The habit's whole target. */
+  weeklyTarget?: number
+  /** Lifetime sessions to aim for. Optional, and never resets. */
+  totalTarget?: number
+  /**
+   * Days in a row to aim for. Retained so habits created before the weekly
+   * commitment became the primary target keep rendering their old goal.
+   */
+  streakTarget?: number
+}
+
 /** Something trackable inside a category, e.g. "Running" or "Math AA". */
 export interface Activity {
   id: Id
@@ -34,6 +65,10 @@ export interface Activity {
    * IndexedDB rows and backups keep their original behaviour.
    */
   difficulty?: ActivityDifficulty
+  /** Missing on rows written before the split, which are all habits. */
+  kind?: ActivityKind
+  /** Habits only. Work items are done or not done; they have nothing to aim at. */
+  goal?: HabitGoal
   levels: Level[]
   order: number
   createdAt: number
@@ -112,7 +147,12 @@ export interface Badge {
   kind: BadgeKind
   title: string
   description: string
-  emoji: string
+  /**
+   * Legacy. Badges are drawn from their `kind` now — see features/badges/
+   * badgeIcon.ts — but the field stays readable so older rows and backups
+   * still import cleanly.
+   */
+  emoji?: string
   earnedAt: number
   /** Activity or category this badge refers to, when relevant. */
   subjectId?: Id

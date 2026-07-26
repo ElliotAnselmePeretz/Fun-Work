@@ -2,12 +2,23 @@ import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
 import { nextOrder, reindex } from '../../lib/ordering'
 import { makeDefaultLevels, makeLevelsFromNames } from '../../lib/xp'
-import type { Activity, ActivityDifficulty, Id, Level } from '../../types'
+import type {
+  Activity,
+  ActivityDifficulty,
+  ActivityKind,
+  HabitGoal,
+  Id,
+  Level,
+} from '../../types'
 
 export interface ActivityDraft {
   categoryId: Id
   name: string
   emoji?: string
+  /** Defaults to a habit, which is what every pre-split row is. */
+  kind?: ActivityKind
+  /** Habits only; work items have nothing to aim at. */
+  goal?: HabitGoal
   /**
    * Optional custom milestones. Empty or omitted gives the auto-generated
    * ladder, which is the fast path for adding an activity.
@@ -34,10 +45,17 @@ export async function createActivity(draft: ActivityDraft): Promise<Id> {
     // Left empty when nothing was pinned, so the icon derives from the name.
     emoji: draft.emoji ?? '',
     difficulty: draft.difficulty ?? 'standard',
+    ...(draft.kind ? { kind: draft.kind } : {}),
+    ...(draft.goal ? { goal: draft.goal } : {}),
+    // A habit is a standing commitment, not a ladder — there is nothing to
+    // climb and nothing to finish, so it carries no levels at all. Only work
+    // gets a journey.
     levels:
-      names.length > 0
-        ? makeLevelsFromNames(names, draft.difficulty)
-        : makeDefaultLevels(draft.levelCount, draft.difficulty),
+      draft.kind === 'habit'
+        ? []
+        : names.length > 0
+          ? makeLevelsFromNames(names, draft.difficulty)
+          : makeDefaultLevels(draft.levelCount, draft.difficulty),
     order: nextOrder(siblings),
     createdAt: Date.now(),
   }

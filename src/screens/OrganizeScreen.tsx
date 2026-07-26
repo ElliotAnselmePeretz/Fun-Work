@@ -76,7 +76,7 @@ export function OrganizeScreen() {
       <div className="flex flex-col gap-5">
         <ScreenHeader back title="Organize" />
         <EmptyState
-          emoji="📂"
+          icon="chest"
           title="Nothing to organize"
           description="Add some categories and activities first."
         />
@@ -198,7 +198,7 @@ export function OrganizeScreen() {
 
       <div className="sticky bottom-24">
         <Button size="lg" onClick={save} disabled={!dirty}>
-          {saved ? 'Saved ✓' : dirty ? 'Save order' : 'No changes'}
+          {saved ? 'Saved' : dirty ? 'Save order' : 'No changes'}
         </Button>
       </div>
 

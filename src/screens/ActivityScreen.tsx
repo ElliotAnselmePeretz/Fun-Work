@@ -18,6 +18,11 @@ import { COINS_PER_SESSION } from '../lib/coins'
 import { relativeDayLabel, timeLabel } from '../lib/date'
 import { summarizeJourney } from '../lib/journey'
 import { computeProgress, levelFraction } from '../lib/xp'
+import { GoalCard } from '../features/activities/GoalCard'
+import { TrialRoadCard } from '../features/trials/TrialRoadCard'
+import { computeGoalProgress, isHabit } from '../lib/goals'
+import { habitTrialRoad } from '../lib/trials'
+import { PixelIcon } from '../components/PixelIcon'
 
 interface ActivityScreenProps {
   activityId: string
@@ -113,6 +118,17 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
 
       <LogButton activityId={activity.id} color={color} size="lg" label="+1 Session" />
 
+      {isHabit(activity) && (
+        <>
+          <GoalCard goals={computeGoalProgress(activity.goal, logs)} />
+          <TrialRoadCard
+            road={habitTrialRoad(logs)}
+            title="Trials of this habit"
+            caption="Beaten by keeping this one going, day after day."
+          />
+        </>
+      )}
+
       {recent.length > 0 && (
         <section>
           <h2 className="mb-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
@@ -128,7 +144,7 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
                   </span>
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2 py-1 text-xs font-black text-gold-dark">
-                  <GameIcon name="coins" size={13} />
+                  <PixelIcon name="coin" className="h-3.5 w-3.5" />
                   +{coins.rewardsByLogId.get(log.id)?.coins ?? COINS_PER_SESSION}
                 </span>
                 <button

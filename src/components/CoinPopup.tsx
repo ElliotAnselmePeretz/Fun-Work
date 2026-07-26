@@ -1,3 +1,5 @@
+import { PixelIcon } from './PixelIcon'
+
 interface CoinPopupProps {
   /** Bump this to retrigger the animation; null renders nothing. */
   token: number | null
@@ -13,9 +15,8 @@ export function CoinPopup({ token, amount }: CoinPopupProps) {
       aria-hidden
       className="animate-float-up pointer-events-none absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap text-lg font-black text-gold drop-shadow"
     >
-      <GameIcon name="coins" size={18} />
+      <PixelIcon name="coin" className="h-5 w-5" />
       +{amount}
     </span>
   )
 }
-import { GameIcon } from './GameIcon'

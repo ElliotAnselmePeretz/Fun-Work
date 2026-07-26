@@ -5,6 +5,7 @@
  */
 export type Route =
   | { name: 'home' }
+  | { name: 'work' }
   | { name: 'activity'; activityId: string }
   | { name: 'arena' }
   | { name: 'shop' }
@@ -22,6 +23,8 @@ export function parseHash(hash: string): Route {
   switch (head) {
     case 'activity':
       return param ? { name: 'activity', activityId: param } : { name: 'home' }
+    case 'work':
+      return { name: 'work' }
     case 'badges':
       return { name: 'badges' }
     case 'arena':

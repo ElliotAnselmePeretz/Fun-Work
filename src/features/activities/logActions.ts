@@ -66,7 +66,8 @@ export async function logSession(activityId: Id, note?: string): Promise<LogResu
       if (newBadges.length > 0) await db.badges.bulkAdd(newBadges)
 
       const coinsGained =
-        computeCoinSummary(ledgerEntries).rewardsByLogId.get(entry.id)?.coins ?? 0
+        computeCoinSummary(ledgerEntries, activities).rewardsByLogId.get(entry.id)
+          ?.coins ?? 0
       return { coinsGained, levelCleared, newBadges }
     },
   )

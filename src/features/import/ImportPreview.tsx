@@ -60,7 +60,7 @@ export function ImportPreview({
         <ul className="flex flex-col gap-1 rounded-2xl border-2 border-gold/50 bg-gold/10 px-4 py-3">
           {result.warnings.map((warning) => (
             <li key={warning} className="text-xs font-bold text-ink">
-              ⚠️ {warning}
+              {warning}
             </li>
           ))}
         </ul>

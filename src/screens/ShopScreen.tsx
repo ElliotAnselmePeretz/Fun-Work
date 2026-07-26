@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { GameIcon } from '../components/GameIcon'
+import { PixelIcon } from '../components/PixelIcon'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { purchaseItem } from '../features/shop/shopActions'
 import { useCoinSummary, useStreak } from '../hooks/useData'
@@ -108,7 +109,7 @@ export function ShopScreen() {
 
       <div className="grid grid-cols-3 gap-2">
         <Card className="mini-stat">
-          <GameIcon name="coins" size={18} className="text-gold-dark" />
+          <PixelIcon name="coin" className="h-5 w-5" />
           <strong>{coins.balance.toLocaleString()}</strong>
           <span>Available</span>
         </Card>
@@ -313,7 +314,7 @@ function GearCard({
                 'Forging…'
               ) : (
                 <span className="flex items-center justify-center gap-1">
-                  <GameIcon name="coins" size={14} />
+                  <PixelIcon name="coin" className="h-4 w-4" />
                   {item.cost}
                 </span>
               )}

@@ -1,4 +1,5 @@
 import { GameIcon } from '../../components/GameIcon'
+import { PixelIcon } from '../../components/PixelIcon'
 import { recentDayWindow } from '../../lib/streak'
 import { weekdayLabel } from '../../lib/date'
 import type { StreakInfo } from '../../types'
@@ -44,7 +45,7 @@ export function StreakFlame({ streak }: StreakFlameProps) {
                 }`}
                 aria-label={`${day}: ${hit ? 'logged' : 'no activity'}`}
               >
-                {hit ? '✓' : ''}
+                {hit && <PixelIcon name="check" className="h-3.5 w-3.5" />}
               </span>
             </div>
           )

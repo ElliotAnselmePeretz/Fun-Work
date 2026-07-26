@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PixelIcon } from '../../components/PixelIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { TextField } from '../../components/TextField'
@@ -40,7 +41,7 @@ export function ApiKeyCard({ settings }: ApiKeyCardProps) {
 
       {hasKey ? (
         <div className="flex items-center gap-2 rounded-2xl border-2 border-grass/40 bg-grass/10 px-3 py-2">
-          <span aria-hidden>🔑</span>
+          <PixelIcon name="key" className="h-5 w-5" />
           <span className="flex-1 text-sm font-extrabold">Key saved</span>
           <Button size="sm" variant="ghost" onClick={clear}>
             Remove
@@ -58,7 +59,7 @@ export function ApiKeyCard({ settings }: ApiKeyCardProps) {
             onChange={(event) => setDraft(event.target.value)}
           />
           <Button onClick={save} disabled={!draft.trim()}>
-            {saved ? 'Saved ✓' : 'Save key'}
+            {saved ? 'Saved' : 'Save key'}
           </Button>
         </>
       )}

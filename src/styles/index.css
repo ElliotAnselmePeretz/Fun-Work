@@ -1162,3 +1162,227 @@ body::before {
     opacity: 0.9;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Streak trials — the consistency track. Bosses here are beaten by turning up
+   rather than by out-spending them, so the road reads as a path of days.
+   ------------------------------------------------------------------------ */
+.trial-road {
+  @apply rounded-3xl border-2 border-swan/90 bg-night/90 p-4;
+  box-shadow:
+    0 1px 2px rgb(8 8 18 / 0.3),
+    0 10px 28px rgb(8 8 18 / 0.28);
+}
+.trial-road-head {
+  @apply mb-3 flex items-start justify-between gap-3;
+}
+.trial-road-caption {
+  @apply mt-0.5 text-xs font-bold text-ink-soft;
+}
+.trial-streak {
+  @apply flex shrink-0 items-center gap-1.5 rounded-full border-2 border-flame/40 bg-flame/12 px-2.5 py-1.5 text-flame-dark;
+}
+.trial-streak strong {
+  @apply text-sm font-black;
+}
+.trial-streak small {
+  @apply text-[9px] font-black uppercase tracking-wide text-ink-soft;
+}
+
+/* Horizontal road: it scrolls rather than wraps, so the ladder stays legible
+   as one continuous journey on a narrow screen. */
+.trial-track {
+  @apply flex gap-2 overflow-x-auto pb-1;
+  scrollbar-width: none;
+}
+.trial-track::-webkit-scrollbar {
+  display: none;
+}
+.trial-node {
+  @apply relative flex w-24 shrink-0 flex-col items-center gap-1 rounded-2xl border-2 border-swan/70 bg-polar/50 px-2 py-2.5 text-center opacity-70 transition-all;
+}
+.trial-node-face {
+  @apply grid h-9 w-9 place-items-center rounded-full border-2 border-swan/70 bg-night text-ink-soft;
+}
+.trial-node-name {
+  @apply text-[10px] font-black leading-tight;
+}
+.trial-node-days {
+  @apply text-[9px] font-black uppercase tracking-wide text-ink-soft;
+}
+
+/* Cleared for good: keyed to the longest run ever, so this never reverts. */
+.trial-node-beaten {
+  @apply border-[var(--trial-accent)]/60 opacity-100;
+  background: color-mix(in srgb, var(--trial-accent) 14%, transparent);
+}
+.trial-node-beaten .trial-node-face {
+  @apply border-[var(--trial-accent)] text-[var(--trial-accent)];
+  box-shadow: 0 0 14px color-mix(in srgb, var(--trial-accent) 45%, transparent);
+}
+.trial-node-beaten .trial-node-days {
+  @apply text-[var(--trial-accent)];
+}
+
+/* The one you are walking toward. */
+.trial-node-next {
+  @apply border-[var(--trial-accent)]/70 opacity-100;
+}
+.trial-node-next .trial-node-face {
+  @apply border-[var(--trial-accent)]/80 text-[var(--trial-accent)];
+}
+.trial-node-bar {
+  @apply mt-0.5 block h-1.5 w-full overflow-hidden rounded-full bg-night;
+}
+.trial-node-bar i {
+  @apply block h-full rounded-full bg-[var(--trial-accent)] transition-[width] duration-500;
+}
+.trial-road-next {
+  @apply mt-3 text-xs font-bold text-ink-soft;
+}
+
+/* ---------------------------------------------------------------------------
+   Habit goals. Targets are stored on the activity; every number shown is
+   derived from the session log on read.
+   ------------------------------------------------------------------------ */
+.goal-card {
+  @apply rounded-3xl border-2 border-swan/90 bg-night/90 p-4;
+}
+.goal-row {
+  @apply grid items-center gap-2;
+  grid-template-columns: 5.5rem 1fr auto;
+}
+.goal-row-label {
+  @apply text-xs font-extrabold text-ink-soft;
+}
+.goal-row-bar {
+  @apply block h-2 overflow-hidden rounded-full bg-polar;
+}
+.goal-row-bar i {
+  @apply block h-full rounded-full bg-violet transition-[width] duration-500;
+}
+.goal-row-value strong {
+  @apply text-sm font-black;
+}
+.goal-row-value small {
+  @apply text-[10px] font-bold text-ink-soft;
+}
+.goal-row-met .goal-row-bar i {
+  @apply bg-grass;
+}
+.goal-row-met .goal-row-value strong {
+  @apply text-grass-dark;
+}
+
+/* The target inputs in the activity form. */
+.goal-grid {
+  @apply grid gap-2;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.goal-field {
+  @apply flex flex-col gap-1 rounded-2xl border-2 border-swan bg-night p-2.5;
+}
+.goal-field > span {
+  @apply text-[10px] font-black uppercase tracking-wide text-ink-soft;
+}
+.goal-field input {
+  @apply w-full rounded-xl border-2 border-swan bg-polar px-2 py-1.5 text-sm font-black text-ink outline-none transition-colors;
+}
+.goal-field input:focus {
+  @apply border-sky;
+}
+.goal-field small {
+  @apply text-[9px] font-bold text-hare;
+}
+
+/* One-tap completion for a work item. */
+.work-check {
+  @apply bg-grass/10;
+}
+.work-check:hover:not(:disabled) {
+  @apply bg-grass/20;
+}
+
+/* ---------------------------------------------------------------------------
+   Habits: the weekly tick list. No levels, no journey — just the pace you
+   agreed to and whether you are keeping it.
+   ------------------------------------------------------------------------ */
+.habit-row {
+  @apply flex items-center gap-3 px-3 py-3;
+}
+.habit-row-name {
+  @apply truncate text-sm font-extrabold;
+}
+.habit-row-meta {
+  @apply mt-1 flex flex-wrap items-center gap-x-2 gap-y-1;
+}
+
+/* One pip per agreed session, so "four of five" reads without arithmetic. */
+.habit-pips {
+  @apply flex items-center gap-1;
+}
+.habit-pips i {
+  @apply block h-2 w-2 rounded-full bg-swan transition-colors;
+}
+.habit-pips .habit-pip-on {
+  @apply bg-grass;
+  box-shadow: 0 0 6px rgb(88 204 2 / 0.55);
+}
+.habit-row-count {
+  @apply text-[11px] font-bold text-ink-soft;
+}
+.habit-row-count-met {
+  @apply text-grass-dark;
+}
+.habit-weeks {
+  @apply inline-flex items-center gap-1 rounded-full bg-flame/12 px-1.5 py-0.5 text-[10px] font-black text-flame-dark;
+}
+
+/* The tick, with what it pays written on it. */
+.habit-tick {
+  @apply flex shrink-0 flex-col items-center gap-0.5 rounded-2xl border-2 border-grass/50 bg-grass/10 px-3 py-2
+         transition-transform active:scale-95 disabled:opacity-50;
+}
+.habit-tick:hover:not(:disabled) {
+  @apply bg-grass/20;
+}
+.habit-tick-met {
+  @apply border-gold/50 bg-gold/10;
+}
+
+/* ---------------------------------------------------------------------------
+   Coin amounts. Always the sprite plus the number, so a figure is never a
+   bare integer the user has to guess the units of.
+   ------------------------------------------------------------------------ */
+.coin-amount {
+  @apply inline-flex items-center gap-1.5 font-black text-gold-dark;
+}
+
+/* The "here is what this pays" strip at the top of each section. */
+.reward-banner {
+  @apply flex items-center justify-between gap-3 rounded-3xl border-2 border-gold/30 px-4 py-3;
+  background:
+    radial-gradient(circle at 8% 0%, rgb(255 200 0 / 0.14), transparent 12rem),
+    rgb(36 30 73 / 0.9);
+}
+.reward-banner-boost {
+  @apply flex max-w-[52%] items-center gap-1.5 text-right text-[11px] font-bold text-ink-soft;
+}
+
+/* How many times a week the habit was agreed to. */
+.week-picker {
+  @apply grid gap-1.5;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.week-picker-option {
+  @apply grid h-10 place-items-center rounded-xl border-2 border-swan bg-night text-sm font-black text-ink-soft transition-colors;
+}
+.week-picker-option:hover {
+  @apply border-grass/50;
+}
+.week-picker-option-active {
+  @apply border-grass bg-grass/15 text-grass-dark;
+}
+.week-picker-caption {
+  @apply mt-2 text-xs font-bold text-ink-soft;
+}

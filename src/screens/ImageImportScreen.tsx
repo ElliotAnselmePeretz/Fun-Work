@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PixelIcon } from '../components/PixelIcon'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
@@ -51,9 +52,7 @@ export function ImageImportScreen() {
       <div className="flex flex-col gap-5">
         <ScreenHeader back title="Imported" />
         <Card className="flex flex-col items-center gap-2 p-6 text-center">
-          <span className="animate-pop-in text-5xl" aria-hidden>
-            🖼️
-          </span>
+          <PixelIcon name="mirror" className="animate-pop-in h-14 w-14" />
           <p className="text-lg font-extrabold">
             {summary.activitiesCreated} activit
             {summary.activitiesCreated === 1 ? 'y' : 'ies'} added
@@ -85,7 +84,7 @@ export function ImageImportScreen() {
       <div className="flex flex-col gap-5">
         <ScreenHeader back title="Import from image" />
         <EmptyState
-          emoji="🔑"
+          icon="key"
           title="Needs an API key"
           description="Reading a list out of a photo uses Claude, so it needs your own Anthropic API key. Add one in Settings."
         >
@@ -131,9 +130,7 @@ export function ImageImportScreen() {
 
       {busy && (
         <Card className="flex items-center gap-3 p-4">
-          <span className="animate-flame text-2xl" aria-hidden>
-            ✨
-          </span>
+          <PixelIcon name="lamp" className="animate-flame h-7 w-7" />
           <span className="text-sm font-bold text-ink-soft">
             Reading the list out of your image…
           </span>

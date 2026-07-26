@@ -10,7 +10,13 @@ import {
   MAX_LEVEL_COUNT,
   MIN_LEVEL_COUNT,
 } from '../../lib/xp'
-import type { Activity, ActivityDifficulty, Category } from '../../types'
+import type {
+  Activity,
+  ActivityDifficulty,
+  ActivityKind,
+  Category,
+  HabitGoal,
+} from '../../types'
 import { createActivity, deleteActivity, updateActivity } from './activityActions'
 
 interface ActivityFormProps {
@@ -19,6 +25,8 @@ interface ActivityFormProps {
   category: Category
   /** Omit to create; pass an activity to edit its name and icon. */
   activity?: Activity
+  /** Which section this belongs to. Existing rows with no kind are habits. */
+  kind?: ActivityKind
 }
 
 /**
@@ -26,8 +34,16 @@ interface ActivityFormProps {
  * milestone list is an optional disclosure for when you already know the
  * rungs you want. Levels stay editable afterwards either way.
  */
-export function ActivityForm({ open, onClose, category, activity }: ActivityFormProps) {
+export function ActivityForm({
+  open,
+  onClose,
+  category,
+  activity,
+  kind: kindProp,
+}: ActivityFormProps) {
   const editing = activity !== undefined
+  const kind: ActivityKind = activity?.kind ?? kindProp ?? 'habit'
+  const isWorkItem = kind === 'work'
   const [name, setName] = useState(activity?.name ?? '')
   // Empty means "let the name choose", which is what the picker shows until
   // the user pins something.
@@ -39,6 +55,32 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
     activity?.difficulty ?? 'standard',
   )
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  // Goal targets are habit-only. Empty string means "no target".
+  // The day-streak target has no input any more — the weekly commitment
+  // replaced it — but an existing one is carried through on save so editing a
+  // habit created earlier never silently drops its goal.
+  const streakTarget = activity?.goal?.streakTarget?.toString() ?? ''
+  const [weeklyTarget, setWeeklyTarget] = useState(
+    activity?.goal?.weeklyTarget?.toString() ?? '',
+  )
+  const [totalTarget, setTotalTarget] = useState(
+    activity?.goal?.totalTarget?.toString() ?? '',
+  )
+
+  /** Only the targets actually filled in end up on the record. */
+  const buildGoal = (): HabitGoal | undefined => {
+    if (isWorkItem) return undefined
+    const read = (raw: string) => {
+      const value = Number.parseInt(raw, 10)
+      return Number.isFinite(value) && value > 0 ? value : undefined
+    }
+    const goal: HabitGoal = {
+      ...(read(streakTarget) ? { streakTarget: read(streakTarget) } : {}),
+      ...(read(weeklyTarget) ? { weeklyTarget: read(weeklyTarget) } : {}),
+      ...(read(totalTarget) ? { totalTarget: read(totalTarget) } : {}),
+    }
+    return Object.keys(goal).length > 0 ? goal : undefined
+  }
 
   const milestoneNames = milestones
     .split('\n')
@@ -53,14 +95,17 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
         name: name.trim(),
         emoji,
         difficulty,
+        goal: buildGoal(),
       })
     } else {
       await createActivity({
         categoryId: category.id,
         name,
         emoji,
-        levelNames: showMilestones ? milestoneNames : undefined,
-        levelCount: showMilestones ? undefined : levelCount,
+        kind,
+        goal: buildGoal(),
+        levelNames: showMilestones && isWorkItem ? milestoneNames : undefined,
+        levelCount: showMilestones && isWorkItem ? undefined : levelCount,
         difficulty,
       })
     }
@@ -77,14 +122,20 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
     <Modal
       open={open}
       onClose={onClose}
-      title={editing ? 'Edit activity' : `New activity in ${category.name}`}
+      title={
+        editing
+          ? `Edit ${isWorkItem ? 'work' : 'habit'}`
+          : isWorkItem
+            ? `New work in ${category.name}`
+            : 'New habit'
+      }
     >
       <div className="flex flex-col gap-4">
         <TextField
           label="Name"
           value={name}
           autoFocus
-          placeholder="e.g. Running"
+          placeholder={isWorkItem ? 'e.g. Math AA' : 'e.g. Gym'}
           onChange={(event) => setName(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !showMilestones) void submit()
@@ -97,6 +148,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
           id={activity?.id}
         />
 
+        {isWorkItem && (
         <fieldset className="quest-builder">
           <legend className="quest-builder-title">1. Choose the challenge</legend>
           <div className="difficulty-grid">
@@ -127,8 +179,51 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
             </p>
           )}
         </fieldset>
+        )}
 
-        {!editing && (
+        {!isWorkItem && (
+          <fieldset className="quest-builder">
+            <legend className="quest-builder-title">The commitment</legend>
+            <p className="mb-3 text-xs text-ink-soft">
+              How many times a week are you agreeing to do this? That pace is
+              the whole target — a rest day never counts against you.
+            </p>
+            <div className="week-picker" role="group" aria-label="Times a week">
+              {[1, 2, 3, 4, 5, 6, 7].map((times) => (
+                <button
+                  key={times}
+                  type="button"
+                  aria-pressed={weeklyTarget === String(times)}
+                  onClick={() => setWeeklyTarget(String(times))}
+                  className={`week-picker-option ${
+                    weeklyTarget === String(times) ? 'week-picker-option-active' : ''
+                  }`}
+                >
+                  {times}
+                </button>
+              ))}
+            </div>
+            <p className="week-picker-caption">
+              {weeklyTarget
+                ? `${weeklyTarget}\u00d7 a week`
+                : 'Pick a pace, or leave it open and just tick when you do it.'}
+            </p>
+            <label className="goal-field mt-3">
+              <span>Lifetime goal (optional)</span>
+              <input
+                type="number"
+                min={1}
+                inputMode="numeric"
+                value={totalTarget}
+                placeholder="100"
+                onChange={(event) => setTotalTarget(event.target.value)}
+              />
+              <small>sessions in total, if you want one</small>
+            </label>
+          </fieldset>
+        )}
+
+        {!editing && isWorkItem && (
           <div className="quest-builder">
             <p className="quest-builder-title">2. Shape the adventure</p>
             {!showMilestones && (
@@ -241,7 +336,7 @@ export function ActivityForm({ open, onClose, category, activity }: ActivityForm
         )}
 
         <Button size="lg" color={category.color} onClick={submit} disabled={!name.trim()}>
-          {editing ? 'Save' : 'Add activity'}
+          {editing ? 'Save' : isWorkItem ? 'Add work' : 'Add habit'}
         </Button>
 
         {editing &&

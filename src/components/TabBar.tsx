@@ -7,7 +7,8 @@ const TABS: {
   icon: GameIconName
   color: string
 }[] = [
-  { route: { name: 'home' }, label: 'Home', icon: 'home', color: 'text-grass-dark' },
+  { route: { name: 'home' }, label: 'Habits', icon: 'home', color: 'text-grass-dark' },
+  { route: { name: 'work' }, label: 'Work', icon: 'check', color: 'text-flame-dark' },
   { route: { name: 'arena' }, label: 'Arena', icon: 'swords', color: 'text-cardinal' },
   { route: { name: 'shop' }, label: 'Armory', icon: 'store', color: 'text-gold-dark' },
   { route: { name: 'stats' }, label: 'Stats', icon: 'chart', color: 'text-sky-dark' },

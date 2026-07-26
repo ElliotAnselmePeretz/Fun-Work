@@ -45,7 +45,6 @@ export function evaluateBadges({
       kind: 'first-log',
       title: 'First Step',
       description: 'Logged your very first session.',
-      emoji: '👟',
     })
   }
 
@@ -58,12 +57,11 @@ export function evaluateBadges({
         kind: 'streak',
         title: `${days}-Day Streak`,
         description: `Kept the flame alive for ${days} days in a row.`,
-        emoji: days >= 30 ? '🔥' : '✨',
       })
     }
   }
 
-  const totalCoins = computeCoinSummary(ledgerEntries).earned
+  const totalCoins = computeCoinSummary(ledgerEntries, activities).earned
   for (const coins of COIN_THRESHOLDS) {
     if (totalCoins >= coins) {
       candidates.push({
@@ -71,7 +69,6 @@ export function evaluateBadges({
         kind: 'coin-total',
         title: `${coins.toLocaleString()} Coins`,
         description: `Earned ${coins.toLocaleString()} total coins.`,
-        emoji: '🪙',
       })
     }
   }
@@ -86,7 +83,6 @@ export function evaluateBadges({
         kind: 'level-up',
         title: `${activity.name}: ${activity.levels[i]?.name ?? `Level ${i + 1}`}`,
         description: `Cleared a level in ${activity.name}.`,
-        emoji: activity.emoji || '⭐',
         subjectId: activity.id,
       })
     }
@@ -97,7 +93,6 @@ export function evaluateBadges({
         kind: 'activity-complete',
         title: `${activity.name} Mastered`,
         description: `Completed every level of ${activity.name}.`,
-        emoji: '🏆',
         subjectId: activity.id,
       })
     }

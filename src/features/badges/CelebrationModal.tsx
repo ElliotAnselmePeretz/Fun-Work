@@ -1,6 +1,8 @@
 import { Button } from '../../components/Button'
 import { Modal } from '../../components/Modal'
 import { useUiStore } from '../../store/useUiStore'
+import { PixelIcon } from '../../components/PixelIcon'
+import { badgeIcon } from './badgeIcon'
 
 /**
  * The single celebration surface. Level-ups and badges both funnel into the
@@ -20,9 +22,7 @@ export function CelebrationModal() {
       <div className="flex flex-col items-center gap-4 py-2 text-center">
         {levelUpMessage && (
           <>
-            <span className="text-6xl animate-pop-in" aria-hidden>
-              🎉
-            </span>
+            <PixelIcon name="crystal" className="animate-pop-in h-16 w-16" />
             <div>
               <h2 className="text-2xl font-extrabold text-grass">Level up!</h2>
               <p className="mt-1 font-bold text-ink-soft">
@@ -43,9 +43,7 @@ export function CelebrationModal() {
                   key={badge.id}
                   className="animate-pop-in flex w-28 flex-col items-center gap-1 rounded-2xl border-2 border-gold/50 bg-gold/10 p-3"
                 >
-                  <span className="text-4xl" aria-hidden>
-                    {badge.emoji}
-                  </span>
+                  <PixelIcon name={badgeIcon(badge.kind)} className="h-11 w-11" />
                   <span className="text-xs font-extrabold leading-tight">
                     {badge.title}
                   </span>

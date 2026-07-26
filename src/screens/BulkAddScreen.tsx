@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { PixelIcon } from '../components/PixelIcon'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { ScreenHeader } from '../components/ScreenHeader'
@@ -9,12 +10,12 @@ import { countActivities, parseBulkText } from '../features/import/parseBulkText
 import { useActivities, useCategories } from '../hooks/useData'
 import { navigate } from '../lib/router'
 
-const EXAMPLE = `# 💪 Physical
+const EXAMPLE = `# Physical
 Running
 Swimming
 Push-ups
 
-# 📚 Schoolwork
+# Schoolwork
 Math AA
 Physics HL
 Extended Essay`
@@ -39,9 +40,7 @@ export function BulkAddScreen() {
       <div className="flex flex-col gap-5">
         <ScreenHeader back title="Imported" />
         <Card className="flex flex-col items-center gap-2 p-6 text-center">
-          <span className="text-5xl animate-pop-in" aria-hidden>
-            📥
-          </span>
+          <PixelIcon name="chest" className="animate-pop-in h-14 w-14" />
           <p className="text-lg font-extrabold">
             {summary.activitiesCreated} activit
             {summary.activitiesCreated === 1 ? 'y' : 'ies'} added

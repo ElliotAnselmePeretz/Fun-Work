@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PixelIcon } from '../../components/PixelIcon'
 import { Button } from '../../components/Button'
 import { Modal } from '../../components/Modal'
 import { arrayMove } from '../../lib/ordering'
@@ -124,7 +125,7 @@ export function LevelEditor({
                 }`}
               >
                 <span className="w-5 shrink-0 text-center text-xs font-extrabold text-ink-soft">
-                  {cleared ? '★' : index + 1}
+                  {cleared ? <PixelIcon name="crystal" className="h-4 w-4" /> : index + 1}
                 </span>
 
                 <input

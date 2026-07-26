@@ -15,19 +15,19 @@ const LOCKED_PLACEHOLDERS = [
     id: badgeId.firstLog(),
     title: 'First Step',
     description: 'Log your very first session.',
-    emoji: '👟',
+    kind: 'first-log' as const,
   },
   ...STREAK_THRESHOLDS.map((days) => ({
     id: badgeId.streak(days),
     title: `${days}-Day Streak`,
     description: `Keep the flame alive ${days} days running.`,
-    emoji: days >= 30 ? '🔥' : '✨',
+    kind: 'streak' as const,
   })),
   ...COIN_THRESHOLDS.map((coins) => ({
     id: badgeId.coinTotal(coins),
     title: `${coins.toLocaleString()} Coins`,
     description: `Earn ${coins.toLocaleString()} total coins.`,
-    emoji: '🪙',
+    kind: 'coin-total' as const,
   })),
 ]
 
@@ -47,7 +47,7 @@ export function BadgesScreen() {
 
       {badges.length === 0 ? (
         <EmptyState
-          emoji="🏅"
+          icon="crystal"
           title="No badges yet"
           description="Log your first session and the shelf starts filling up."
         />

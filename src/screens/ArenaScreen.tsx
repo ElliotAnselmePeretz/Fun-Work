@@ -21,6 +21,7 @@ import {
 import { recommendLoadout } from '../lib/loadout'
 import { navigate } from '../lib/router'
 import { ownedArmour, ownedWeapons } from '../lib/shop'
+import { PixelIcon } from '../components/PixelIcon'
 
 export function ArenaScreen() {
   const ledger = useLedgerEntries()
@@ -140,7 +141,7 @@ export function ArenaScreen() {
             onClick={() => navigate({ name: 'shop' })}
             aria-label={`${coins.balance} coins. Open Armory`}
           >
-            <GameIcon name="coins" size={17} />
+            <PixelIcon name="coin" className="h-4 w-4" />
             {coins.balance.toLocaleString()}
           </button>
         }
@@ -326,7 +327,7 @@ export function ArenaScreen() {
           <span>Defeats</span>
         </Card>
         <Card className="battle-stat">
-          <GameIcon name="coins" size={17} />
+          <PixelIcon name="coin" className="h-4 w-4" />
           <strong>{activeBoss.boss.coinReward}</strong>
           <span>Reward</span>
         </Card>
