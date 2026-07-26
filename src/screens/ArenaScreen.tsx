@@ -1,4 +1,10 @@
-import { useMemo, useRef, useState, type CSSProperties } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { GameIcon } from '../components/GameIcon'
@@ -9,6 +15,10 @@ import {
   type SwingMeterHandle,
 } from '../components/SwingMeter'
 import { takeTurn } from '../features/arena/arenaActions'
+import {
+  BossResultOverlay,
+  type BossResultKind,
+} from '../features/arena/BossResultOverlay'
 import { useCoinSummary, useLedgerEntries } from '../hooks/useData'
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import {
@@ -23,6 +33,23 @@ import { navigate } from '../lib/router'
 import { ownedArmour, ownedWeapons } from '../lib/shop'
 import { PixelIcon } from '../components/PixelIcon'
 
+interface ResultOverlayState {
+  kind: BossResultKind
+  boss: BossProgress['boss']
+  coinReward: number
+  attemptNumber: number
+}
+
+interface CombatFx {
+  token: number
+  playerDamage: number
+  bossDamage: number
+  healing: number
+  bossHealed: number
+  critical: boolean
+  guarded: boolean
+}
+
 export function ArenaScreen() {
   const ledger = useLedgerEntries()
   const coins = useCoinSummary()
@@ -36,6 +63,21 @@ export function ArenaScreen() {
   const [lastImpact, setLastImpact] = useState<'hit' | 'guard' | 'loss'>('hit')
   const [lastTiming, setLastTiming] = useState<StrikeTiming>()
   const [message, setMessage] = useState<string | null>(null)
+  const [cinematicPending, setCinematicPending] = useState(false)
+  const [combatFx, setCombatFx] = useState<CombatFx | null>(null)
+  const [resultOverlay, setResultOverlay] = useState<ResultOverlayState | null>(
+    null,
+  )
+  const resultTimer = useRef<number | undefined>(undefined)
+
+  useEffect(
+    () => () => {
+      if (resultTimer.current !== undefined) {
+        window.clearTimeout(resultTimer.current)
+      }
+    },
+    [],
+  )
 
   const bosses = useMemo(
     () => (ledger ? computeBossProgress(ledger) : undefined),
@@ -78,7 +120,8 @@ export function ArenaScreen() {
   const displayedPlayerHp =
     activeBoss.attemptHits === 0 ? displayedPlayerMaxHp : activeBoss.playerHp
   const allDefeated = bosses.every((progress) => progress.defeated)
-  const inCombat = !activeBoss.defeated && !activeBoss.locked
+  const inCombat =
+    !activeBoss.defeated && !activeBoss.locked && !cinematicPending
   const nextMove = activeBoss.nextMove
 
   const play = async (action: 'strike' | 'guard') => {
@@ -97,14 +140,45 @@ export function ArenaScreen() {
         action,
         timing,
       })
+      setCombatFx({
+        token: Date.now(),
+        playerDamage: result.playerDamage,
+        bossDamage: result.bossDamage,
+        healing: result.healing,
+        bossHealed: result.bossHealed,
+        critical: result.critical,
+        guarded: action === 'guard',
+      })
       if (result.lost) {
         setLastImpact('loss')
+        setCinematicPending(true)
         setMessage(
           `${activeBoss.boss.name} defeated you. No coins were lost; attempt ${activeBoss.attemptNumber + 1} is ready.`,
         )
+        resultTimer.current = window.setTimeout(
+          () =>
+            setResultOverlay({
+              kind: 'defeat',
+              boss: activeBoss.boss,
+              coinReward: 0,
+              attemptNumber: activeBoss.attemptNumber,
+            }),
+          reducedMotion ? 0 : 520,
+        )
       } else if (result.defeated) {
+        setCinematicPending(true)
         setMessage(
           `${activeBoss.boss.name} defeated. ${result.coinReward} coins added to your ledger.`,
+        )
+        resultTimer.current = window.setTimeout(
+          () =>
+            setResultOverlay({
+              kind: 'victory',
+              boss: activeBoss.boss,
+              coinReward: result.coinReward,
+              attemptNumber: activeBoss.attemptNumber,
+            }),
+          reducedMotion ? 0 : 520,
         )
       } else if (action === 'guard') {
         setMessage(
@@ -307,6 +381,43 @@ export function ArenaScreen() {
         )}
         {resolving && lastImpact === 'guard' && (
           <span className="guard-flash" aria-hidden />
+        )}
+        {combatFx && (
+          <div
+            key={combatFx.token}
+            className="combat-fx-layer"
+            aria-hidden
+            onAnimationEnd={() => setCombatFx(null)}
+          >
+            {combatFx.playerDamage > 0 && (
+              <span
+                className={`combat-number combat-number-boss ${
+                  combatFx.critical ? 'combat-number-critical' : ''
+                }`}
+              >
+                −{combatFx.playerDamage}
+                {combatFx.critical && <small>Critical</small>}
+              </span>
+            )}
+            {combatFx.bossDamage > 0 && (
+              <span className="combat-number combat-number-player">
+                −{combatFx.bossDamage}
+                {combatFx.guarded && <small>Blocked</small>}
+              </span>
+            )}
+            {combatFx.healing > 0 && (
+              <span className="combat-number combat-number-heal">
+                +{combatFx.healing}
+                <small>Heal</small>
+              </span>
+            )}
+            {combatFx.bossHealed > 0 && (
+              <span className="combat-number combat-number-drain">
+                +{combatFx.bossHealed}
+                <small>Drain</small>
+              </span>
+            )}
+          </div>
         )}
       </section>
 
@@ -557,6 +668,16 @@ export function ArenaScreen() {
             arena is prepared.
           </p>
         </Card>
+      )}
+
+      {resultOverlay && (
+        <BossResultOverlay
+          {...resultOverlay}
+          onDismiss={() => {
+            setResultOverlay(null)
+            setCinematicPending(false)
+          }}
+        />
       )}
     </div>
   )
