@@ -34,6 +34,12 @@ const FILTER_DETAILS: Record<
     eyebrow: 'Survivability',
     description: 'Reduce every counterattack and begin each attempt with more health.',
   },
+  relic: {
+    label: 'Relics',
+    eyebrow: 'Rule-changing side-grades',
+    description:
+      'Change how you fight with timing, recovery, rhythm, or comeback perks—each with a tradeoff.',
+  },
 }
 
 export function ShopScreen() {
@@ -83,7 +89,8 @@ export function ShopScreen() {
             Choose how you survive.
           </h2>
           <p className="mt-2 text-sm font-bold leading-relaxed text-white/65">
-            Strike hard, recover with magic, or absorb the counterattack.
+            Strike hard, recover with magic, absorb the counterattack, or bend
+            the rules with a relic.
           </p>
           <Button
             size="sm"
@@ -148,7 +155,9 @@ export function ShopScreen() {
                     ? 'swords'
                     : type === 'magic'
                       ? 'sparkles'
-                      : 'shield'
+                      : type === 'armour'
+                        ? 'shield'
+                        : 'crown'
                 }
                 size={17}
               />
@@ -260,8 +269,20 @@ function GearCard({
           {item.description}
         </p>
 
-        <div className="gear-stats">
-          {item.gearType !== 'armour' ? (
+        {item.gearType === 'relic' ? (
+          <div className="relic-perks">
+            <span className="relic-perk-positive">
+              <GameIcon name="sparkles" size={13} />
+              {item.perk}
+            </span>
+            <span className="relic-perk-tradeoff">
+              <GameIcon name="target" size={13} />
+              {item.tradeoff}
+            </span>
+          </div>
+        ) : (
+          <div className="gear-stats">
+            {item.gearType !== 'armour' ? (
             <>
               <Stat label="Damage" value={item.damage ?? 0} tone="damage" />
               {item.gearType === 'magic' ? (
@@ -274,24 +295,32 @@ function GearCard({
                 />
               )}
             </>
-          ) : (
-            <>
-              <Stat label="Guard" value={item.defense ?? 0} tone="guard" />
-              <Stat
-                label="Max HP"
-                value={`+${item.maxHpBonus ?? 0}`}
-                tone="health"
-              />
-            </>
-          )}
-        </div>
-
-        <div className="gear-power">
-          <span>Gear rating</span>
-          <div>
-            <i style={{ width: `${power}%` }} />
+            ) : (
+              <>
+                <Stat label="Guard" value={item.defense ?? 0} tone="guard" />
+                <Stat
+                  label="Max HP"
+                  value={`+${item.maxHpBonus ?? 0}`}
+                  tone="health"
+                />
+              </>
+            )}
           </div>
-        </div>
+        )}
+
+        {item.gearType === 'relic' ? (
+          <div className="relic-sidegrade-label">
+            <GameIcon name="sparkles" size={12} />
+            Side-grade · choose for your strategy
+          </div>
+        ) : (
+          <div className="gear-power">
+            <span>Gear rating</span>
+            <div>
+              <i style={{ width: `${power}%` }} />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="gear-card-action">
@@ -347,6 +376,7 @@ function Stat({
 }
 
 function gearPower(item: ShopItem): number {
+  if (item.gearType === 'relic') return 50
   if (item.gearType === 'armour') {
     return Math.min(
       100,

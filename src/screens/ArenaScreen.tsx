@@ -23,14 +23,16 @@ import { useCoinSummary, useLedgerEntries } from '../hooks/useData'
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import {
   BOSS_MOVES,
+  ENRAGE_AFTER,
   computeBossProgress,
+  enrageMultiplier,
   type BossProgress,
   type CombatTurn,
   type StrikeTiming,
 } from '../lib/bosses'
 import { recommendLoadout } from '../lib/loadout'
 import { navigate } from '../lib/router'
-import { ownedArmour, ownedWeapons } from '../lib/shop'
+import { ownedArmour, ownedRelics, ownedWeapons } from '../lib/shop'
 import { PixelIcon } from '../components/PixelIcon'
 
 interface ResultOverlayState {
@@ -48,6 +50,8 @@ interface CombatFx {
   bossHealed: number
   critical: boolean
   guarded: boolean
+  relicTriggered?: string
+  revived: boolean
 }
 
 export function ArenaScreen() {
@@ -58,6 +62,7 @@ export function ArenaScreen() {
   const [selectedBossId, setSelectedBossId] = useState<string | null>(null)
   const [selectedWeaponId, setSelectedWeaponId] = useState('lucky-pouch')
   const [selectedArmourId, setSelectedArmourId] = useState('traveler-guard')
+  const [selectedRelicId, setSelectedRelicId] = useState('wayfarer-ward')
   const [resolving, setResolving] = useState(false)
   const [impactToken, setImpactToken] = useState(0)
   const [lastImpact, setLastImpact] = useState<'hit' | 'guard' | 'loss'>('hit')
@@ -65,6 +70,7 @@ export function ArenaScreen() {
   const [message, setMessage] = useState<string | null>(null)
   const [cinematicPending, setCinematicPending] = useState(false)
   const [combatFx, setCombatFx] = useState<CombatFx | null>(null)
+  const [phaseShift, setPhaseShift] = useState<string | null>(null)
   const [resultOverlay, setResultOverlay] = useState<ResultOverlayState | null>(
     null,
   )
@@ -104,6 +110,7 @@ export function ArenaScreen() {
 
   const availableWeapons = ownedWeapons(coins.ownedItemIds)
   const availableArmour = ownedArmour(coins.ownedItemIds)
+  const availableRelics = ownedRelics(coins.ownedItemIds)
   const weapon =
     availableWeapons.find((item) => item.id === selectedWeaponId) ??
     availableWeapons[0]
@@ -113,6 +120,12 @@ export function ArenaScreen() {
     availableArmour.find(
       (item) => item.id === (lockedArmourId ?? selectedArmourId),
     ) ?? availableArmour[0]
+  const lockedRelicId =
+    activeBoss.attemptHits > 0 ? activeBoss.relicId : undefined
+  const relic =
+    availableRelics.find(
+      (item) => item.id === (lockedRelicId ?? selectedRelicId),
+    ) ?? availableRelics[0]
   const displayedPlayerMaxHp =
     activeBoss.attemptHits === 0
       ? 100 + (armour?.maxHpBonus ?? 0)
@@ -123,9 +136,11 @@ export function ArenaScreen() {
   const inCombat =
     !activeBoss.defeated && !activeBoss.locked && !cinematicPending
   const nextMove = activeBoss.nextMove
+  const rageMultiplier = enrageMultiplier(activeBoss.attemptHits)
+  const turnsUntilRage = Math.max(0, ENRAGE_AFTER - activeBoss.attemptHits)
 
   const play = async (action: 'strike' | 'guard') => {
-    if (!activeBoss || !weapon || !armour) return
+    if (!activeBoss || !weapon || !armour || !relic) return
     const timing = action === 'strike' ? meter.current?.read() : undefined
     setResolving(true)
     setMessage(null)
@@ -137,6 +152,7 @@ export function ArenaScreen() {
         bossId: activeBoss.boss.id,
         weaponId: weapon.id,
         armourId: armour.id,
+        relicId: relic.id,
         action,
         timing,
       })
@@ -148,7 +164,10 @@ export function ArenaScreen() {
         bossHealed: result.bossHealed,
         critical: result.critical,
         guarded: action === 'guard',
+        relicTriggered: result.relicTriggered,
+        revived: result.revived,
       })
+      setPhaseShift(result.phaseChanged ?? null)
       if (result.lost) {
         setLastImpact('loss')
         setCinematicPending(true)
@@ -184,6 +203,8 @@ export function ArenaScreen() {
         setMessage(
           `You guarded. ${activeBoss.boss.name} got through for ${result.bossDamage}.${
             result.healing > 0 ? ` You restored ${result.healing} HP.` : ''
+          }${result.relicTriggered ? ` ${result.relicTriggered} awakened.` : ''}${
+            result.revived ? ' It pulled you back from defeat.' : ''
           }`,
         )
       } else {
@@ -193,8 +214,12 @@ export function ArenaScreen() {
             : ''
         const healed =
           result.healing > 0 ? ` You restored ${result.healing} HP.` : ''
+        const relicMessage = result.relicTriggered
+          ? ` ${result.relicTriggered} awakened.`
+          : ''
+        const revived = result.revived ? ' The Phoenix Feather saved you.' : ''
         setMessage(
-          `${result.critical ? 'Critical strike! ' : ''}${weapon.name} dealt ${result.playerDamage}; ${activeBoss.boss.name} returned ${result.bossDamage}.${drained}${healed}`,
+          `${result.critical ? 'Critical strike! ' : ''}${weapon.name} dealt ${result.playerDamage}; ${activeBoss.boss.name} returned ${result.bossDamage}.${drained}${healed}${relicMessage}${revived}`,
         )
       }
     } catch (error) {
@@ -268,6 +293,8 @@ export function ArenaScreen() {
           activeBoss.defeated ? 'boss-stage-defeated' : ''
         } ${resolving ? 'boss-stage-impact' : ''} ${
           lastImpact === 'loss' ? 'boss-stage-loss' : ''
+        } boss-move-${nextMove.kind} ${
+          rageMultiplier > 1 ? 'boss-stage-raging' : ''
         }`}
         style={{ '--boss-accent': activeBoss.boss.accent } as CSSProperties}
       >
@@ -301,6 +328,15 @@ export function ArenaScreen() {
             <div className="boss-phase">
               <span>Phase {activeBoss.phase.number}</span>
               <strong>{activeBoss.phase.name}</strong>
+              <span
+                className={`boss-rage-chip ${
+                  rageMultiplier > 1 ? 'boss-rage-chip-active' : ''
+                }`}
+              >
+                {rageMultiplier > 1
+                  ? `Rage ${rageMultiplier.toFixed(2)}×`
+                  : `Rage in ${turnsUntilRage}`}
+              </span>
             </div>
             <div className="boss-telegraph-head">
               <GameIcon name={nextMove.icon} size={15} />
@@ -308,6 +344,14 @@ export function ArenaScreen() {
               <span className="boss-telegraph-label">Next</span>
             </div>
             <p className="boss-telegraph-hint">{nextMove.hint}</p>
+            <div className="boss-tactic">
+              <span>Best response</span>
+              <strong>
+                {nextMove.kind === 'heavy' || nextMove.kind === 'brace'
+                  ? 'Guard'
+                  : 'Strike'}
+              </strong>
+            </div>
             <ol className="boss-rotation" aria-hidden>
               {activeBoss.boss.pattern.map((kind, index) => (
                 <li
@@ -323,6 +367,19 @@ export function ArenaScreen() {
                 </li>
               ))}
             </ol>
+            {relic && (
+              <div className="boss-equipped-relic">
+                <img
+                  src={relic.image}
+                  alt=""
+                  className={relic.pixelArt ? 'pixel-art' : undefined}
+                />
+                <span>
+                  Relic bound
+                  <strong>{relic.name}</strong>
+                </span>
+              </div>
+            )}
           </div>
         )}
 
@@ -417,6 +474,34 @@ export function ArenaScreen() {
                 <small>Drain</small>
               </span>
             )}
+            {combatFx.revived && (
+              <span className="combat-revive">
+                <PixelIcon name="flame" className="h-8 w-8" />
+                One more chance
+              </span>
+            )}
+            {combatFx.relicTriggered && relic && (
+              <span className="combat-relic-trigger">
+                <img
+                  src={relic.image}
+                  alt=""
+                  className={relic.pixelArt ? 'pixel-art' : undefined}
+                />
+                <small>Relic awakened</small>
+                <strong>{combatFx.relicTriggered}</strong>
+              </span>
+            )}
+          </div>
+        )}
+        {phaseShift && (
+          <div
+            key={phaseShift}
+            className="boss-phase-shift"
+            role="status"
+            onAnimationEnd={() => setPhaseShift(null)}
+          >
+            <span>Phase shift</span>
+            <strong>{phaseShift}</strong>
           </div>
         )}
       </section>
@@ -541,6 +626,14 @@ export function ArenaScreen() {
                       <strong className="text-ink">{advice.best.weapon.name}</strong>{' '}
                       with{' '}
                       <strong className="text-ink">{advice.best.armour.name}</strong>
+                      {advice.best.relic && (
+                        <>
+                          {' '}and{' '}
+                          <strong className="text-ink">
+                            {advice.best.relic.name}
+                          </strong>
+                        </>
+                      )}
                       {' '}— keep logging sessions and upgrade in the Armory.
                     </>
                   ) : (
@@ -548,7 +641,15 @@ export function ArenaScreen() {
                       Best owned kit:{' '}
                       <strong className="text-ink">{advice.best.weapon.name}</strong>{' '}
                       with{' '}
-                      <strong className="text-ink">{advice.best.armour.name}</strong>{' '}
+                      <strong className="text-ink">{advice.best.armour.name}</strong>
+                      {advice.best.relic && (
+                        <>
+                          {' '}and{' '}
+                          <strong className="text-ink">
+                            {advice.best.relic.name}
+                          </strong>
+                        </>
+                      )}{' '}
                       wins in about {advice.best.hitsToWin} turns
                       {advice.best.guardTurns > 0
                         ? `, guarding ${advice.best.guardTurns} of them`
@@ -561,10 +662,16 @@ export function ArenaScreen() {
                   <button
                     type="button"
                     className="advice-apply"
-                    disabled={lockedArmourId !== undefined}
+                    disabled={
+                      lockedArmourId !== undefined ||
+                      lockedRelicId !== undefined
+                    }
                     onClick={() => {
                       setSelectedWeaponId(advice.best!.weapon.id)
                       setSelectedArmourId(advice.best!.armour.id)
+                      if (advice.best!.relic) {
+                        setSelectedRelicId(advice.best!.relic.id)
+                      }
                     }}
                   >
                     Equip
@@ -646,6 +753,54 @@ export function ArenaScreen() {
               ))}
             </div>
           </div>
+
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-black text-world">
+                  Choose your relic
+                </h3>
+                <p className="text-[10px] font-bold text-white/45">
+                  Relics change your strategy instead of adding raw power.
+                </p>
+              </div>
+              {lockedRelicId && (
+                <span className="loadout-lock">
+                  <GameIcon name="lock" size={12} />
+                  Locked
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {availableRelics.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  disabled={lockedRelicId !== undefined}
+                  onClick={() => setSelectedRelicId(item.id)}
+                  className={`relic-chip ${
+                    relic?.id === item.id ? 'relic-chip-active' : ''
+                  }`}
+                >
+                  <span className="relic-chip-art">
+                    <img
+                      src={item.image}
+                      alt=""
+                      className={item.pixelArt ? 'pixel-art' : undefined}
+                    />
+                  </span>
+                  <span className="min-w-0 text-left">
+                    <span className="block truncate text-xs font-black">
+                      {item.name}
+                    </span>
+                    <span className="block max-w-48 text-[9px] font-bold leading-snug text-ink-soft">
+                      {item.perk}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
       )}
 
@@ -708,11 +863,14 @@ function TurnRow({ turn, progress }: TurnRowProps) {
             {turn.timing === 'perfect' ? ' (perfect)' : ''}
             {turn.timing === 'weak' ? ' (weak)' : ''}
             {turn.bossHealed > 0 ? ` · drained ${turn.bossHealed}` : ''}
+            {turn.relicTriggered ? ` · ${turn.relicTriggered}` : ''}
           </>
         )}
       </span>
       <span className="battle-log-taken">
-        {turn.lost
+        {turn.revived
+          ? 'Revived at 1 HP'
+          : turn.lost
           ? `${progress.boss.name} won`
           : turn.bossDamage > 0
             ? `−${turn.bossDamage} HP`

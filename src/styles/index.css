@@ -86,10 +86,14 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
+    radial-gradient(circle at 18% 24%, rgb(255 171 74 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 74% 66%, rgb(139 124 246 / 0.38) 0 1px, transparent 2px),
     radial-gradient(circle at center, transparent 34%, rgb(0 0 0 / 0.48) 100%),
     linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
   background-size:
+    190px 230px,
+    270px 210px,
     100% 100%,
     36px 36px,
     36px 36px;
@@ -301,7 +305,7 @@ body::before {
   animation: status-in 280ms ease-out both;
 }
 .gear-category-tabs {
-  @apply mb-4 grid grid-cols-3 gap-1 rounded-2xl border border-swan bg-night/90 p-1.5 shadow-sm;
+  @apply mb-4 grid grid-cols-4 gap-1 rounded-2xl border border-swan bg-night/90 p-1.5 shadow-sm;
 }
 .gear-category-tabs button {
   @apply flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 text-xs font-black text-ink-soft transition-all;
@@ -344,6 +348,11 @@ body::before {
     radial-gradient(circle at 6% 50%, rgb(28 176 246 / 0.14), transparent 8rem),
     linear-gradient(145deg, #29264e, #1f1a3e);
 }
+.gear-card-relic {
+  background:
+    radial-gradient(circle at 6% 50%, rgb(206 130 255 / 0.2), transparent 8rem),
+    linear-gradient(145deg, #30214d, #1c1738);
+}
 .gear-card-visual {
   @apply relative grid h-24 w-24 place-items-center overflow-hidden rounded-[1.4rem] border border-white/10 bg-night;
   background:
@@ -362,6 +371,17 @@ body::before {
   background:
     radial-gradient(circle at 50% 45%, rgb(28 176 246 / 0.26), transparent 68%),
     linear-gradient(145deg, #1b2740, #101322);
+}
+.gear-card-relic .gear-card-visual {
+  background:
+    radial-gradient(circle at 50% 45%, rgb(206 130 255 / 0.34), transparent 68%),
+    linear-gradient(145deg, #372152, #141126);
+  box-shadow:
+    inset 0 0 22px rgb(206 130 255 / 0.1),
+    0 8px 22px rgb(0 0 0 / 0.24);
+}
+.gear-card-relic .gear-card-visual img {
+  animation: relic-hover 3.2s ease-in-out infinite;
 }
 .gear-card-visual img {
   @apply h-full w-full object-contain p-1.5;
@@ -421,6 +441,21 @@ body::before {
 }
 .gear-card-armour .gear-power i {
   @apply bg-grass;
+}
+.relic-perks {
+  @apply mt-3 flex flex-col gap-1.5;
+}
+.relic-perks > span {
+  @apply flex items-start gap-1.5 rounded-xl px-2.5 py-2 text-[10px] font-bold leading-snug;
+}
+.relic-perk-positive {
+  @apply bg-beetle/10 text-beetle-dark;
+}
+.relic-perk-tradeoff {
+  @apply bg-cardinal/8 text-cardinal;
+}
+.relic-sidegrade-label {
+  @apply mt-3 flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.12em] text-beetle-dark;
 }
 .gear-card-action {
   @apply flex flex-col items-stretch justify-center gap-1.5;
@@ -756,6 +791,25 @@ body::before {
 .boss-stage-loss {
   animation: boss-loss 520ms ease-out;
 }
+.boss-move-heavy:not(.boss-stage-defeated) {
+  box-shadow:
+    0 22px 48px rgb(23 21 46 / 0.23),
+    inset 0 0 48px rgb(255 75 75 / 0.12);
+}
+.boss-move-drain:not(.boss-stage-defeated) .boss-stage-grid {
+  animation: drain-grid 4s linear infinite;
+}
+.boss-move-brace:not(.boss-stage-defeated) .boss-art {
+  filter:
+    drop-shadow(0 18px 18px rgb(0 0 0 / 0.42))
+    drop-shadow(0 0 18px rgb(28 176 246 / 0.32));
+}
+.boss-stage-raging:not(.boss-stage-defeated)::before {
+  content: '';
+  @apply pointer-events-none absolute inset-0 z-[2];
+  background: radial-gradient(circle at 82% 30%, rgb(255 75 75 / 0.16), transparent 48%);
+  animation: rage-pulse 1.25s ease-in-out infinite;
+}
 .combat-fx-layer {
   @apply pointer-events-none absolute inset-0 z-20;
   animation: combat-fx-life 920ms ease-out both;
@@ -813,6 +867,52 @@ body::before {
   inset: -1.6rem;
   animation-delay: 70ms;
 }
+.combat-relic-trigger {
+  @apply absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center rounded-2xl border border-beetle/35 bg-night/90 px-5 py-3 text-center text-white;
+  box-shadow: 0 0 42px rgb(206 130 255 / 0.3);
+  animation: relic-awaken 900ms cubic-bezier(0.18, 1.3, 0.32, 1) both;
+}
+.combat-relic-trigger img {
+  @apply h-12 w-12 object-contain;
+  filter: drop-shadow(0 0 12px rgb(206 130 255 / 0.7));
+}
+.combat-relic-trigger small {
+  @apply mt-1 text-[7px] font-black uppercase tracking-[0.2em] text-beetle-dark;
+}
+.combat-relic-trigger strong {
+  @apply mt-0.5 text-xs font-black;
+}
+.combat-revive {
+  @apply absolute left-1/2 top-[58%] flex -translate-x-1/2 items-center gap-2 rounded-full border border-flame/40 bg-night/90 px-4 py-2 text-xs font-black uppercase tracking-wide text-flame-dark;
+  box-shadow: 0 0 42px rgb(255 150 0 / 0.38);
+  animation: revive-burst 920ms cubic-bezier(0.18, 1.3, 0.32, 1) both;
+}
+.boss-phase-shift {
+  @apply pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center overflow-hidden text-center;
+  background:
+    linear-gradient(90deg, transparent, rgb(7 6 18 / 0.94) 20% 80%, transparent);
+  animation: phase-shift-screen 1.35s ease-in-out both;
+}
+.boss-phase-shift::before,
+.boss-phase-shift::after {
+  content: '';
+  @apply absolute left-1/2 h-px w-[130%] -translate-x-1/2;
+  background: linear-gradient(90deg, transparent, var(--boss-accent), transparent);
+  box-shadow: 0 0 20px var(--boss-accent);
+}
+.boss-phase-shift::before {
+  top: 36%;
+}
+.boss-phase-shift::after {
+  bottom: 36%;
+}
+.boss-phase-shift span {
+  @apply text-[9px] font-black uppercase tracking-[0.3em] text-white/45;
+}
+.boss-phase-shift strong {
+  @apply mt-1 text-4xl font-black uppercase tracking-tight text-white;
+  text-shadow: 0 0 28px var(--boss-accent);
+}
 .boss-phase {
   @apply mb-2 flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.14em] text-white/60;
 }
@@ -821,6 +921,13 @@ body::before {
 }
 .boss-phase strong {
   color: var(--boss-accent);
+}
+.boss-rage-chip {
+  @apply ml-auto rounded-full border border-white/10 bg-black/20 px-2 py-1 text-[8px] text-white/45;
+}
+.boss-rage-chip-active {
+  @apply border-cardinal/40 bg-cardinal/15 text-cardinal-dark;
+  animation: rage-chip 900ms ease-in-out infinite alternate;
 }
 .boss-telegraph {
   @apply mt-4 max-w-[72%] rounded-2xl border border-white/15 bg-black/25 p-3 text-white backdrop-blur-sm;
@@ -835,6 +942,15 @@ body::before {
 .boss-telegraph-hint {
   @apply mt-1 text-[10px] font-bold leading-snug text-white/60;
 }
+.boss-tactic {
+  @apply mt-2 flex items-center justify-between rounded-xl border border-white/8 bg-white/5 px-2.5 py-1.5;
+}
+.boss-tactic span {
+  @apply text-[8px] font-black uppercase tracking-[0.14em] text-white/35;
+}
+.boss-tactic strong {
+  @apply text-[10px] font-black uppercase tracking-wide text-white;
+}
 .boss-rotation {
   @apply mt-2 flex gap-1;
 }
@@ -845,6 +961,20 @@ body::before {
   color: var(--boss-accent);
   border-color: color-mix(in srgb, var(--boss-accent) 55%, transparent);
   background: color-mix(in srgb, var(--boss-accent) 18%, transparent);
+}
+.boss-equipped-relic {
+  @apply mt-2 flex items-center gap-2 border-t border-white/8 pt-2;
+}
+.boss-equipped-relic img {
+  @apply h-7 w-7 object-contain;
+  filter: drop-shadow(0 0 8px rgb(206 130 255 / 0.42));
+  animation: relic-hover 2.8s ease-in-out infinite;
+}
+.boss-equipped-relic span {
+  @apply text-[7px] font-black uppercase tracking-[0.14em] text-white/30;
+}
+.boss-equipped-relic strong {
+  @apply block text-[9px] normal-case tracking-normal text-beetle-dark;
 }
 .boss-map-cleared-mark {
   @apply absolute -bottom-1 -left-1 grid h-4 w-4 place-items-center rounded-full bg-grass text-white;
@@ -1116,6 +1246,25 @@ body::before {
 .armour-chip-art img {
   @apply h-full w-full object-contain p-0.5;
 }
+.relic-chip {
+  @apply flex min-w-64 shrink-0 items-center gap-2 rounded-2xl border border-swan bg-night p-3 text-ink-soft shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-65;
+}
+.relic-chip-active {
+  @apply -translate-y-0.5 border-beetle bg-beetle/10 text-beetle-dark;
+  box-shadow:
+    0 8px 22px rgb(206 130 255 / 0.14),
+    inset 0 0 18px rgb(206 130 255 / 0.05);
+}
+.relic-chip-art {
+  @apply grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-beetle/15 bg-beetle/8;
+}
+.relic-chip-art img {
+  @apply h-full w-full object-contain p-1;
+  filter: drop-shadow(0 0 8px rgb(206 130 255 / 0.38));
+}
+.relic-chip-active .relic-chip-art img {
+  animation: relic-hover 2.4s ease-in-out infinite;
+}
 .loadout-lock {
   @apply flex items-center gap-1 rounded-full bg-swan px-2 py-1 text-[9px] font-black uppercase tracking-wide text-ink-soft;
 }
@@ -1141,6 +1290,36 @@ body::before {
   box-shadow:
     inset 0 1px rgb(255 255 255 / 0.05),
     0 -12px 34px rgb(0 0 0 / 0.34);
+}
+.tab-art-frame {
+  @apply relative grid h-8 w-9 place-items-center rounded-xl border border-transparent;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+.tab-art-frame-active {
+  @apply -translate-y-1 border-white/10 bg-white/8;
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 0.08),
+    0 5px 12px rgb(0 0 0 / 0.24);
+}
+.tab-art {
+  @apply h-6 w-6 object-contain;
+  filter: grayscale(0.7) saturate(0.55) brightness(0.72);
+  opacity: 0.7;
+  transition:
+    filter 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+.tab-art-active {
+  filter:
+    saturate(1.2)
+    brightness(1.12)
+    drop-shadow(0 0 7px currentColor);
+  opacity: 1;
+  animation: nav-image-arrive 420ms cubic-bezier(0.18, 1.4, 0.32, 1) both;
 }
 
 /* Respect the notch / home indicator when installed to the home screen. */
@@ -1239,8 +1418,21 @@ body::before {
   }
 }
 @keyframes background-drift {
+  from {
+    background-position:
+      0 0,
+      0 0,
+      center,
+      0 0,
+      0 0;
+  }
   to {
-    background-position: 28px 28px;
+    background-position:
+      42px -66px,
+      -54px 38px,
+      center,
+      28px 28px,
+      28px 28px;
   }
 }
 @keyframes dungeon-parallax {
@@ -1324,6 +1516,99 @@ body::before {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+@keyframes relic-hover {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) rotate(2deg) scale(1.04);
+  }
+}
+@keyframes drain-grid {
+  from {
+    background-position: 0 0;
+    opacity: 0.18;
+  }
+  to {
+    background-position: 64px 64px;
+    opacity: 0.34;
+  }
+}
+@keyframes rage-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes rage-chip {
+  from {
+    box-shadow: 0 0 0 rgb(255 75 75 / 0);
+  }
+  to {
+    box-shadow: 0 0 14px rgb(255 75 75 / 0.38);
+  }
+}
+@keyframes relic-awaken {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.35) rotate(-8deg);
+    filter: blur(8px);
+  }
+  35%,
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08) rotate(2deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -68%) scale(0.96);
+  }
+}
+@keyframes revive-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 16px) scale(0.45);
+  }
+  35%,
+  72% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -22px) scale(0.92);
+  }
+}
+@keyframes phase-shift-screen {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0.7);
+  }
+  20%,
+  76% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+@keyframes nav-image-arrive {
+  0% {
+    transform: translateY(6px) scale(0.55) rotate(-10deg);
+    opacity: 0;
+  }
+  65% {
+    transform: translateY(-2px) scale(1.18) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0);
   }
 }
 @keyframes boss-impact {
@@ -1628,7 +1913,13 @@ body::before {
   .combat-message,
   .boss-stage-impact,
   .boss-stage-loss,
+  .boss-stage-raging::before,
+  .boss-move-drain .boss-stage-grid,
+  .boss-rage-chip-active,
   .boss-art,
+  .boss-equipped-relic img,
+  .gear-card-relic .gear-card-visual img,
+  .relic-chip-active .relic-chip-art img,
   .showcase-item-front,
   .sword-slash,
   .guard-flash,
@@ -1640,6 +1931,9 @@ body::before {
   .combat-number,
   .combat-number-critical::before,
   .combat-number-critical::after,
+  .combat-relic-trigger,
+  .combat-revive,
+  .boss-phase-shift,
   .boss-result-overlay,
   .boss-result-content,
   .boss-result-particles i,
@@ -1651,6 +1945,7 @@ body::before {
   .coin-pill img,
   .habit-pips .habit-pip-on,
   .habit-tick:active:not(:disabled) img,
+  .tab-art-active,
   body::before,
   body::after,
   .app-shell::before,

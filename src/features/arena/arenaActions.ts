@@ -8,7 +8,7 @@ import { isPurchaseLog } from '../../lib/coins'
 import { dayKey } from '../../lib/date'
 import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
-import { getArmour, getWeapon, isItemOwned } from '../../lib/shop'
+import { getArmour, getRelic, getWeapon, isItemOwned } from '../../lib/shop'
 import type { BossHitLogEntry, Id } from '../../types'
 
 export interface AttackResult {
@@ -24,12 +24,16 @@ export interface AttackResult {
   action: PlayerAction
   timing?: StrikeTiming
   bossHealed: number
+  relicTriggered?: string
+  revived: boolean
+  phaseChanged?: string
 }
 
 export interface TurnInput {
   bossId: Id
   weaponId: Id
   armourId: Id
+  relicId: Id
   action: PlayerAction
   /** Ignored when guarding. */
   timing?: StrikeTiming
@@ -43,7 +47,7 @@ export interface TurnInput {
  * replay will derive.
  */
 export async function takeTurn(input: TurnInput): Promise<AttackResult> {
-  const { bossId, weaponId, armourId, action } = input
+  const { bossId, weaponId, armourId, relicId, action } = input
   return db.transaction('rw', db.logs, async () => {
     const ledger = await db.logs.toArray()
     const progress = computeBossProgress(ledger).find(
@@ -57,6 +61,8 @@ export async function takeTurn(input: TurnInput): Promise<AttackResult> {
     if (!weapon) throw new Error('Choose a weapon before attacking.')
     const armour = getArmour(armourId)
     if (!armour) throw new Error('Choose armour before attacking.')
+    const relic = getRelic(relicId)
+    if (!relic) throw new Error('Choose a relic before attacking.')
     const purchased = new Set(
       ledger.filter(isPurchaseLog).map((entry) => entry.itemId),
     )
@@ -66,12 +72,22 @@ export async function takeTurn(input: TurnInput): Promise<AttackResult> {
     if (!isItemOwned(armour, purchased)) {
       throw new Error('Buy this armour in the Armory first.')
     }
+    if (!isItemOwned(relic, purchased)) {
+      throw new Error('Buy this relic in the Armory first.')
+    }
     if (
       progress.attemptHits > 0 &&
       progress.armourId !== undefined &&
       progress.armourId !== armour.id
     ) {
       throw new Error('Your armour is locked until this attempt ends.')
+    }
+    if (
+      progress.attemptHits > 0 &&
+      progress.relicId !== undefined &&
+      progress.relicId !== relic.id
+    ) {
+      throw new Error('Your relic is locked until this attempt ends.')
     }
 
     const now = Date.now()
@@ -81,6 +97,7 @@ export async function takeTurn(input: TurnInput): Promise<AttackResult> {
       bossId,
       weaponId,
       armourId,
+      relicId,
       action,
       ...(action === 'strike' && input.timing ? { timing: input.timing } : undefined),
       at: now,
@@ -104,6 +121,15 @@ export async function takeTurn(input: TurnInput): Promise<AttackResult> {
       action,
       timing: turn?.timing,
       bossHealed: turn?.bossHealed ?? 0,
+      relicTriggered: turn?.relicTriggered,
+      revived: turn?.revived ?? false,
+      phaseChanged:
+        after &&
+        !after.defeated &&
+        !turn?.lost &&
+        after.phase.number > progress.phase.number
+          ? after.phase.name
+          : undefined,
     }
   })
 }

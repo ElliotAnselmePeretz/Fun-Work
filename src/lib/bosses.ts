@@ -1,6 +1,6 @@
 import type { GameIconName } from '../components/GameIcon'
 import type { BossHitLogEntry, Id, LogEntry } from '../types'
-import { getArmour, getWeapon } from './shop'
+import { getArmour, getRelic, getWeapon } from './shop'
 
 /**
  * What the boss does on a given turn. The move is derived from the boss and the
@@ -107,7 +107,7 @@ const GUARD_RECOVERY = 0.35
  * it is stored — and it is applied only on the tactical path, so no turn
  * recorded under the older rules is re-scored.
  */
-const ENRAGE_AFTER = 14
+export const ENRAGE_AFTER = 14
 const ENRAGE_STEP = 0.12
 
 /** How hard the boss swings on a given turn of an attempt, as a multiplier. */
@@ -141,6 +141,10 @@ export interface CombatTurn {
   timing?: StrikeTiming
   /** Health the boss stole back on a drain turn. */
   bossHealed: number
+  /** The relic name when its positive perk fired on this turn. */
+  relicTriggered?: string
+  /** True when a Phoenix Feather prevented this turn from ending the attempt. */
+  revived?: boolean
 }
 
 export interface BossProgress {
@@ -157,6 +161,9 @@ export interface BossProgress {
   playerHp: number
   playerMaxHp: number
   armourId?: Id
+  relicId?: Id
+  strikeCount: number
+  relicChargeUsed: boolean
   lastTurn?: CombatTurn
   /** Newest first, for the battle log. Derived like everything else. */
   recentTurns: CombatTurn[]
@@ -349,8 +356,14 @@ export interface AttemptState {
   playerMaxHp: number
   /** Adopted from the first non-legacy turn and locked for the attempt. */
   armourId?: Id
+  /** Adopted from the first relic-enabled turn and locked for the attempt. */
+  relicId?: Id
   /** Turns already taken, which drives both the crit rhythm and the rotation. */
   attemptHits: number
+  /** Non-guard actions, used by rhythm relics and derived during replay. */
+  strikeCount: number
+  /** Whether this attempt has already spent its one-use survival relic. */
+  relicChargeUsed: boolean
   defeated: boolean
   /** Attempts lost so far against this boss. */
   losses: number
@@ -363,6 +376,8 @@ export function freshAttempt(boss: Boss): AttemptState {
     playerHp: 100,
     playerMaxHp: 100,
     attemptHits: 0,
+    strikeCount: 0,
+    relicChargeUsed: false,
     defeated: false,
     losses: 0,
   }
@@ -389,7 +404,14 @@ export function resolveTurn(
   hit: BossHitLogEntry,
 ): { state: AttemptState; turn: CombatTurn } {
   const legacyHit = hit.armourId === undefined
-  let { remainingHp, playerHp, playerMaxHp, armourId } = state
+  let {
+    remainingHp,
+    playerHp,
+    playerMaxHp,
+    armourId,
+    relicId,
+    relicChargeUsed,
+  } = state
   const attemptHits = state.attemptHits
 
   if (!legacyHit && armourId === undefined) {
@@ -398,12 +420,18 @@ export function resolveTurn(
     playerMaxHp = 100 + (armour?.maxHpBonus ?? 0)
     playerHp = playerMaxHp
   }
+  if (!legacyHit && relicId === undefined) {
+    relicId = getRelic(hit.relicId)?.id
+  }
 
   const weapon = getWeapon(hit.weaponId)
   const tactical = !legacyHit && hit.action !== undefined
   const move = moveFor(boss, attemptHits)
   const guarding = tactical && hit.action === 'guard'
+  const strikeCount = state.strikeCount + (guarding ? 0 : 1)
   const timing: StrikeTiming = hit.timing ?? 'good'
+  const relic = tactical ? getRelic(relicId) : undefined
+  const relicEffect = relic?.relicEffect
   const tacticalFields = tactical
     ? { move: move.kind, action: hit.action, timing: hit.timing }
     : undefined
@@ -414,20 +442,57 @@ export function resolveTurn(
     weapon?.critEvery !== undefined &&
     (attemptHits + 1) % weapon.critEvery === 0
   const baseDamage = (weapon?.damage ?? 0) * (critical ? 2 : 1)
+  let relicDamageMultiplier = 1
+  let relicTriggered: string | undefined
+
+  if (!guarding && relicEffect === 'duelist-prism') {
+    if (timing === 'perfect') {
+      relicDamageMultiplier = 1.3
+      relicTriggered = relic?.name
+    } else if (timing === 'weak') {
+      relicDamageMultiplier = 0.8
+    }
+  } else if (
+    !guarding &&
+    relicEffect === 'ember-crown' &&
+    remainingHp / boss.maxHp <= 0.33
+  ) {
+    relicDamageMultiplier = 1.3
+    relicTriggered = relic?.name
+  } else if (!guarding && relicEffect === 'phoenix-feather') {
+    relicDamageMultiplier = 0.9
+  } else if (!guarding && relicEffect === 'echo-stone') {
+    if (strikeCount % 3 === 0) {
+      relicDamageMultiplier = 1.4
+      relicTriggered = relic?.name
+    } else {
+      relicDamageMultiplier = 0.95
+    }
+  }
+
   const playerDamage = guarding
     ? 0
     : tactical
       ? Math.round(
-          baseDamage * TIMING_MULTIPLIER[timing] * move.incomingMultiplier,
+          baseDamage *
+            TIMING_MULTIPLIER[timing] *
+            move.incomingMultiplier *
+            relicDamageMultiplier,
         )
       : baseDamage
 
   remainingHp = Math.max(0, remainingHp - playerDamage)
 
   if (remainingHp === 0) {
+    const relicHealing =
+      relicEffect === 'moon-vial' && timing === 'perfect' ? 12 : 0
+    if (relicHealing > 0) relicTriggered = relic?.name
     const healing = legacyHit
       ? 0
-      : Math.min(weapon?.healing ?? 0, playerMaxHp - playerHp)
+      : Math.min(
+          (weapon?.healing ?? 0) + relicHealing,
+          playerMaxHp - playerHp,
+        )
     playerHp += healing
     return {
       state: {
@@ -436,7 +501,10 @@ export function resolveTurn(
         playerHp,
         playerMaxHp,
         armourId,
+        relicId,
         attemptHits: attemptHits + 1,
+        strikeCount,
+        relicChargeUsed,
         defeated: true,
       },
       turn: {
@@ -446,6 +514,7 @@ export function resolveTurn(
         critical,
         lost: false,
         bossHealed: 0,
+        relicTriggered,
         ...tacticalFields,
       },
     }
@@ -462,19 +531,49 @@ export function resolveTurn(
         boss.attack * move.attackMultiplier * enrageMultiplier(attemptHits),
       ) - guardValue,
     )
-    bossDamage = guarding
+    const defendedDamage = guarding
       ? Math.max(1, Math.round(swing * GUARD_DAMAGE_TAKEN))
       : swing
-    blocked = swing - bossDamage
+    bossDamage =
+      relicEffect === 'ember-crown'
+        ? Math.max(1, Math.round(defendedDamage * 1.1))
+        : defendedDamage
+    blocked = guarding ? Math.max(0, swing - bossDamage) : 0
   } else if (!legacyHit) {
     bossDamage = Math.max(1, boss.attack - guardValue)
   }
 
   playerHp = Math.max(0, playerHp - bossDamage)
-  const lost = playerHp === 0
-  const recovered = (weapon?.healing ?? 0) + Math.round(blocked * GUARD_RECOVERY)
+  let lost = playerHp === 0
+  let revived = false
+  if (
+    lost &&
+    relicEffect === 'phoenix-feather' &&
+    relicChargeUsed === false
+  ) {
+    playerHp = 1
+    lost = false
+    revived = true
+    relicChargeUsed = true
+    relicTriggered = relic?.name
+  }
+
+  const wardRecovery =
+    guarding && relicEffect === 'wayfarer-ward'
+      ? Math.round(blocked * 0.15)
+      : 0
+  const vialRecovery =
+    !guarding && relicEffect === 'moon-vial' && timing === 'perfect' ? 12 : 0
+  if (wardRecovery > 0 || vialRecovery > 0) relicTriggered = relic?.name
+  const recovered =
+    (weapon?.healing ?? 0) +
+    Math.round(blocked * GUARD_RECOVERY) +
+    wardRecovery +
+    vialRecovery
   const healing =
-    legacyHit || lost ? 0 : Math.min(recovered, playerMaxHp - playerHp)
+    legacyHit || lost || revived
+      ? 0
+      : Math.min(recovered, playerMaxHp - playerHp)
   playerHp += healing
 
   // A drain turn gives back part of what it took, capped by the damage already
@@ -491,6 +590,8 @@ export function resolveTurn(
     critical,
     lost,
     bossHealed,
+    relicTriggered,
+    revived,
     ...tacticalFields,
   }
 
@@ -510,7 +611,10 @@ export function resolveTurn(
       playerHp,
       playerMaxHp,
       armourId,
+      relicId,
       attemptHits: attemptHits + 1,
+      strikeCount,
+      relicChargeUsed,
     },
     turn,
   }
@@ -555,6 +659,9 @@ export function computeBossProgress(entries: LogEntry[]): BossProgress[] {
       playerHp: state.playerHp,
       playerMaxHp: state.playerMaxHp,
       armourId: state.armourId,
+      relicId: state.relicId,
+      strikeCount: state.strikeCount,
+      relicChargeUsed: state.relicChargeUsed,
       lastTurn,
       recentTurns,
       nextMove: moveFor(boss, state.attemptHits),

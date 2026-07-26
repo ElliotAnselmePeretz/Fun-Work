@@ -118,6 +118,11 @@ export interface BossHitLogEntry {
    */
   armourId?: Id
   /**
+   * Optional for backward compatibility. New tactical turns record the relic
+   * chosen for that attempt; its effects are always replayed from this event.
+   */
+  relicId?: Id
+  /**
    * What the player chose to do. Missing on turns recorded before the tactical
    * arena, which replay without boss moves or guarding — the same reason
    * `armourId` is optional. Boss moves, damage and healing are all still

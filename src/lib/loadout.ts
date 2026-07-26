@@ -8,7 +8,12 @@ import {
   type PlayerAction,
 } from './bosses'
 import { dayKey } from './date'
-import { ownedArmour, ownedWeapons, type ShopItem } from './shop'
+import {
+  ownedArmour,
+  ownedRelics,
+  ownedWeapons,
+  type ShopItem,
+} from './shop'
 import type { BossHitLogEntry, LogEntry } from '../types'
 
 /**
@@ -19,6 +24,7 @@ import type { BossHitLogEntry, LogEntry } from '../types'
 export interface LoadoutOutcome {
   weapon: ShopItem
   armour: ShopItem
+  relic?: ShopItem
   /** Turns needed to win, or undefined if this loadout cannot win at all. */
   hitsToWin?: number
   /** True when the player's health runs out before the boss's does. */
@@ -103,6 +109,7 @@ export function simulateLoadout(
   boss: Boss,
   weapon: ShopItem,
   armour: ShopItem,
+  relic?: ShopItem,
 ): LoadoutOutcome {
   const at = 0
   const day = dayKey(at)
@@ -110,6 +117,7 @@ export function simulateLoadout(
   const base: LoadoutOutcome = {
     weapon,
     armour,
+    relic,
     defeated: false,
     survivingHp: 0,
     playerMaxHp,
@@ -146,6 +154,7 @@ export function simulateLoadout(
       bossId: boss.id,
       weaponId: weapon.id,
       armourId: armour.id,
+      ...(relic ? { relicId: relic.id } : undefined),
       action,
       ...(action === 'strike' ? { timing: 'good' as const } : undefined),
       at: at + index,
@@ -177,7 +186,9 @@ export function rankLoadouts(
   const outcomes: LoadoutOutcome[] = []
   for (const weapon of ownedWeapons(ownedItemIds)) {
     for (const armour of ownedArmour(ownedItemIds)) {
-      outcomes.push(simulateLoadout(boss, weapon, armour))
+      for (const relic of ownedRelics(ownedItemIds)) {
+        outcomes.push(simulateLoadout(boss, weapon, armour, relic))
+      }
     }
   }
   return outcomes.sort(compareOutcomes)

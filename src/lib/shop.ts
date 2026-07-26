@@ -1,7 +1,15 @@
 import type { GameIconName } from '../components/GameIcon'
 import type { Id } from '../types'
 
-export type GearType = 'weapon' | 'magic' | 'armour'
+export type GearType = 'weapon' | 'magic' | 'armour' | 'relic'
+
+export type RelicEffect =
+  | 'wayfarer-ward'
+  | 'duelist-prism'
+  | 'moon-vial'
+  | 'ember-crown'
+  | 'phoenix-feather'
+  | 'echo-stone'
 
 export interface ShopItem {
   id: Id
@@ -17,6 +25,10 @@ export interface ShopItem {
   healing?: number
   defense?: number
   maxHpBonus?: number
+  /** Relics are side-grades: each changes a rule instead of adding raw stats. */
+  relicEffect?: RelicEffect
+  perk?: string
+  tradeoff?: string
   starter?: boolean
   rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary'
   /**
@@ -320,6 +332,103 @@ export const SHOP_ITEMS: ShopItem[] = [
     rarity: 'Legendary',
   },
   {
+    id: 'wayfarer-ward',
+    name: 'Wayfarer Ward',
+    icon: 'shield',
+    gearType: 'relic',
+    image: '/assets/avatars/amulet.png',
+    description:
+      'A quiet travel charm that rewards patience when a boss telegraphs danger.',
+    role: 'Guard specialist',
+    perk: 'Guarding converts 15% more blocked damage into healing.',
+    tradeoff: 'No benefit while striking.',
+    relicEffect: 'wayfarer-ward',
+    cost: 0,
+    starter: true,
+    pixelArt: true,
+    rarity: 'Common',
+  },
+  {
+    id: 'duelist-prism',
+    name: 'Duelist Prism',
+    icon: 'target',
+    gearType: 'relic',
+    image: '/assets/ui/crystal.png',
+    description:
+      'A razor-clear crystal that amplifies precise swings and punishes rushed ones.',
+    role: 'High-skill timing',
+    perk: 'Perfect strikes deal 30% more damage.',
+    tradeoff: 'Weak strikes deal 20% less damage.',
+    relicEffect: 'duelist-prism',
+    cost: 140,
+    pixelArt: true,
+    rarity: 'Rare',
+  },
+  {
+    id: 'moon-vial',
+    name: 'Moon Vial',
+    icon: 'sparkles',
+    gearType: 'relic',
+    image: '/assets/avatars/flask.png',
+    description:
+      'Silver medicine that opens only when a strike lands at exactly the right moment.',
+    role: 'Precision recovery',
+    perk: 'Perfect strikes restore 12 HP after the counterattack.',
+    tradeoff: 'Offers nothing on Good or Weak timing.',
+    relicEffect: 'moon-vial',
+    cost: 240,
+    pixelArt: true,
+    rarity: 'Rare',
+  },
+  {
+    id: 'ember-crown',
+    name: 'Ember Crown',
+    icon: 'flame',
+    gearType: 'relic',
+    image: '/assets/avatars/gold.png',
+    description:
+      'A hot fragment of a fallen crown that burns brightest near the finishing blow.',
+    role: 'Risky execution',
+    perk: 'Deal 30% more damage while the boss is in Phase 3.',
+    tradeoff: 'Boss counterattacks deal 10% more damage.',
+    relicEffect: 'ember-crown',
+    cost: 330,
+    pixelArt: true,
+    rarity: 'Epic',
+  },
+  {
+    id: 'phoenix-feather',
+    name: 'Phoenix Feather',
+    icon: 'flame',
+    gearType: 'relic',
+    image: '/assets/avatars/potion.png',
+    description:
+      'A single ember of borrowed life for challengers who expect one fatal mistake.',
+    role: 'One last chance',
+    perk: 'Survive one lethal counterattack per attempt with 1 HP.',
+    tradeoff: 'All strikes deal 10% less damage.',
+    relicEffect: 'phoenix-feather',
+    cost: 460,
+    pixelArt: true,
+    rarity: 'Epic',
+  },
+  {
+    id: 'echo-stone',
+    name: 'Echo Stone',
+    icon: 'zap',
+    gearType: 'relic',
+    image: '/assets/ui/mirror.png',
+    description:
+      'A mirrored shard that stores the rhythm of battle and releases it in pulses.',
+    role: 'Rhythm build',
+    perk: 'Every third strike deals 40% more damage.',
+    tradeoff: 'Other strikes deal 5% less damage.',
+    relicEffect: 'echo-stone',
+    cost: 580,
+    pixelArt: true,
+    rarity: 'Legendary',
+  },
+  {
     id: 'traveler-guard',
     name: 'Traveler Hide',
     icon: 'shield',
@@ -458,7 +567,9 @@ export function isItemOwned(item: ShopItem, ownedItemIds: Set<string>): boolean 
 
 export function ownedWeapons(ownedItemIds: Set<string>): ShopItem[] {
   return SHOP_ITEMS.filter(
-    (item) => item.gearType !== 'armour' && isItemOwned(item, ownedItemIds),
+    (item) =>
+      (item.gearType === 'weapon' || item.gearType === 'magic') &&
+      isItemOwned(item, ownedItemIds),
   )
 }
 
@@ -468,13 +579,27 @@ export function ownedArmour(ownedItemIds: Set<string>): ShopItem[] {
   )
 }
 
+export function ownedRelics(ownedItemIds: Set<string>): ShopItem[] {
+  return SHOP_ITEMS.filter(
+    (item) => item.gearType === 'relic' && isItemOwned(item, ownedItemIds),
+  )
+}
+
 export function getWeapon(itemId: Id): ShopItem | undefined {
   const item = getShopItem(itemId)
-  return item?.gearType !== 'armour' ? item : undefined
+  return item?.gearType === 'weapon' || item?.gearType === 'magic'
+    ? item
+    : undefined
 }
 
 export function getArmour(itemId: Id | undefined): ShopItem | undefined {
   if (!itemId) return undefined
   const item = getShopItem(itemId)
   return item?.gearType === 'armour' ? item : undefined
+}
+
+export function getRelic(itemId: Id | undefined): ShopItem | undefined {
+  if (!itemId) return undefined
+  const item = getShopItem(itemId)
+  return item?.gearType === 'relic' ? item : undefined
 }

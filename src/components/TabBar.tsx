@@ -1,18 +1,18 @@
-import { GameIcon, type GameIconName } from './GameIcon'
+import { PixelIcon, type PixelIconName } from './PixelIcon'
 import { hrefFor, type Route } from '../lib/router'
 
 const TABS: {
   route: Route
   label: string
-  icon: GameIconName
+  image: PixelIconName
   color: string
 }[] = [
-  { route: { name: 'home' }, label: 'Habits', icon: 'home', color: 'text-grass-dark' },
-  { route: { name: 'work' }, label: 'Work', icon: 'check', color: 'text-flame-dark' },
-  { route: { name: 'arena' }, label: 'Arena', icon: 'swords', color: 'text-cardinal' },
-  { route: { name: 'shop' }, label: 'Armory', icon: 'store', color: 'text-gold-dark' },
-  { route: { name: 'stats' }, label: 'Stats', icon: 'chart', color: 'text-sky-dark' },
-  { route: { name: 'settings' }, label: 'Settings', icon: 'settings', color: 'text-beetle-dark' },
+  { route: { name: 'home' }, label: 'Habits', image: 'check', color: 'text-grass-dark' },
+  { route: { name: 'work' }, label: 'Work', image: 'scroll', color: 'text-flame-dark' },
+  { route: { name: 'arena' }, label: 'Arena', image: 'flame', color: 'text-cardinal' },
+  { route: { name: 'shop' }, label: 'Armory', image: 'chest', color: 'text-gold-dark' },
+  { route: { name: 'stats' }, label: 'Stats', image: 'crystal', color: 'text-sky-dark' },
+  { route: { name: 'settings' }, label: 'Settings', image: 'mirror', color: 'text-beetle-dark' },
 ]
 
 interface TabBarProps {
@@ -35,13 +35,11 @@ export function TabBar({ current }: TabBarProps) {
                   active ? tab.color : 'text-hare'
                 }`}
               >
-                <span
-                  className={`transition-transform ${
-                    active ? `-translate-y-0.5 scale-110 ${tab.color}` : ''
-                  }`}
-                  aria-hidden
-                >
-                  <GameIcon name={tab.icon} size={21} strokeWidth={active ? 2.8 : 2.2} />
+                <span className={`tab-art-frame ${active ? 'tab-art-frame-active' : ''}`} aria-hidden>
+                  <PixelIcon
+                    name={tab.image}
+                    className={`tab-art ${active ? 'tab-art-active' : ''}`}
+                  />
                 </span>
                 {tab.label}
                 {active && (
