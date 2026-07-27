@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { GameIcon } from '../components/GameIcon'
@@ -241,9 +241,12 @@ function GearCard({
 
   return (
     <Card
-      className={`gear-card gear-card-${item.gearType} ${
+      className={`gear-card stagger-in gear-card-${item.gearType} ${
         owned ? 'gear-card-owned' : ''
+      } ${affordable && !owned ? 'gear-card-affordable' : ''} ${
+        buying ? 'gear-card-buying' : ''
       }`}
+      style={{ '--stagger': `${Math.min(index, 12) * 45}ms` } as CSSProperties}
     >
       <div className="gear-card-visual">
         <span className="gear-rank">{String(index + 1).padStart(2, '0')}</span>

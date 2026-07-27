@@ -1,8 +1,9 @@
 # Fun-Work
 
-A gamified habit and activity tracker — Duolingo-style. Track physical
-activities, schoolwork and anything else you define, make small progressive
-steps, keep a daily streak, and earn badges.
+A gamified habit and activity tracker — Duolingo-style. It has two halves:
+**Habits** you keep (the gym, four times a week) and **Work** you finish (a
+course, a project). Keep a streak, climb a journey, beat bosses, and earn
+badges.
 
 Everything is stored **on your device**. There is no backend, no account and no
 login, and nothing is uploaded.
@@ -47,16 +48,32 @@ devices. Use Settings → Export to move it.
 
 ## How it works
 
-- **Category** — a top-level grouping ("Physical", "Schoolwork") with a name,
-  color and locally bundled pixel-art icon.
-- **Activity** — belongs to a category ("Running", "Math AA") and has a ladder
-  of progressive levels plus a challenge rating that sets its generated pace.
-- **Log** — one tap is one session. A session starts at 10 coins and earns more
-  when a streak multiplier is active. Sessions, shop purchases, and combat turns
-  are the only stored progress history; coin balances, levels, streaks, badges,
-  item ownership, and combat state are all derived from that history.
-- **Streak** — consecutive calendar days with at least one log. Not having
+- **Habit** — a standing commitment you tick off, with a pace you agree to
+  ("4× a week"). It has no levels, no difficulty and no journey, because it is
+  never finished. Tap a habit to see a month calendar of every day you did and
+  didn't do it.
+- **Work** — something you are working *through* and will one day be done with.
+  This is what carries levels, a challenge rating and the journey through the
+  biomes. Work belongs to a category ("Schoolwork" → "Math AA").
+- **Category** — a top-level grouping for work, with a name, color and locally
+  bundled pixel-art icon.
+- **Log** — one tap is one session. A habit session starts at 10 coins and earns
+  more when a streak multiplier is active; a work session pays a flat 25, with
+  no multiplier, because there is no streak to keep on something you do once.
+  Sessions, shop purchases, and combat turns are the only stored progress
+  history; coin balances, levels, streaks, badges, item ownership, and combat
+  state are all derived from that history.
+- **Streak** — consecutive calendar days with at least one *habit* log. Work is
+  excluded on purpose: clearing a backlog of one-off jobs is not a daily
+  practice, and counting it would make the streak trivially farmable. Not having
   logged *today* doesn't break it — you still have the rest of the day.
+- **Weeks kept** — for a habit with an agreed pace, the honest streak is
+  consecutive *weeks* that hit the target. A rest day is part of the plan, not a
+  failure, and the week in progress never breaks the run.
+- **Fixing a missed day** — forgetting to tick is not the same as not doing it.
+  Tap any past day in a habit's calendar to add or remove that day's session;
+  the event carries the chosen date, so every derived number replays as if it
+  had been logged then.
 - **Badges** — awarded automatically for your first log, every level-up,
   streaks of 3/7/14/30/100 days, coin totals, and completing every level of an
   activity.
@@ -64,7 +81,12 @@ devices. Use Settings → Export to move it.
   critical-hit rhythms, healing magic with lower damage, or armour with guard
   and max-health bonuses. A purchase is appended to the same history rather
   than mutating a stored balance.
-- **Boss arena** — use an owned weapon-and-armour loadout against a ten-boss
+- **Streak trials** — bosses beaten by turning up rather than by out-spending
+  anything. Each habit has its own road (First Spark at 3 days through The
+  Eternal Watch at 100), and an Overworld road runs on your streak across every
+  habit. A trial is cleared off your *longest* run ever, never the current one,
+  so breaking a streak dims the road ahead but can never take a victory back.
+- **Boss arena** — use an owned weapon-and-armour loadout against a fourteen-boss
   campaign. Bosses telegraph rotating moves; timed strikes, guarding, healing
   magic and deterministic critical hits create real choices. Bosses enrage in
   long fights, the player can lose, and a defeat resets the current attempt
@@ -74,7 +96,8 @@ devices. Use Settings → Export to move it.
 
 ### Coins and streak multipliers
 
-Every session starts at 10 coins. Consecutive active days raise the reward for
+A habit session starts at 10 coins; a work session pays a flat 25 and takes no
+multiplier. Consecutive active days raise the reward for
 every session on that day:
 
 - Days 1–2: 1×
@@ -102,6 +125,7 @@ haunted ruins, deep vaults and endgame rifts. The last stop of a chapter is
 shown as a larger landmark. Chapters you have not reached are dimmed rather
 than drained, so the road ahead still reads as somewhere to go.
 
+
 A three-level path still maps exactly to Green Hollow, Stoneford and Amber
 Ridge. Longer paths progressively open more regions: the 15-level Campaign
 visits seven, the 24-level Epic visits ten, and a 30-level path reaches all
@@ -121,12 +145,12 @@ A line starting with `# ` starts a category. Every line under it becomes an
 activity in that category:
 
 ```
-# 💪 Physical
+# Physical
 Running
 Swimming
 Push-ups
 
-# 📚 Schoolwork
+# Schoolwork
 Math AA
 Physics HL
 ```
@@ -240,6 +264,12 @@ export first if you might want it back.
   difficulty-aware quest creation, adaptive six-biome journeys, a 29-piece
   armory, ten bosses, telegraphed tactical turns, guarding, timing, phases,
   enrage, battle logs and accessible reduced-motion behavior.
+- **Phase 9 — Habits and Work:** done. The app split into standing habits and
+  finishable work, weekly commitments with a week-based streak, per-habit and
+  overworld streak trials, a month calendar per habit with tap-to-fix for days
+  you forgot, coin amounts surfaced on every action, every emoji replaced with
+  pixel-art sprites, four more bosses with a matching top gear tier, stats
+  surfaced in Settings, and motion across the Habits, Work and Armory tabs.
 
 Verified end to end in a browser, including real pointer drags on the Organize
 screen for both same-category reordering and cross-category moves. Image import

@@ -1,6 +1,6 @@
 import { evaluateBadges } from '../../lib/badges'
 import { computeCoinSummary, isSessionLog } from '../../lib/coins'
-import { dayKey } from '../../lib/date'
+import { dayKey, todayKey } from '../../lib/date'
 import { db } from '../../lib/db'
 import { newId } from '../../lib/id'
 import { computeStreak } from '../../lib/streak'
@@ -19,6 +19,49 @@ export interface LogResult {
  * re-derives badges from scratch. Deriving rather than incrementing means a
  * badge can never be missed or double-awarded if a write is interrupted.
  */
+/**
+ * Records a session on a past day, or removes the ones already there.
+ *
+ * Forgetting to tick is not the same as not doing it, and a tracker that
+ * cannot be corrected quietly lies about your history — and breaks a streak
+ * you actually kept. The event carries the chosen `day` and a timestamp inside
+ * it, so every derived number replays exactly as if it had been logged then.
+ */
+export async function toggleSessionOn(
+  activityId: Id,
+  day: string,
+): Promise<'added' | 'removed'> {
+  return db.transaction('rw', [db.activities, db.logs], async () => {
+    const activity = await db.activities.get(activityId)
+    if (!activity) throw new Error(`Unknown activity: ${activityId}`)
+    if (day > todayKey()) throw new Error('That day has not happened yet.')
+
+    const existing = (
+      await db.logs.where('activityId').equals(activityId).toArray()
+    )
+      .filter(isSessionLog)
+      .filter((entry) => entry.day === day)
+
+    if (existing.length > 0) {
+      await db.logs.bulkDelete(existing.map((entry) => entry.id))
+      return 'removed'
+    }
+
+    // Noon on the chosen day, so the timestamp cannot drift into a neighbour
+    // when it is later read back in a different timezone.
+    const [year, month, date] = day.split('-').map(Number)
+    const entry: SessionLogEntry = {
+      id: newId(),
+      kind: 'session',
+      activityId,
+      at: new Date(year, month - 1, date, 12).getTime(),
+      day,
+    }
+    await db.logs.add(entry)
+    return 'added'
+  })
+}
+
 export async function logSession(activityId: Id, note?: string): Promise<LogResult> {
   return db.transaction(
     'rw',

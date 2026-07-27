@@ -1924,6 +1924,15 @@ body::before {
   .sword-slash,
   .guard-flash,
   .swing-marker,
+  .stagger-in,
+  .habit-pips .habit-pip-on,
+  .habit-tick-burst,
+  .habit-tick-float,
+  .habit-day,
+  .gear-card-affordable,
+  .gear-card-buying,
+  .gear-card:has(.rarity-legendary) .gear-card-visual::after,
+  .reward-banner::after,
   .journey-stop-current .level-node-face,
   .level-node-arrived .level-node-face,
   .level-node-arrived::after,
@@ -1952,6 +1961,19 @@ body::before {
   .app-shell::after {
     animation: none;
   }
+  /* Transforms are motion too, not just keyframes. */
+  .habit-row-open:hover .habit-row-art,
+  .habit-row-open:active .habit-row-art,
+  .habit-tick:hover:not(:disabled),
+  .habit-tick:active:not(:disabled) .habit-tick-mark,
+  .habit-day:hover,
+  .habit-day-editable:hover,
+  .stat-tile-link:hover,
+  .gear-card:hover,
+  .gear-card:hover .gear-card-visual img {
+    transform: none;
+  }
+
   /* Arrival still needs to be visible without motion, so it keeps its ring. */
   .level-node-arrived::after {
     opacity: 0.9;
@@ -2184,4 +2206,345 @@ body::before {
 }
 .week-picker-caption {
   @apply mt-2 text-xs font-bold text-ink-soft;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion for the Habits and Work tabs.
+
+   Every animation below is opt-out: the reduced-motion block at the end of this
+   file disables them, and none of them carry information that is not also in
+   the text, so nothing is lost when they are off.
+   ------------------------------------------------------------------------ */
+
+/* Rows and category sections rise in, offset by --stagger so a list arrives as
+   a wave rather than all at once. */
+@keyframes stagger-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stagger-in {
+  animation: stagger-rise 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--stagger, 0ms);
+}
+
+/* Tapping the name opens the habit; the art leans in to say so. */
+.habit-row-open {
+  @apply flex min-w-0 flex-1 items-center gap-3 text-left;
+}
+.habit-row-art {
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.habit-row-open:hover .habit-row-art {
+  transform: translateY(-2px) scale(1.12) rotate(-4deg);
+}
+.habit-row-open:active .habit-row-art {
+  transform: scale(0.94);
+}
+
+/* Pips fill left to right, each a beat after the last. */
+@keyframes pip-fill {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.habit-pips .habit-pip-on {
+  animation: pip-fill 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--pip, 0ms);
+}
+
+.habit-tick {
+  @apply relative overflow-visible;
+  transition:
+    transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+.habit-tick:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.habit-tick-mark {
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.habit-tick:active:not(:disabled) .habit-tick-mark {
+  transform: scale(1.35) rotate(-8deg);
+}
+
+/* A ring that expands out of the button on a successful tick. */
+@keyframes tick-burst {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+.habit-tick-burst {
+  @apply pointer-events-none absolute inset-0 rounded-2xl border-2 border-grass;
+  animation: tick-burst 620ms ease-out both;
+}
+
+/* The coins you just earned, floating off the button. */
+@keyframes tick-float {
+  0% {
+    transform: translate(-50%, 0) scale(0.8);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -14px) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -46px) scale(1);
+    opacity: 0;
+  }
+}
+.habit-tick-float {
+  @apply pointer-events-none absolute left-1/2 top-0 whitespace-nowrap text-sm font-black text-gold;
+  animation: tick-float 900ms ease-out both;
+  text-shadow: 0 2px 6px rgb(8 8 18 / 0.7);
+}
+
+/* The reward strip gets a slow sheen so the coin figure catches the eye. */
+@keyframes reward-sheen {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+.reward-banner {
+  @apply relative overflow-hidden;
+}
+.reward-banner::after {
+  content: '';
+  @apply pointer-events-none absolute inset-y-0 left-0 w-1/4 skew-x-12;
+  background: linear-gradient(90deg, transparent, rgb(255 220 120 / 0.13), transparent);
+  animation: reward-sheen 4.5s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   The habit calendar: a real month grid, one numbered box per day.
+   ------------------------------------------------------------------------ */
+.habit-calendar {
+  @apply rounded-3xl border-2 border-swan/90 bg-night/90 p-4;
+}
+.habit-calendar-head {
+  @apply mb-3 flex items-center justify-between gap-2;
+}
+.habit-calendar-month {
+  @apply text-sm font-black;
+}
+.habit-calendar-caption {
+  @apply mt-0.5 text-xs font-bold text-ink-soft;
+}
+.habit-calendar-nav {
+  @apply grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-swan
+         text-lg font-black text-ink-soft transition-colors
+         disabled:opacity-30;
+}
+.habit-calendar-nav:hover:not(:disabled) {
+  @apply border-[var(--habit-accent)] text-ink;
+}
+
+.habit-month {
+  @apply grid gap-1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.habit-month-weekday {
+  @apply pb-1 text-center text-[10px] font-black uppercase tracking-wide text-hare;
+}
+
+/* Every day of the month is a numbered box, so the grid reads as dates. */
+.habit-day {
+  @apply relative grid aspect-square place-items-center rounded-lg border-2 text-xs font-black;
+  animation: day-pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--day, 0ms);
+}
+@keyframes day-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.habit-day-number {
+  @apply leading-none;
+}
+
+/* Done: filled in the habit's accent. */
+.habit-day-done {
+  border-color: var(--habit-accent, #58cc02);
+  background: color-mix(in srgb, var(--habit-accent) 30%, transparent);
+  color: #f6f2ff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--habit-accent) 35%, transparent);
+}
+/* A day that passed without a session. */
+.habit-day-off {
+  @apply border-swan/70 bg-night text-hare;
+}
+/* Future days, and days before the habit existed — not failures. */
+.habit-day-idle {
+  @apply border-transparent bg-transparent text-hare/45;
+}
+.habit-day-today {
+  @apply ring-2 ring-gold/70;
+}
+.habit-day-extra {
+  @apply absolute -right-0.5 -top-0.5 rounded-full bg-gold px-1 text-[8px] font-black text-night;
+}
+
+/* Small swatches for the legend. */
+.habit-day-chip {
+  @apply inline-block h-3.5 w-3.5 rounded border-2 align-middle;
+  animation: none;
+}
+
+.habit-calendar-legend {
+  @apply mt-3 flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-ink-soft;
+}
+.habit-calendar-legend-note {
+  @apply ml-auto inline-flex items-center gap-1 text-hare;
+}
+
+/* ---------------------------------------------------------------------------
+   Armory motion. The shop is where coins turn into power, so it is worth
+   making the moment land — hovering a piece, affording it, and buying it.
+   ------------------------------------------------------------------------ */
+
+/* The art lifts out of its frame on hover, like picking the piece up. */
+.gear-card-visual img {
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 260ms ease;
+}
+.gear-card:hover .gear-card-visual img {
+  transform: translateY(-5px) scale(1.08) rotate(-3deg);
+  filter: drop-shadow(0 8px 10px rgb(8 8 18 / 0.5));
+}
+
+.gear-card {
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+.gear-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Anything you can actually afford breathes, so the eye finds it. */
+@keyframes gear-affordable {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgb(255 200 0 / 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgb(255 200 0 / 0.24);
+  }
+}
+.gear-card-affordable {
+  animation: gear-affordable 2.8s ease-in-out infinite;
+}
+
+/* A legendary piece keeps a slow gold shimmer crossing its frame. */
+@keyframes gear-shimmer {
+  0% {
+    transform: translateX(-140%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(420%) skewX(-12deg);
+  }
+}
+.gear-card-visual {
+  @apply relative overflow-hidden;
+}
+.gear-card:has(.rarity-legendary) .gear-card-visual::after {
+  content: '';
+  @apply pointer-events-none absolute inset-y-0 left-0 w-1/3;
+  background: linear-gradient(90deg, transparent, rgb(255 220 120 / 0.22), transparent);
+  animation: gear-shimmer 5s ease-in-out infinite;
+}
+
+/* The purchase itself: a bright pulse through the whole card. */
+@keyframes gear-bought {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgb(88 204 2 / 0);
+  }
+  35% {
+    transform: scale(1.03);
+    box-shadow: 0 0 26px rgb(88 204 2 / 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgb(88 204 2 / 0);
+  }
+}
+.gear-card-buying {
+  animation: gear-bought 700ms ease-out;
+}
+
+/* Owned pieces settle rather than shout. */
+.gear-card-owned .gear-card-visual img {
+  filter: drop-shadow(0 4px 6px rgb(8 8 18 / 0.4));
+}
+
+/* ---------------------------------------------------------------------------
+   Settings: the numbers first, then the buttons that act on them.
+   ------------------------------------------------------------------------ */
+.stat-grid {
+  @apply grid gap-2;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+}
+.stat-tile {
+  @apply flex flex-col items-center gap-1 rounded-2xl border-2 border-swan/80 bg-night/90 px-3 py-3 text-center;
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease;
+}
+.stat-tile strong {
+  @apply text-lg font-black leading-none;
+}
+.stat-tile span {
+  @apply text-[10px] font-black uppercase tracking-wide text-ink-soft;
+}
+.stat-tile-link:hover {
+  @apply border-violet;
+  transform: translateY(-2px);
+}
+
+/* The one thing worth being loud about: local-only data can be wiped. */
+.settings-warning {
+  @apply rounded-2xl border-2 border-gold/35 bg-gold/8 px-3 py-2 text-xs font-bold text-gold-dark;
+}
+
+.habit-calendar-hint {
+  @apply mt-2 text-[11px] font-bold text-hare;
+}
+.habit-day-editable {
+  cursor: pointer;
+}
+.habit-day-editable:hover {
+  border-color: var(--habit-accent, #58cc02);
+  transform: scale(1.08);
 }

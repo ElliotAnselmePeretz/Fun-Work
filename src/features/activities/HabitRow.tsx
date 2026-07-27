@@ -10,7 +10,10 @@ interface HabitRowProps {
   /** What ticking this right now would pay. */
   reward: number
   onTick: () => void
+  onOpen: () => void
   busy?: boolean
+  /** Bumped by the parent to replay the reward animation on this row. */
+  celebrate?: number
 }
 
 /**
@@ -21,7 +24,15 @@ interface HabitRowProps {
  * proportion. Ticking beyond the commitment keeps counting; going over is
  * never discouraged.
  */
-export function HabitRow({ habit, logs, reward, onTick, busy }: HabitRowProps) {
+export function HabitRow({
+  habit,
+  logs,
+  reward,
+  onTick,
+  onOpen,
+  busy,
+  celebrate,
+}: HabitRowProps) {
   const goals = computeGoalProgress(habit.goal, logs)
   const target = goals.weekly?.target ?? 0
   const done = goals.weekly?.done ?? logs.length
@@ -29,21 +40,30 @@ export function HabitRow({ habit, logs, reward, onTick, busy }: HabitRowProps) {
 
   return (
     <div className="habit-row">
-      <AvatarIcon
-        name={habit.name}
-        id={habit.id}
-        stored={habit.emoji}
-        className="h-7 w-7"
-      />
-
-      <div className="min-w-0 flex-1">
-        <p className="habit-row-name">{habit.name}</p>
-        <div className="habit-row-meta">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="habit-row-open"
+        aria-label={`Open ${habit.name}`}
+      >
+        <AvatarIcon
+          name={habit.name}
+          id={habit.id}
+          stored={habit.emoji}
+          className="habit-row-art h-7 w-7"
+        />
+        <span className="min-w-0 flex-1 text-left">
+          <span className="habit-row-name block truncate">{habit.name}</span>
+        <span className="habit-row-meta">
           {target > 0 ? (
             <>
               <span className="habit-pips" aria-hidden>
                 {Array.from({ length: target }, (_, i) => (
-                  <i key={i} className={i < done ? 'habit-pip-on' : ''} />
+                  <i
+                    key={i}
+                    className={i < done ? 'habit-pip-on' : ''}
+                    style={{ '--pip': `${i * 70}ms` } as React.CSSProperties}
+                  />
                 ))}
               </span>
               <span className={`habit-row-count ${met ? 'habit-row-count-met' : ''}`}>
@@ -59,8 +79,9 @@ export function HabitRow({ habit, logs, reward, onTick, busy }: HabitRowProps) {
               {goals.weeksKept}w kept
             </span>
           )}
-        </div>
-      </div>
+        </span>
+        </span>
+      </button>
 
       <button
         type="button"
@@ -69,8 +90,16 @@ export function HabitRow({ habit, logs, reward, onTick, busy }: HabitRowProps) {
         aria-label={`Tick ${habit.name}, earns ${reward} coins`}
         className={`habit-tick ${met ? 'habit-tick-met' : ''}`}
       >
-        <PixelIcon name="check" className="h-5 w-5" />
+        {celebrate ? (
+          <span key={celebrate} className="habit-tick-burst" aria-hidden />
+        ) : null}
+        <PixelIcon name="check" className="habit-tick-mark h-5 w-5" />
         <CoinAmount value={reward} size="sm" />
+        {celebrate ? (
+          <span key={`coin-${celebrate}`} className="habit-tick-float" aria-hidden>
+            +{reward}
+          </span>
+        ) : null}
       </button>
     </div>
   )

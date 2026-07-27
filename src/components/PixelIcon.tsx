@@ -6,19 +6,27 @@
  * plus are drawn to match, because no tile in the pack reads as either.
  */
 export const PIXEL_ICONS = [
+  'book',
+  'chart',
   'check',
   'check-dim',
   'coin',
+  'cog',
   'chest',
   'crystal',
   'flame',
   'heart',
   'key',
   'lamp',
+  'lantern',
   'map',
   'mirror',
+  'orb',
   'plus',
+  'rune',
   'scroll',
+  'shop',
+  'swords',
 ] as const
 
 export type PixelIconName = (typeof PIXEL_ICONS)[number]

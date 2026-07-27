@@ -8,11 +8,11 @@ const TABS: {
   color: string
 }[] = [
   { route: { name: 'home' }, label: 'Habits', image: 'check', color: 'text-grass-dark' },
-  { route: { name: 'work' }, label: 'Work', image: 'scroll', color: 'text-flame-dark' },
-  { route: { name: 'arena' }, label: 'Arena', image: 'flame', color: 'text-cardinal' },
-  { route: { name: 'shop' }, label: 'Armory', image: 'chest', color: 'text-gold-dark' },
-  { route: { name: 'stats' }, label: 'Stats', image: 'crystal', color: 'text-sky-dark' },
-  { route: { name: 'settings' }, label: 'Settings', image: 'mirror', color: 'text-beetle-dark' },
+  { route: { name: 'work' }, label: 'Work', image: 'book', color: 'text-flame-dark' },
+  { route: { name: 'arena' }, label: 'Arena', image: 'swords', color: 'text-cardinal' },
+  { route: { name: 'shop' }, label: 'Armory', image: 'shop', color: 'text-gold-dark' },
+  { route: { name: 'stats' }, label: 'Stats', image: 'chart', color: 'text-sky-dark' },
+  { route: { name: 'settings' }, label: 'Settings', image: 'cog', color: 'text-beetle-dark' },
 ]
 
 interface TabBarProps {

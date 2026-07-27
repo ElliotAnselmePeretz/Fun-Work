@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { CoinAmount } from '../components/CoinAmount'
@@ -40,6 +40,8 @@ export function HabitsScreen() {
   const streak = useStreak()
   const [adding, setAdding] = useState(false)
   const [busyId, setBusyId] = useState<string>()
+  // Bumped per habit so a tick replays its reward animation.
+  const [celebrations, setCelebrations] = useState<Record<string, number>>({})
   const [pendingCategoryId, setPendingCategoryId] = useState<string>()
 
   const { habits, byActivity } = useMemo(() => {
@@ -72,6 +74,10 @@ export function HabitsScreen() {
     setBusyId(habit.id)
     try {
       await logSession(habit.id)
+      setCelebrations((current) => ({
+        ...current,
+        [habit.id]: (current[habit.id] ?? 0) + 1,
+      }))
     } finally {
       setBusyId(undefined)
     }
@@ -117,15 +123,24 @@ export function HabitsScreen() {
       ) : (
         <>
           <Card className="divide-y-2 divide-swan/70 overflow-hidden">
-            {habits.map((habit) => (
-              <HabitRow
+            {habits.map((habit, index) => (
+              <div
                 key={habit.id}
-                habit={habit}
-                logs={byActivity.get(habit.id) ?? []}
-                reward={nextReward}
-                busy={busyId === habit.id}
-                onTick={() => void tick(habit)}
-              />
+                className="stagger-in"
+                style={{ '--stagger': `${index * 55}ms` } as CSSProperties}
+              >
+                <HabitRow
+                  habit={habit}
+                  logs={byActivity.get(habit.id) ?? []}
+                  reward={nextReward}
+                  busy={busyId === habit.id}
+                  celebrate={celebrations[habit.id]}
+                  onTick={() => void tick(habit)}
+                  onOpen={() =>
+                    navigate({ name: 'activity', activityId: habit.id })
+                  }
+                />
+              </div>
             ))}
           </Card>
 

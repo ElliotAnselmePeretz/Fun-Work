@@ -7,7 +7,7 @@ import { ActivityForm } from '../features/activities/ActivityForm'
 import { LevelEditor } from '../features/activities/LevelEditor'
 import { LevelPath } from '../features/activities/LevelPath'
 import { LogButton } from '../features/activities/LogButton'
-import { deleteLog } from '../features/activities/logActions'
+import { deleteLog, toggleSessionOn } from '../features/activities/logActions'
 import {
   useActivity,
   useActivityLogs,
@@ -19,6 +19,7 @@ import { relativeDayLabel, timeLabel } from '../lib/date'
 import { summarizeJourney } from '../lib/journey'
 import { computeProgress, levelFraction } from '../lib/xp'
 import { GoalCard } from '../features/activities/GoalCard'
+import { HabitCalendar } from '../features/activities/HabitCalendar'
 import { TrialRoadCard } from '../features/trials/TrialRoadCard'
 import { computeGoalProgress, isHabit } from '../lib/goals'
 import { habitTrialRoad } from '../lib/trials'
@@ -65,6 +66,31 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
         }
       />
 
+      {isHabit(activity) ? (
+        <Card className="flex flex-col gap-3 p-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="font-extrabold">
+              {activity.goal?.weeklyTarget
+                ? `${activity.goal.weeklyTarget}× a week`
+                : 'No set pace'}
+            </span>
+            <span className="text-sm font-bold text-ink-soft">
+              {progress.totalSessions} session
+              {progress.totalSessions === 1 ? '' : 's'} all time
+            </span>
+          </div>
+          <div className="flex justify-between text-xs font-bold text-ink-soft">
+            <span>
+              {logs.length > 0
+                ? `Going since ${relativeDayLabel([...logs].sort((a, b) => a.at - b.at)[0].day)}`
+                : 'Not started yet'}
+            </span>
+            <span>
+              {(coins.earnedByActivityId.get(activity.id) ?? 0).toLocaleString()} coins
+            </span>
+          </div>
+        </Card>
+      ) : (
       <Card className="flex flex-col gap-3 p-4">
         <div className="flex items-baseline justify-between gap-2">
           <span className="flex items-center gap-2 font-extrabold">
@@ -98,28 +124,37 @@ export function ActivityScreen({ activityId }: ActivityScreenProps) {
           </span>
         </div>
       </Card>
+      )}
 
-      <section>
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">
-            {journey.currentChapter
-              ? `Journey · ${journey.currentChapter.name}`
-              : 'Journey · complete'}
-          </h2>
-          <button
-            onClick={() => setEditingLevels(true)}
-            className="text-xs font-extrabold uppercase tracking-wide text-sky"
-          >
-            Edit levels
-          </button>
-        </div>
-        <LevelPath activity={activity} progress={progress} color={color} />
-      </section>
+      {!isHabit(activity) && (
+        <section>
+          <div className="mb-2 flex items-baseline justify-between">
+            <h2 className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">
+              {journey.currentChapter
+                ? `Journey · ${journey.currentChapter.name}`
+                : 'Journey · complete'}
+            </h2>
+            <button
+              onClick={() => setEditingLevels(true)}
+              className="text-xs font-extrabold uppercase tracking-wide text-sky"
+            >
+              Edit levels
+            </button>
+          </div>
+          <LevelPath activity={activity} progress={progress} color={color} />
+        </section>
+      )}
 
       <LogButton activityId={activity.id} color={color} size="lg" label="+1 Session" />
 
       {isHabit(activity) && (
         <>
+          <HabitCalendar
+            onToggleDay={(day) => void toggleSessionOn(activity.id, day)}
+            logs={logs}
+            weeklyTarget={activity.goal?.weeklyTarget}
+            accent={color}
+          />
           <GoalCard goals={computeGoalProgress(activity.goal, logs)} />
           <TrialRoadCard
             road={habitTrialRoad(logs)}

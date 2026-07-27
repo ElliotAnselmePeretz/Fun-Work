@@ -1,9 +1,20 @@
 import { useState } from 'react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { PixelIcon } from '../components/PixelIcon'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { ApiKeyCard } from '../features/settings/ApiKeyCard'
-import { useBadges, useCategories, useLogs, useSettings } from '../hooks/useData'
+import { StatsSummary } from '../features/settings/StatsSummary'
+import {
+  useActivities,
+  useBadges,
+  useCategories,
+  useCoinSummary,
+  useLedgerEntries,
+  useLogs,
+  useSettings,
+  useStreak,
+} from '../hooks/useData'
 import { clearAllData, exportBackup, importBackup, type BackupFile } from '../lib/db'
 import { navigate } from '../lib/router'
 
@@ -12,6 +23,10 @@ export function SettingsScreen() {
   const logs = useLogs()
   const badges = useBadges()
   const settings = useSettings()
+  const activities = useActivities()
+  const ledger = useLedgerEntries()
+  const coins = useCoinSummary()
+  const streak = useStreak()
   const [confirmingReset, setConfirmingReset] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
@@ -40,14 +55,30 @@ export function SettingsScreen() {
 
   return (
     <div className="flex flex-col gap-5">
-      <ScreenHeader title="Settings" />
+      <ScreenHeader title="Settings" subtitle="Your data, your numbers" />
+
+      {activities && ledger && coins && streak && (
+        <StatsSummary
+          activities={activities}
+          ledger={ledger}
+          coins={coins}
+          streak={streak}
+          badgeCount={badges?.length ?? 0}
+        />
+      )}
 
       <Card className="flex flex-col gap-3 p-4">
-        <h2 className="font-extrabold">Your data</h2>
+        <h2 className="flex items-center gap-2 font-extrabold">
+          <PixelIcon name="chest" className="h-5 w-5" />
+          Backup
+        </h2>
         <p className="text-sm text-ink-soft">
           {categories?.length ?? 0} categories · {logs?.length ?? 0} sessions ·{' '}
-          {badges?.length ?? 0} badges. Everything is stored on this device only —
-          nothing is uploaded.
+          {badges?.length ?? 0} badges.
+        </p>
+        <p className="settings-warning">
+          Everything lives in this browser and nothing is uploaded — so clearing
+          your browser data would erase all of it. Export a file to keep a copy.
         </p>
         <div className="flex gap-2">
           <Button variant="secondary" className="flex-1" onClick={download}>
@@ -73,7 +104,10 @@ export function SettingsScreen() {
       </Card>
 
       <Card className="flex flex-col gap-3 p-4">
-        <h2 className="font-extrabold">Bulk add</h2>
+        <h2 className="flex items-center gap-2 font-extrabold">
+          <PixelIcon name="scroll" className="h-5 w-5" />
+          Add in bulk
+        </h2>
         <p className="text-sm text-ink-soft">
           Paste a plain-text list to create many categories and activities at once.
         </p>
@@ -88,7 +122,10 @@ export function SettingsScreen() {
       {settings && <ApiKeyCard settings={settings} />}
 
       <Card className="flex flex-col gap-3 p-4">
-        <h2 className="font-extrabold text-cardinal">Danger zone</h2>
+        <h2 className="flex items-center gap-2 font-extrabold text-cardinal">
+          <PixelIcon name="flame" className="h-5 w-5" />
+          Danger zone
+        </h2>
         {confirmingReset ? (
           <>
             <p className="text-sm font-bold">

@@ -28,6 +28,18 @@ Gear art is ordered with the price ladder on purpose: starter pieces are a
 plain knife, a wooden club and a roll of hide, while endgame pieces are gilded
 and ornate. The tier should be legible before you read a single stat.
 
+## Interface icons
+
+`ui/` holds the small icons the interface itself uses — coins, flame, chest,
+shop door, sword and the rest — prepared from the same Dungeon Crawl tileset so
+a coin in the header is the same object as a coin in the world.
+
+Four of them are **hand-drawn for this project** rather than taken from the
+pack, because no tile in it reads as the thing needed: the tick (`check.png`,
+`check-dim.png`), the plus, the cog and the bar chart. They are drawn on the
+same pixel grid with the tileset's shaded lower-right edge, and are released
+under CC0 along with everything else here.
+
 No attribution is required by CC0, but the creators and source pages are
 recorded here with thanks.
 
