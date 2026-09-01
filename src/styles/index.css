@@ -684,15 +684,25 @@ body::before {
   @apply text-gold;
 }
 
+/* Fourteen bosses will not fit across a phone, so the campaign scrolls
+   sideways as one continuous road rather than squeezing every node. */
 .boss-map {
-  @apply relative flex items-center justify-between px-2;
+  @apply relative flex items-center gap-3 overflow-x-auto px-2 py-2;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.boss-map::-webkit-scrollbar {
+  display: none;
 }
 .boss-map::before {
   content: '';
-  @apply absolute left-8 right-8 top-1/2 h-0.5 -translate-y-1/2 bg-violet/35;
+  @apply absolute left-8 top-1/2 h-0.5 -translate-y-1/2 bg-violet/35;
+  /* Spans the scrolled width, not just the visible box. */
+  width: calc(100% - 4rem);
 }
 .boss-map-node {
-  @apply relative z-10 grid h-12 w-12 place-items-center rounded-2xl border border-swan bg-night text-ink-soft shadow-sm transition-all disabled:opacity-45;
+  @apply relative z-10 grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-swan bg-night text-ink-soft shadow-sm transition-all disabled:opacity-45;
+  scroll-snap-align: center;
 }
 .boss-map-node-active {
   @apply -translate-y-1 border-violet bg-violet text-white;
@@ -1968,6 +1978,7 @@ body::before {
   .habit-tick:active:not(:disabled) .habit-tick-mark,
   .habit-day:hover,
   .habit-day-editable:hover,
+  .icon-picker-option:hover,
   .stat-tile-link:hover,
   .gear-card:hover,
   .gear-card:hover .gear-card-visual img {
@@ -2019,7 +2030,14 @@ body::before {
   @apply relative flex w-24 shrink-0 flex-col items-center gap-1 rounded-2xl border-2 border-swan/70 bg-polar/50 px-2 py-2.5 text-center opacity-70 transition-all;
 }
 .trial-node-face {
-  @apply grid h-9 w-9 place-items-center rounded-full border-2 border-swan/70 bg-night text-ink-soft;
+  @apply grid h-11 w-11 place-items-center overflow-hidden rounded-xl border-2 border-swan/70 bg-night p-0.5;
+}
+/* Unbeaten trials are shown as shadowed silhouettes of what is coming. */
+.trial-node:not(.trial-node-beaten) .trial-node-face img {
+  filter: grayscale(1) brightness(0.55);
+}
+.trial-node-next .trial-node-face img {
+  filter: grayscale(0.45) brightness(0.85);
 }
 .trial-node-name {
   @apply text-[10px] font-black leading-tight;
@@ -2547,4 +2565,262 @@ body::before {
 .habit-day-editable:hover {
   border-color: var(--habit-accent, #58cc02);
   transform: scale(1.08);
+}
+
+/* ---------------------------------------------------------------------------
+   The icon picker. The set is large enough that it scrolls rather than pushing
+   the rest of the form off the screen.
+   ------------------------------------------------------------------------ */
+.icon-picker-search {
+  @apply mb-2 w-full rounded-xl border-2 border-swan bg-night px-3 py-2 text-sm font-bold text-ink
+         outline-none transition-colors placeholder:text-hare;
+}
+.icon-picker-search:focus {
+  @apply border-sky;
+}
+.icon-picker-grid {
+  @apply grid max-h-52 gap-2 overflow-y-auto rounded-2xl border-2 border-swan/60 bg-night/60 p-2;
+  grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+  scrollbar-width: thin;
+}
+.icon-picker-option {
+  @apply grid aspect-square place-items-center rounded-xl border-2 border-swan bg-[#17142d] transition-all;
+}
+.icon-picker-option:hover {
+  @apply border-violet;
+  transform: translateY(-2px);
+}
+.icon-picker-option-active {
+  @apply border-sky bg-sky/15;
+  box-shadow: 0 0 12px rgb(28 176 246 / 0.35);
+}
+.icon-picker-empty {
+  @apply col-span-full px-2 py-3 text-center text-xs font-bold text-hare;
+}
+
+/* The standing you hold right now, distinct from the trophies already won. */
+.trial-held {
+  @apply mb-3 flex items-center gap-2 rounded-2xl border-2 border-[var(--trial-accent,#8b7cf6)]/35
+         bg-night/70 px-3 py-2 text-xs font-bold text-ink-soft;
+}
+.trial-held strong {
+  @apply text-ink;
+}
+.trial-held-none {
+  @apply border-swan/60 text-hare;
+}
+.trial-times {
+  @apply rounded-full bg-gold/20 px-1.5 py-0.5 text-[10px] font-black text-gold-dark;
+}
+
+/* A trial the current run still satisfies keeps its colour and a lit ring. */
+.trial-node-held {
+  @apply opacity-100;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--trial-accent) 55%, transparent);
+}
+.trial-node-held .trial-node-days {
+  @apply text-[var(--trial-accent)];
+}
+/* Cleared but lapsed: the trophy is kept, the colour is not. */
+.trial-node-beaten:not(.trial-node-held) .trial-node-face img {
+  filter: grayscale(0.7) brightness(0.8);
+}
+.trial-node-times {
+  @apply absolute -right-1 -top-1 rounded-full bg-gold px-1 text-[8px] font-black text-night;
+}
+.trial-node-face {
+  @apply relative;
+}
+
+/* ---------------------------------------------------------------------------
+   The loadout bench. Previously three loose rows with mismatched heading
+   levels and three different chip shapes, which read as three unrelated
+   widgets. Now one panel: what you have equipped, then a consistent picker
+   per slot.
+   ------------------------------------------------------------------------ */
+.loadout-bench {
+  @apply rounded-3xl border-2 border-swan/80 p-4;
+  background:
+    radial-gradient(circle at 12% 0%, rgb(139 124 246 / 0.14), transparent 14rem),
+    rgb(36 30 73 / 0.92);
+}
+.loadout-bench-head {
+  @apply mb-3 flex items-end justify-between gap-3;
+}
+.loadout-bench-title {
+  @apply text-lg font-black;
+}
+.loadout-bench-link {
+  @apply shrink-0 rounded-full border-2 border-beetle/45 px-3 py-1.5 text-[11px] font-black text-beetle transition-colors;
+}
+.loadout-bench-link:hover {
+  @apply border-beetle bg-beetle/12;
+}
+
+/* The three equipped slots, so the current kit is legible before any picking. */
+.loadout-equipped {
+  @apply mb-4 grid gap-2;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.loadout-slot {
+  @apply flex min-w-0 flex-col items-center gap-1 rounded-2xl border-2 border-swan/70 bg-night/80 px-2 py-2.5 text-center transition-all;
+}
+.loadout-slot:hover {
+  @apply border-violet/70;
+}
+.loadout-slot-open {
+  @apply border-violet bg-violet/12;
+  box-shadow: 0 0 14px rgb(139 124 246 / 0.3);
+}
+/* The affordance that the tile is a picker, not just a readout. */
+.loadout-slot-change {
+  @apply mt-0.5 text-[9px] font-black uppercase tracking-wide text-violet;
+}
+.loadout-slot-open .loadout-slot-change {
+  @apply text-beetle;
+}
+.loadout-lock-note {
+  @apply mb-1 w-full justify-center;
+}
+.loadout-slot-label {
+  @apply text-[9px] font-black uppercase tracking-wide text-hare;
+}
+.loadout-slot-art {
+  @apply h-9 w-9 object-contain;
+  filter: drop-shadow(0 3px 4px rgb(8 8 18 / 0.5));
+}
+.loadout-slot-name {
+  @apply w-full truncate text-[10px] font-black;
+}
+.loadout-slot-empty {
+  @apply grid h-9 place-items-center text-[10px] font-bold text-hare;
+}
+
+.loadout-group-head {
+  @apply mb-2 flex items-center justify-between gap-2;
+}
+.loadout-group-label {
+  @apply mb-2 text-[11px] font-black uppercase tracking-[0.14em] text-violet;
+}
+.loadout-group-head .loadout-group-label {
+  @apply mb-0;
+}
+.loadout-group-hint {
+  @apply text-[10px] font-bold text-hare;
+}
+
+/* One scroll strip shape for all three slots. */
+.loadout-strip {
+  @apply mb-4 flex gap-2 overflow-x-auto pb-2;
+  scrollbar-width: none;
+}
+.loadout-strip::-webkit-scrollbar {
+  display: none;
+}
+.loadout-strip:last-child {
+  @apply mb-0;
+}
+
+/* ---------------------------------------------------------------------------
+   Per-screen backdrops.
+
+   The dungeon world runs behind everything; these give each destination its own
+   room inside it. They differ by *structure*, not just tint — a brick forge, a
+   sand-floored pit, a star chart — because a hue shift alone reads as the same
+   room with the lights changed. All gradients, so they cost no requests.
+
+   Two layers each: ::before builds the room, ::after lights it.
+   ------------------------------------------------------------------------ */
+.screen-armory,
+.screen-arena,
+.screen-stats {
+  @apply relative;
+}
+.screen-armory::before,
+.screen-arena::before,
+.screen-stats::before,
+.screen-armory::after,
+.screen-arena::after,
+.screen-stats::after {
+  content: '';
+  @apply pointer-events-none fixed inset-0;
+  z-index: -1;
+}
+
+/* ---- The Armory: a forge room, walled in real brick. ----
+   The wall is an actual tiled image built from the pack's own seamless brick
+   tiles (see scripts note in ART_CREDITS), not a gradient impression of one. */
+.screen-armory::before {
+  background-image: url('/assets/backgrounds/armory.png');
+  background-repeat: repeat;
+  background-size: 232px 232px;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+  opacity: 0.5;
+}
+/* Forge light. Raised clear of the tab bar so the fire is actually visible. */
+.screen-armory::after {
+  background:
+    radial-gradient(46% 22% at 50% 88%, rgb(255 156 38 / 0.6), transparent 68%),
+    radial-gradient(22% 12% at 14% 84%, rgb(255 88 16 / 0.42), transparent 70%),
+    radial-gradient(22% 12% at 86% 84%, rgb(255 88 16 / 0.34), transparent 70%),
+    radial-gradient(60% 30% at 50% 0%, rgb(255 196 120 / 0.12), transparent 70%),
+    linear-gradient(180deg, rgb(12 6 10 / 0.42) 0%, transparent 34%);
+}
+
+/* ---- The Arena: a fighting pit floored in bloodied cobbles. ----
+   Also a real tiled image, from the pack's own stained-floor tiles. */
+.screen-arena::before {
+  background-image: url('/assets/backgrounds/arena.png');
+  background-repeat: repeat;
+  background-size: 208px 208px;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+  opacity: 0.6;
+}
+/* Overhead spotlight, dust in the beam, and a hard vignette onto the floor. */
+.screen-arena::after {
+  background:
+    radial-gradient(30% 40% at 50% -8%, rgb(255 240 205 / 0.3), transparent 66%),
+    radial-gradient(64% 28% at 50% 2%, rgb(255 61 110 / 0.32), transparent 72%),
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 0.028) 0 1px,
+      transparent 1px 6px
+    ),
+    radial-gradient(86% 56% at 50% 56%, transparent 34%, rgb(6 3 10 / 0.68) 100%);
+}
+
+/* ---- Stats: an observatory. A star chart on deep blue. ---- */
+.screen-stats::before {
+  background:
+    radial-gradient(circle, rgb(226 240 255 / 1) 1.1px, transparent 1.5px),
+    radial-gradient(circle, rgb(168 208 255 / 0.72) 0.9px, transparent 1.3px),
+    radial-gradient(circle, rgb(139 124 246 / 0.5) 0.7px, transparent 1.1px),
+    linear-gradient(180deg, #0a1338 0%, #0e1c4c 46%, #060c22 100%);
+  background-size:
+    118px 118px,
+    54px 54px,
+    31px 31px,
+    auto;
+  background-position:
+    12px 26px,
+    7px 0,
+    0 0,
+    0 0;
+}
+/* Chart grid, and a cold aurora across the top. */
+.screen-stats::after {
+  background:
+    linear-gradient(rgb(105 206 255 / 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(105 206 255 / 0.13) 1px, transparent 1px),
+    radial-gradient(46% 24% at 28% 0%, rgb(28 176 246 / 0.4), transparent 70%),
+    radial-gradient(42% 20% at 80% 6%, rgb(139 124 246 / 0.34), transparent 70%),
+    radial-gradient(70% 34% at 50% 100%, rgb(4 8 24 / 0.5), transparent 72%);
+  background-size:
+    52px 52px,
+    52px 52px,
+    auto,
+    auto,
+    auto;
 }

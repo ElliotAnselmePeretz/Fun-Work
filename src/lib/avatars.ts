@@ -1,3 +1,4 @@
+import { assetUrl } from './asset'
 /**
  * Art avatars for categories and activities, replacing the old emoji.
  *
@@ -17,20 +18,50 @@ export const AVATARS = [
   'amulet',
   'apple',
   'axe',
+  'banana',
   'blade',
   'book',
   'boots',
   'bow',
+  'box',
+  'bread',
+  'cheese',
+  'cloak',
+  'club',
+  'coin',
+  'dagger',
   'flask',
   'food',
   'gold',
+  'grape',
+  'hat',
+  'heart',
   'helm',
+  'helmet',
+  'honey',
+  'horn',
+  'key',
+  'lantern',
+  'lemon',
+  'mace',
+  'map',
+  'meat',
+  'mirror',
+  'orange',
+  'orb',
+  'pear',
+  'pizza',
   'potion',
   'ring',
+  'rune',
   'scroll',
   'shield',
+  'spear',
   'staff',
+  'trident',
   'wand',
+  'wand2',
+  'whip',
 ] as const
 
 export type AvatarName = (typeof AVATARS)[number]
@@ -54,6 +85,21 @@ const KEYWORDS: [RegExp, AvatarName][] = [
   [/defen|guard|protect|shield|floss|brush|skin/, 'shield'],
   [/fight|spar|martial|box|climb|compet/, 'blade'],
   [/aim|target|focus|goal|habit|practice/, 'bow'],
+  [/cook|bake|kitchen|recipe/, 'bread'],
+  [/fruit|snack|apple|orange|banana/, 'orange'],
+  [/coffee|tea|brew/, 'flask'],
+  [/sleep|bed|night|wake|morning/, 'lantern'],
+  [/plan|organis|organiz|admin|inbox|email|tidy/, 'box'],
+  [/spend|bill|pay|budget|cost/, 'coin'],
+  [/travel|explore|route|map|navigat/, 'map'],
+  [/sing|voice|speak|present|podcast/, 'horn'],
+  [/dress|outfit|wardrobe|laundry/, 'cloak'],
+  [/hat|study|revise|exam|lecture|class/, 'hat'],
+  [/heart|health|therapy|mood|journal/, 'heart'],
+  [/swim|surf|dive|row|sail/, 'trident'],
+  [/climb|hike|mountain|trek/, 'spear'],
+  [/lift|press|deadlift|squat|heavy/, 'mace'],
+  [/secret|password|admin|account|login/, 'key'],
 ]
 
 /** Stable 32-bit hash (FNV-1a) so a given id always lands on the same icon. */
@@ -96,7 +142,7 @@ export function avatarFor(name: string, id: string, stored?: string): AvatarName
 }
 
 export function avatarSrc(avatar: AvatarName): string {
-  return `/assets/avatars/${avatar}.png`
+  return assetUrl(`/assets/avatars/${avatar}.png`)
 }
 
 /** Convenience for the common "I have a record, give me its art" case. */

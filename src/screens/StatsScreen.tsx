@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
-import { GameIcon } from '../components/GameIcon'
+import { PixelIcon } from '../components/PixelIcon'
 import { ProgressBar } from '../components/ProgressBar'
 import { ScreenHeader } from '../components/ScreenHeader'
 import {
@@ -61,7 +61,7 @@ export function StatsScreen() {
 
   if (logs.length === 0) {
     return (
-      <div className="flex flex-col gap-5">
+      <div className="screen-stats flex flex-col gap-5">
         <ScreenHeader title="Stats" />
         <EmptyState
           icon="map"
@@ -74,7 +74,7 @@ export function StatsScreen() {
 
   const busiest = Math.max(...perDay.map((entry) => entry.count), 1)
   return (
-    <div className="flex flex-col gap-5">
+    <div className="screen-stats flex flex-col gap-5">
       <ScreenHeader
         title="Stats"
         subtitle={`${logs.length} sessions logged`}
@@ -84,7 +84,7 @@ export function StatsScreen() {
             aria-label="Open achievements"
             className="grid h-10 w-10 place-items-center rounded-2xl border border-swan bg-night text-beetle shadow-sm"
           >
-            <GameIcon name="trophy" size={20} />
+            <PixelIcon name="crystal" className="h-5 w-5" />
           </button>
         }
       />
@@ -175,7 +175,7 @@ function Stat({
   return (
     <Card className="flex flex-col items-center gap-0.5 p-3">
       <span className="flex items-center gap-1.5 text-xl font-extrabold">
-        {icon && <GameIcon name={icon} size={18} className="text-gold-dark" />}
+        {icon && <PixelIcon name="coin" className="h-5 w-5" />}
         {value}
       </span>
       <span className="text-[10px] font-bold uppercase tracking-wide text-ink-soft">

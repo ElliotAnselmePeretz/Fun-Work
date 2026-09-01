@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { AVATARS, avatarFor, avatarSrc, avatarToken } from '../lib/avatars'
 
 interface IconPickerProps {
@@ -16,27 +17,57 @@ interface IconPickerProps {
  * is what you get. Until something is chosen the app derives an icon from the
  * name, and that guess is shown as the selected tile so the row never looks
  * unset — picking simply pins it.
+ *
+ * The set is large enough that a plain wrap became a wall, so it scrolls inside
+ * a fixed height with a search box. The currently selected icon is always
+ * pulled to the front, so it stays visible no matter what is typed.
  */
 export function IconPicker({ value, onChange, name, id = '' }: IconPickerProps) {
+  const [query, setQuery] = useState('')
   const selected = avatarFor(name, id, value)
+
+  const shown = useMemo(() => {
+    const term = query.trim().toLowerCase()
+    const matches = term
+      ? AVATARS.filter((avatar) => avatar.includes(term))
+      : [...AVATARS]
+    // Keep the selection reachable even when it does not match the search.
+    return matches.includes(selected)
+      ? [selected, ...matches.filter((avatar) => avatar !== selected)]
+      : [selected, ...matches]
+  }, [query, selected])
 
   return (
     <div>
-      <span className="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-ink-soft">
-        Icon
-      </span>
-      <div className="flex flex-wrap gap-2">
-        {AVATARS.map((avatar) => (
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <span className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">
+          Icon
+        </span>
+        <span className="text-[10px] font-bold text-hare">
+          {AVATARS.length} to choose from
+        </span>
+      </div>
+
+      <input
+        type="search"
+        value={query}
+        placeholder="Search icons…"
+        aria-label="Search icons"
+        onChange={(event) => setQuery(event.target.value)}
+        className="icon-picker-search"
+      />
+
+      <div className="icon-picker-grid">
+        {shown.map((avatar) => (
           <button
             key={avatar}
             type="button"
             onClick={() => onChange(avatarToken(avatar))}
             aria-label={avatar}
+            title={avatar}
             aria-pressed={avatar === selected}
-            className={`grid h-11 w-11 place-items-center rounded-xl border-2 transition-colors ${
-              avatar === selected
-                ? 'border-sky bg-sky/10'
-                : 'border-swan bg-[#17142d] hover:bg-polar'
+            className={`icon-picker-option ${
+              avatar === selected ? 'icon-picker-option-active' : ''
             }`}
           >
             <img
@@ -47,6 +78,12 @@ export function IconPicker({ value, onChange, name, id = '' }: IconPickerProps) 
             />
           </button>
         ))}
+
+        {shown.length === 1 && query.trim() && (
+          <p className="icon-picker-empty">
+            Nothing matches “{query.trim()}”. Clear the search to see them all.
+          </p>
+        )}
       </div>
     </div>
   )

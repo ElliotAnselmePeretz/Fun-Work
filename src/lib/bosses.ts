@@ -1,4 +1,5 @@
 import type { GameIconName } from '../components/GameIcon'
+import { assetUrl } from './asset'
 import type { BossHitLogEntry, Id, LogEntry } from '../types'
 import { getArmour, getRelic, getWeapon } from './shop'
 
@@ -224,7 +225,7 @@ export const BOSSES: Boss[] = [
     coinReward: 35,
     icon: 'shield',
     accent: '#4c8df6',
-    art: '/assets/bosses/sentinel.png',
+    art: assetUrl('/assets/bosses/sentinel.png'),
     pattern: ['strike'],
   },
   {
@@ -236,7 +237,7 @@ export const BOSSES: Boss[] = [
     coinReward: 55,
     icon: 'axe',
     accent: '#c0803a',
-    art: '/assets/bosses/hollow-brigand.png',
+    art: assetUrl('/assets/bosses/hollow-brigand.png'),
     pattern: ['strike', 'strike', 'heavy'],
   },
   {
@@ -248,7 +249,7 @@ export const BOSSES: Boss[] = [
     coinReward: 90,
     icon: 'castle',
     accent: '#6c5ce7',
-    art: '/assets/bosses/iron-golem.png',
+    art: assetUrl('/assets/bosses/iron-golem.png'),
     pattern: ['strike', 'brace', 'strike', 'heavy'],
   },
   {
@@ -260,7 +261,7 @@ export const BOSSES: Boss[] = [
     coinReward: 140,
     icon: 'flame',
     accent: '#3fae6b',
-    art: '/assets/bosses/mirefang.png',
+    art: assetUrl('/assets/bosses/mirefang.png'),
     pattern: ['strike', 'drain', 'strike', 'heavy'],
   },
   {
@@ -272,7 +273,7 @@ export const BOSSES: Boss[] = [
     coinReward: 210,
     icon: 'zap',
     accent: '#1cb0f6',
-    art: '/assets/bosses/storm-warden.png',
+    art: assetUrl('/assets/bosses/storm-warden.png'),
     pattern: ['strike', 'brace', 'heavy', 'strike'],
   },
   {
@@ -284,7 +285,7 @@ export const BOSSES: Boss[] = [
     coinReward: 300,
     icon: 'flame',
     accent: '#ff5a2b',
-    art: '/assets/bosses/ember-lord.png',
+    art: assetUrl('/assets/bosses/ember-lord.png'),
     pattern: ['heavy', 'strike', 'drain', 'strike'],
   },
   {
@@ -296,7 +297,7 @@ export const BOSSES: Boss[] = [
     coinReward: 390,
     icon: 'sparkles',
     accent: '#7fd8ff',
-    art: '/assets/bosses/rime-fiend.png',
+    art: assetUrl('/assets/bosses/rime-fiend.png'),
     pattern: ['strike', 'brace', 'heavy', 'brace'],
   },
   {
@@ -308,7 +309,7 @@ export const BOSSES: Boss[] = [
     coinReward: 500,
     icon: 'crown',
     accent: '#8b5cf6',
-    art: '/assets/bosses/void-king.png',
+    art: assetUrl('/assets/bosses/void-king.png'),
     pattern: ['heavy', 'drain', 'strike', 'brace'],
   },
   {
@@ -320,7 +321,7 @@ export const BOSSES: Boss[] = [
     coinReward: 700,
     icon: 'trophy',
     accent: '#ffb020',
-    art: '/assets/bosses/gilded-wyrm.png',
+    art: assetUrl('/assets/bosses/gilded-wyrm.png'),
     pattern: ['heavy', 'strike', 'brace', 'drain', 'strike'],
   },
   {
@@ -332,7 +333,7 @@ export const BOSSES: Boss[] = [
     coinReward: 1000,
     icon: 'swords',
     accent: '#ff3d6e',
-    art: '/assets/bosses/starfall-tyrant.png',
+    art: assetUrl('/assets/bosses/starfall-tyrant.png'),
     pattern: ['heavy', 'brace', 'drain', 'heavy', 'strike'],
   },
   {
@@ -344,7 +345,7 @@ export const BOSSES: Boss[] = [
     coinReward: 1300,
     icon: 'sparkles',
     accent: '#cfd8e8',
-    art: '/assets/bosses/bone-choir.png',
+    art: assetUrl('/assets/bosses/bone-choir.png'),
     pattern: ['strike', 'drain', 'heavy', 'drain', 'brace'],
   },
   {
@@ -356,7 +357,7 @@ export const BOSSES: Boss[] = [
     coinReward: 1650,
     icon: 'castle',
     accent: '#7fd8ff',
-    art: '/assets/bosses/clockwork-titan.png',
+    art: assetUrl('/assets/bosses/clockwork-titan.png'),
     pattern: ['brace', 'heavy', 'brace', 'strike', 'heavy', 'strike'],
   },
   {
@@ -368,7 +369,7 @@ export const BOSSES: Boss[] = [
     coinReward: 2100,
     icon: 'flame',
     accent: '#b23a2f',
-    art: '/assets/bosses/abyssal-maw.png',
+    art: assetUrl('/assets/bosses/abyssal-maw.png'),
     pattern: ['heavy', 'drain', 'strike', 'heavy', 'brace', 'drain'],
   },
   {
@@ -380,7 +381,7 @@ export const BOSSES: Boss[] = [
     coinReward: 3000,
     icon: 'crown',
     accent: '#ff9600',
-    art: '/assets/bosses/worldeater.png',
+    art: assetUrl('/assets/bosses/worldeater.png'),
     pattern: ['heavy', 'brace', 'drain', 'heavy', 'strike', 'drain'],
   },
 ]

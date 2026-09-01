@@ -60,6 +60,16 @@ export function ArenaScreen() {
   const reducedMotion = usePrefersReducedMotion()
   const meter = useRef<SwingMeterHandle | null>(null)
   const [selectedBossId, setSelectedBossId] = useState<string | null>(null)
+  const selectedNodeRef = useRef<HTMLButtonElement>(null)
+  // Which loadout slot's picker is open; only one at a time.
+  const [openSlot, setOpenSlot] = useState<'weapon' | 'armour' | 'relic'>()
+
+  useEffect(() => {
+    selectedNodeRef.current?.scrollIntoView({
+      block: 'nearest',
+      inline: 'center',
+    })
+  }, [selectedBossId])
   const [selectedWeaponId, setSelectedWeaponId] = useState('lucky-pouch')
   const [selectedArmourId, setSelectedArmourId] = useState('traveler-guard')
   const [selectedRelicId, setSelectedRelicId] = useState('wayfarer-ward')
@@ -230,7 +240,7 @@ export function ArenaScreen() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="screen-arena flex flex-col gap-5">
       <ScreenHeader
         title="Boss Arena"
         subtitle={`${bosses.filter((progress) => progress.defeated).length}/${bosses.length} bosses defeated`}
@@ -250,6 +260,7 @@ export function ArenaScreen() {
         {bosses.map((progress, index) => (
           <button
             key={progress.boss.id}
+            ref={progress.boss.id === selectedBossId ? selectedNodeRef : undefined}
             type="button"
             disabled={progress.locked}
             onClick={() => setSelectedBossId(progress.boss.id)}
@@ -597,20 +608,64 @@ export function ArenaScreen() {
             </div>
           )}
 
-          <div>
-            <div className="mb-3 flex items-end justify-between">
-              <div>
+          <section className="loadout-bench">
+            <div className="loadout-bench-head">
+              <div className="min-w-0">
                 <p className="section-kicker">Loadout</p>
-                <h2 className="text-xl font-black text-world">
-                  Choose your weapon
-                </h2>
+                <h2 className="loadout-bench-title">What you carry in</h2>
               </div>
               <button
                 onClick={() => navigate({ name: 'shop' })}
-                className="text-xs font-black text-beetle"
+                className="loadout-bench-link"
               >
                 Open Armory
               </button>
+            </div>
+
+            {/* The slots are the picker. Tapping one opens its list below, so
+                the equipped item is never also shown in a list beneath it. */}
+            <div className="loadout-equipped">
+              {([
+                { slot: 'weapon', label: 'Weapon', item: weapon, locked: false },
+                { slot: 'armour', label: 'Armour', item: armour, locked: lockedArmourId !== undefined },
+                { slot: 'relic', label: 'Relic', item: relic, locked: lockedRelicId !== undefined },
+              ] as const).map((entry) => (
+                <button
+                  key={entry.slot}
+                  type="button"
+                  onClick={() =>
+                    setOpenSlot((current) =>
+                      current === entry.slot ? undefined : entry.slot,
+                    )
+                  }
+                  aria-expanded={openSlot === entry.slot}
+                  className={`loadout-slot ${
+                    openSlot === entry.slot ? 'loadout-slot-open' : ''
+                  }`}
+                >
+                  <span className="loadout-slot-label">
+                    {entry.label}
+                    {entry.locked && (
+                      <GameIcon name="lock" size={10} className="ml-1 inline" />
+                    )}
+                  </span>
+                  {entry.item ? (
+                    <>
+                      <img
+                        src={entry.item.image}
+                        alt=""
+                        className={`loadout-slot-art ${entry.item.pixelArt ? 'pixel-art' : ''}`}
+                      />
+                      <span className="loadout-slot-name">{entry.item.name}</span>
+                    </>
+                  ) : (
+                    <span className="loadout-slot-empty">None</span>
+                  )}
+                  <span className="loadout-slot-change">
+                    {openSlot === entry.slot ? 'Close' : 'Change'}
+                  </span>
+                </button>
+              ))}
             </div>
 
             {advice?.best && (
@@ -680,7 +735,8 @@ export function ArenaScreen() {
               </Card>
             )}
 
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            {openSlot === 'weapon' && (
+            <div className="loadout-strip">
               {availableWeapons.map((item) => (
                 <button
                   key={item.id}
@@ -709,21 +765,16 @@ export function ArenaScreen() {
                 </button>
               ))}
             </div>
-          </div>
+            )}
 
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-black text-world">
-                Choose your armour
-              </h3>
+            {openSlot === 'armour' && (
+            <div className="loadout-strip">
               {lockedArmourId && (
-                <span className="loadout-lock">
+                <span className="loadout-lock loadout-lock-note">
                   <GameIcon name="lock" size={12} />
-                  Locked for this attempt
+                  Armour is locked until this attempt ends
                 </span>
               )}
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-2">
               {availableArmour.map((item) => (
                 <button
                   key={item.id}
@@ -752,26 +803,13 @@ export function ArenaScreen() {
                 </button>
               ))}
             </div>
-          </div>
+            )}
 
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-black text-world">
-                  Choose your relic
-                </h3>
-                <p className="text-[10px] font-bold text-white/45">
-                  Relics change your strategy instead of adding raw power.
-                </p>
-              </div>
-              {lockedRelicId && (
-                <span className="loadout-lock">
-                  <GameIcon name="lock" size={12} />
-                  Locked
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            {openSlot === 'relic' && (
+            <div className="loadout-strip">
+              <p className="loadout-group-hint w-full">
+                Relics change your strategy instead of adding raw power.
+              </p>
               {availableRelics.map((item) => (
                 <button
                   key={item.id}
@@ -800,7 +838,8 @@ export function ArenaScreen() {
                 </button>
               ))}
             </div>
-          </div>
+            )}
+          </section>
         </section>
       )}
 

@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from 'react'
+import { assetUrl } from '../lib/asset'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { GameIcon } from '../components/GameIcon'
@@ -75,7 +76,7 @@ export function ShopScreen() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="screen-armory flex flex-col gap-5">
       <ScreenHeader
         title="The Armory"
         subtitle={`${ownedCount}/${SHOP_ITEMS.length} gear pieces unlocked`}
@@ -103,13 +104,13 @@ export function ShopScreen() {
         </div>
         <div className="armory-showcase" aria-hidden="true">
           <span className="showcase-item showcase-item-back">
-            <img src="/assets/gear/armour/dragon-plate.png" alt="" />
+            <img src={assetUrl("/assets/gear/armour/dragon-plate.png")} alt="" />
           </span>
           <span className="showcase-item showcase-item-middle">
-            <img src="/assets/gear/magic/crystal-staff.png" alt="" />
+            <img src={assetUrl("/assets/gear/magic/crystal-staff.png")} alt="" />
           </span>
           <span className="showcase-item showcase-item-front">
-            <img src="/assets/gear/weapons/voidbreaker.png" alt="" />
+            <img src={assetUrl("/assets/gear/weapons/voidbreaker.png")} alt="" />
           </span>
         </div>
       </section>
@@ -149,17 +150,17 @@ export function ShopScreen() {
               aria-pressed={filter === type}
               className={filter === type ? 'gear-category-tab-active' : ''}
             >
-              <GameIcon
+              <PixelIcon
                 name={
                   type === 'weapon'
                     ? 'swords'
                     : type === 'magic'
-                      ? 'sparkles'
+                      ? 'staff'
                       : type === 'armour'
                         ? 'shield'
-                        : 'crown'
+                        : 'amulet'
                 }
-                size={17}
+                className="h-5 w-5"
               />
               {FILTER_DETAILS[type].label}
             </button>

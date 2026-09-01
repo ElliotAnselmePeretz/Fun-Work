@@ -10,6 +10,11 @@ const base = process.env.VITE_BASE_PATH ?? '/'
 // https://vite.dev/config/
 export default defineConfig({
   base,
+  server: {
+    // Vite otherwise always takes 5173, which collides when another dev server
+    // is already holding it. Honouring PORT lets a launcher assign a free one.
+    ...(process.env.PORT ? { port: Number(process.env.PORT) } : {}),
+  },
   plugins: [
     react(),
     tailwindcss(),

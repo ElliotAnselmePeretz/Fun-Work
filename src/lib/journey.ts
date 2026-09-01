@@ -1,4 +1,5 @@
 import type { Activity, ActivityProgress, Level } from '../types'
+import { assetUrl } from './asset'
 import { levelState, type LevelState } from './xp'
 
 /**
@@ -19,7 +20,7 @@ export interface Chapter {
   terrainSize?: string
 }
 
-const terrain = (id: string) => `/assets/areas/${id}.png`
+const terrain = (id: string) => assetUrl(`/assets/areas/${id}.png`)
 
 export const CHAPTERS: Chapter[] = [
   {

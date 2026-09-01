@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/asset'
 /**
  * The app's icon set: real pixel-art sprites rather than font symbols.
  *
@@ -6,6 +7,7 @@
  * plus are drawn to match, because no tile in the pack reads as either.
  */
 export const PIXEL_ICONS = [
+  'amulet',
   'book',
   'chart',
   'check',
@@ -25,7 +27,9 @@ export const PIXEL_ICONS = [
   'plus',
   'rune',
   'scroll',
+  'shield',
   'shop',
+  'staff',
   'swords',
 ] as const
 
@@ -41,7 +45,7 @@ interface PixelIconProps {
 export function PixelIcon({ name, className = 'h-5 w-5', label }: PixelIconProps) {
   return (
     <img
-      src={`/assets/ui/${name}.png`}
+      src={assetUrl(`/assets/ui/${name}.png`)}
       alt={label ?? ''}
       aria-hidden={label ? undefined : true}
       className={`pixel-art shrink-0 ${className}`}
