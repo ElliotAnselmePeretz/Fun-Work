@@ -37,6 +37,12 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
+        with:
+          # Creates the Pages site on the first run. Without this the step
+          # fails with "Get Pages site failed" on a repo where Pages has never
+          # been turned on — which is why every run so far died here, right
+          # after a successful build.
+          enablement: true
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v5
